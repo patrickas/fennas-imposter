@@ -220,6 +220,21 @@ describe('import', () => {
 })
 
 describe('test mode (dev server only)', () => {
+  it('is on by default on the dev server, so a fresh dev session deals the placeholder word straight away', () => {
+    const app = setup(memoryStorage(), 1, true)
+    withPlayers(app)
+    app.beginRound({ kind: 'random' })
+    expect(app.state.round!.secret).toEqual(TEST_SECRETS.en)
+  })
+
+  it('can be switched off on the dev server to play real words', () => {
+    const app = setup(memoryStorage(), 1, true)
+    withPlayers(app)
+    app.setTestMode(false)
+    app.beginRound({ kind: 'random' })
+    expect(app.state.round!.secret!.wordId).not.toBe(TEST_SECRETS.en.wordId)
+  })
+
   it('always deals the same fixed word, without using up the word history, so the UI can be tried again and again', () => {
     const app = setup(memoryStorage(), 1, true)
     withPlayers(app)

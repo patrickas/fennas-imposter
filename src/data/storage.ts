@@ -33,7 +33,7 @@ export interface Stored {
   lastImportUrl: string | null
   session: Session | null
   round: RoundState | null
-  /** Dev-only: deal the fixed test word (see data/testWord.ts). Absent in older documents. */
+  /** Dev-only: deal the fixed test word (see data/testWord.ts). Absent = on (dev server only); false = off. */
   testMode?: boolean
 }
 

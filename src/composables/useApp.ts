@@ -46,7 +46,8 @@ export function createAppStore(deps: AppDeps) {
 
   const content = computed(() => custom.allContent(state))
   const devTools = deps.devTools ?? false
-  const testModeActive = computed(() => devTools && state.testMode === true)
+  // On the dev server test mode is on unless explicitly switched off; production never honours it.
+  const testModeActive = computed(() => devTools && state.testMode !== false)
 
   function t(key: MessageKey, params?: Params): string {
     return translate(state.language, key, params)

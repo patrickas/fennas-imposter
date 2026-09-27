@@ -87,7 +87,7 @@ const timerEnabled = computed({
   set: (enabled: boolean) => app.updateSettings({ timer: { ...app.state.settings.timer, enabled } }),
 })
 const testMode = computed({
-  get: () => app.state.testMode === true,
+  get: () => app.state.testMode !== false, // on by default on the dev server
   set: (on: boolean) => app.setTestMode(on),
 })
 const timerSeconds = computed({
