@@ -47,11 +47,12 @@ function hideAndPass(): void {
     </template>
   </Screen>
 
-  <Screen v-else-if="round" :tone="isImposter ? 'bubblegum' : 'mint'" data-testid="card-screen">
+  <!-- Same screen, card and motion for every role: bystanders must not read a role from colour or movement. -->
+  <Screen v-else-if="round" tone="mint" data-testid="card-screen">
     <template #top>
       <Chip>{{ name }}</Chip>
     </template>
-    <StickerCard v-if="isImposter" tone="ink" motion="shake">
+    <StickerCard v-if="isImposter" motion="wobble">
       <p class="secret-word" data-testid="imposter-title">{{ app.t('reveal.imposterTitle') }}</p>
       <p v-if="round.settings.hints && round.secret" class="hint" data-testid="imposter-hint">
         {{ app.t('reveal.hint', { hint: imposterHint(round.secret) }) }}
@@ -69,5 +70,5 @@ function hideAndPass(): void {
 
 <style scoped>
 .lead { font-size: 1.3rem; font-weight: 700; }
-.hint { display: inline-block; margin-top: 12px; padding: 2px 12px; border-radius: 12px; background: var(--mint); color: var(--ink); font-weight: 700; overflow-wrap: anywhere; }
+.hint { margin-top: 12px; font-size: 1.1rem; font-weight: 700; overflow-wrap: anywhere; }
 </style>

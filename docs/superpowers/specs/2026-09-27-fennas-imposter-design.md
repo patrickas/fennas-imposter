@@ -423,7 +423,7 @@ interface RoundState {
 | ink | `#1B1036` |
 | paper | `#FFFFFF` |
 
-  Screens get a bold solid background per phase: sun for pass, bubblegum for imposter, mint or grape for crew.
+  Screens get a bold solid background per phase: sun for pass screens, mint for every card screen. **Crew and imposter card screens look identical** (same background, card and motion); only the text differs, so bystanders can't read a role from colour or movement.
 - **Sticker style:** 3 px ink outlines, hard offset shadows (`6px 6px 0 ink`), large radii (18–22 px), and slight rotations.
 - **Typography:** **Baloo Bhaijaan 2** (Latin + Arabic), self-hosted via `@fontsource`, weights 500/700/800. The secret word is shown at 40–48 px.
 - **Motion:**
@@ -432,7 +432,7 @@ interface RoundState {
   - **Stickers:** wobble.
   - **Buttons:** squish on press.
   - **Background:** drifting background shapes.
-  - **Imposter card:** shake.
+  - **Cards:** the same wobble for every role (never a role-specific motion).
   - **Confetti:** hand-rolled CSS/canvas, about 50 lines, for the winning side.
   - Only `transform` and `opacity` are animated.
   - `prefers-reduced-motion: reduce` disables looping animations and replaces pop-ins with short fades.
