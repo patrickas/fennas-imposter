@@ -4,10 +4,10 @@ import { useApp } from '../../composables/useApp'
 
 const app = useApp()
 const router = useRouter()
+// Goes Home through PlayView's "Leave the round?" guard; Home then offers "Abandon this round".
 </script>
 
 <template>
-  <!-- Goes Home through PlayView's "Leave the round?" guard; Home then offers "Abandon this round". -->
   <button
     type="button"
     class="icon-btn leave"

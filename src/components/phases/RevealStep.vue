@@ -47,8 +47,10 @@ function hideAndPass(): void {
     </template>
   </Screen>
 
-  <!-- Same screen, card and motion for every role: bystanders must not read a role from colour or movement. -->
   <Screen v-else-if="round" tone="mint" data-testid="card-screen">
+    <!-- Same screen, card and motion for every role: bystanders must not read a role from colour or movement.
+         (Comments stay inside the Screen: a root-level comment makes this a multi-root component in dev
+         builds, and <Transition mode="out-in"> then never finishes — a blank page.) -->
     <template #top>
       <Chip><bdi>{{ name }}</bdi></Chip>
     </template>
