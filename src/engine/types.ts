@@ -1,0 +1,86 @@
+export type Lang = 'en' | 'ar'
+export const LANGS: readonly Lang[] = ['en', 'ar']
+
+/** A text that may exist in English, Arabic, or both. */
+export type Localized = Partial<Record<Lang, string>>
+
+export interface Category {
+  id: string
+  name: Localized
+  builtIn: boolean
+}
+
+export interface Word {
+  id: string
+  categoryId: string
+  builtIn: boolean
+  text: Localized
+  hint: Localized
+}
+
+export interface Player {
+  id: string
+  name: string
+}
+
+export interface TimerSettings {
+  enabled: boolean
+  seconds: number
+}
+
+export interface Settings {
+  imposterCount: number
+  randomImposterCount: boolean
+  hints: boolean
+  timer: TimerSettings
+  scoring: boolean
+}
+
+export interface Content {
+  categories: Category[]
+  words: Word[]
+}
+
+export type Phase = 'gmEntry' | 'reveal' | 'discussion' | 'vote' | 'guess' | 'result'
+
+export type Source =
+  | { kind: 'random' }
+  | { kind: 'playerGm'; gmPlayerId: string }
+  | { kind: 'outsideGm' }
+
+/** Snapshot of the round's word, so later edits/deletes never change a running round. */
+export interface Secret {
+  wordId: string
+  word: string
+  hint: string | null
+  categoryName: string
+}
+
+export interface RoundSettings {
+  hints: boolean
+  scoring: boolean
+  timer: TimerSettings
+  imposterCountHidden: boolean
+}
+
+export type Outcome = 'crew' | 'imposters'
+
+/** `null` until the vote happens; `playerId: null` means the group voted out nobody. */
+export type VotedOut = { playerId: string | null } | null
+
+export interface RoundState {
+  number: number
+  lang: Lang
+  source: Source
+  participantIds: string[]
+  imposterIds: string[]
+  startingPlayerId: string
+  secret: Secret | null
+  settings: RoundSettings
+  phase: Phase
+  revealIndex: number
+  timerEndsAt: number | null
+  votedOut: VotedOut
+  imposterGuessed: boolean | null
+  outcome: Outcome | null
+}
