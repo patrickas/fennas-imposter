@@ -19,7 +19,7 @@ export interface Deal {
   hints: string[]
 }
 
-/** Passes the phone through `count` players, recording what each one saw. `onScreen` runs on every pass/card screen. */
+/** Passes the phone through `count` players, recording what each one saw, and ends on the Starting screen. `onScreen` runs on every pass/card screen. */
 export async function dealCards(page: Page, count: number, onScreen?: () => Promise<void>): Promise<Deal> {
   const deal: Deal = { imposters: [], crew: [], crewWords: [], hints: [] }
   for (let i = 0; i < count; i++) {
@@ -40,8 +40,14 @@ export async function dealCards(page: Page, count: number, onScreen?: () => Prom
     }
     await page.getByTestId('hide-pass').click()
   }
-  await expect(page.getByTestId('discussion')).toBeVisible()
+  await expect(page.getByTestId('starting')).toBeVisible()
   return deal
+}
+
+/** From the Starting screen ("X starts"): tap "Start playing" and land on the playing screen. */
+export async function startPlaying(page: Page): Promise<void> {
+  await page.getByTestId('start-playing').click()
+  await expect(page.getByTestId('discussion')).toBeVisible()
 }
 
 /** From Home: start a GM round (player GM when `gmPlayer` is given, otherwise outside GM) and submit a word in a new category. */

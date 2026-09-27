@@ -23,6 +23,7 @@ export interface StartRoundInput {
 export type RoundAction =
   | { type: 'setSecret'; secret: Secret }
   | { type: 'cardSeen'; now: number }
+  | { type: 'startPlaying'; now: number }
   | { type: 'endDiscussion' }
   | { type: 'voteOut'; playerId: string | null }
   | { type: 'imposterGuess'; correct: boolean }
@@ -86,10 +87,14 @@ export function reduce(state: RoundState, action: RoundAction): RoundState {
       expectPhase(state, 'reveal', action)
       const revealIndex = state.revealIndex + 1
       if (revealIndex < state.participantIds.length) return { ...state, revealIndex }
+      return { ...state, revealIndex, phase: 'starting' }
+    }
+
+    case 'startPlaying': {
+      expectPhase(state, 'starting', action)
       const { timer } = state.settings
       return {
         ...state,
-        revealIndex,
         phase: 'discussion',
         timerEndsAt: timer.enabled ? action.now + timer.seconds * 1000 : null,
       }

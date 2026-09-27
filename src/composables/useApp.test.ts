@@ -17,6 +17,7 @@ function revealAll(app: AppStore): void {
 }
 function playOut(app: AppStore): void {
   revealAll(app)
+  app.dispatch({ type: 'startPlaying', now: 0 })
   app.dispatch({ type: 'endDiscussion' })
   if (app.state.round!.phase === 'vote') app.dispatch({ type: 'voteOut', playerId: null })
   app.finishRound()
@@ -62,6 +63,7 @@ describe('rounds', () => {
     app.updateSettings({ scoring: true })
     app.beginRound({ kind: 'random' })
     revealAll(app)
+    app.dispatch({ type: 'startPlaying', now: 0 })
     app.dispatch({ type: 'endDiscussion' })
     const r = app.state.round!
     app.dispatch({ type: 'voteOut', playerId: r.imposterIds[0] })

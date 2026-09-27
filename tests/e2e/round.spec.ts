@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test'
-import { addPlayers, dealCards } from './helpers'
+import { addPlayers, dealCards, startPlaying } from './helpers'
 
 const PLAYERS = ['Rami', 'Lina', 'Omar', 'Sara']
 
@@ -36,6 +36,7 @@ test('a scored round: catching the imposter who then misses the word gives each 
   await page.getByTestId('play').click()
   await page.getByTestId('start-round').click()
   const deal = await dealCards(page, PLAYERS.length)
+  await startPlaying(page)
   await page.getByTestId('end-discussion').click()
   await page.getByTestId('vote-player').filter({ hasText: deal.imposters[0] }).click()
   await page.getByTestId('guess-no').click()
@@ -66,4 +67,20 @@ test('too few players blocks the round with an explanation', async ({ page }) =>
   await page.getByTestId('play').click()
   await expect(page.getByTestId('round-blocker')).toBeVisible()
   await expect(page.getByTestId('start-round')).toBeDisabled()
+})
+
+test('after the last card the starter is announced, and the timer only starts with "Start playing"', async ({ page }) => {
+  await page.goto('/')
+  await addPlayers(page, PLAYERS)
+  await page.getByTestId('nav-setup').click()
+  await page.getByTestId('toggle-timer').click()
+  await page.getByTestId('setup-done').click()
+  await page.getByTestId('play').click()
+  await page.getByTestId('start-round').click()
+  await dealCards(page, PLAYERS.length)
+  await expect(page.getByTestId('starter')).toContainText('starts')
+  await expect(page.getByTestId('timer')).toHaveCount(0)
+  await page.waitForTimeout(2_000) // the group settles down; the clock must not be running yet
+  await startPlaying(page)
+  await expect(page.getByTestId('timer')).toHaveText('3:00')
 })

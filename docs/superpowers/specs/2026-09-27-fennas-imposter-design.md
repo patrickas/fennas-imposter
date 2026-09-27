@@ -105,13 +105,17 @@ For each participant in roster order:
 
 There is no back navigation, and the card is never shown again after "Hide & pass". After the last participant, the round moves to Discussion.
 
-### 3.4 Discussion
+### 3.4 Starting and discussion
 
-- The screen shows the starting player (picked uniformly among participants) and guidance on the turn-taking.
-- It also shows the imposter count, or "?" in random mode.
-- If the timer is on, a countdown runs. When it ends, the app beeps and vibrates where the device supports it. The timer can be ended early.
-- A screen wake-lock is held during Reveal and Discussion.
-- The **"Reveal"** / **"Vote"** button ends the discussion.
+Two screens follow the last card:
+
+1. **Starting:** a card announces "**Omar** starts" / «**عمر** بيبلّش». The starting player is picked uniformly among participants. The screen also shows turn-taking guidance, the imposter count (or "?" in random mode), and a **"Start playing"** button.
+2. **Playing:** a "Playing…" card waits while the group gives clues and discusses. It shows the imposter count, and the countdown if the timer is on.
+   - **The timer starts when "Start playing" is tapped**, not at the last card, so the group can settle first.
+   - When it ends, the app beeps and vibrates where the device supports it. The timer can be ended early.
+   - The **"Reveal the imposter"** / **"Time to vote"** button ends the discussion.
+
+A screen wake-lock is held during Reveal, Starting and Playing.
 
 ### 3.5 End of round & scoring
 
@@ -358,7 +362,7 @@ interface Stored {
 ### 9.1 Round state
 
 ```ts
-type Phase = 'gmEntry' | 'reveal' | 'discussion' | 'vote' | 'guess' | 'result';
+type Phase = 'gmEntry' | 'reveal' | 'starting' | 'discussion' | 'vote' | 'guess' | 'result';
 type Source = { kind: 'random' } | { kind: 'playerGm'; gmPlayerId: string } | { kind: 'outsideGm' };
 
 interface Secret { wordId: string; word: string; hint: string | null; categoryName: string }
@@ -400,7 +404,8 @@ interface RoundState {
 |---|---|---|---|
 | gmEntry | `setSecret{secret}` | reveal | secret stored |
 | reveal | `cardSeen{now}` | reveal | `revealIndex++` |
-| reveal (last card) | `cardSeen{now}` | discussion | `timerEndsAt = timer.enabled ? now + seconds·1000 : null` |
+| reveal (last card) | `cardSeen{now}` | starting | starter announced; no timer yet |
+| starting | `startPlaying{now}` | discussion | `timerEndsAt = timer.enabled ? now + seconds·1000 : null` |
 | discussion | `endDiscussion` | vote (scoring on) / result (scoring off) | — |
 | vote | `voteOut{playerId \| null}` | guess (voted-out is imposter) / result | otherwise `outcome = 'imposters'` |
 | guess | `imposterGuess{correct}` | result | `outcome = correct ? 'imposters' : 'crew'` |

@@ -25,7 +25,8 @@ function revealAll(round: RoundState, now = 1_000): RoundState {
   for (let i = 0; i < round.participantIds.length; i++) s = reduce(s, { type: 'cardSeen', now })
   return s
 }
-const toVote = (r: RoundState) => reduce(revealAll(r), { type: 'endDiscussion' })
+const play = (r: RoundState, now = 2_000) => reduce(revealAll(r), { type: 'startPlaying', now })
+const toVote = (r: RoundState) => reduce(play(r), { type: 'endDiscussion' })
 const crewOf = (r: RoundState) => r.participantIds.find((id) => !r.imposterIds.includes(id))!
 
 describe('startRound', () => {
@@ -75,23 +76,29 @@ describe('startRound', () => {
 })
 
 describe('reduce', () => {
-  it('shows every participant exactly one card, then starts the discussion', () => {
+  it('shows every participant exactly one card, then announces who starts', () => {
     let r = start()
     for (let i = 0; i < 3; i++) r = reduce(r, { type: 'cardSeen', now: 0 })
     expect(r.phase).toBe('reveal')
     expect(r.revealIndex).toBe(3)
     r = reduce(r, { type: 'cardSeen', now: 0 })
-    expect(r.phase).toBe('discussion')
+    expect(r.phase).toBe('starting')
   })
 
-  it('stores the timer end as an absolute time so a reload can resume it', () => {
+  it('starts the discussion only when the group taps "Start playing"', () => {
+    expect(play(start()).phase).toBe('discussion')
+  })
+
+  it('starts the timer when play starts, not while the starter is being announced', () => {
     const timed = start({ settings: settings({ timer: { enabled: true, seconds: 120 } }) })
-    expect(revealAll(timed, 5_000).timerEndsAt).toBe(125_000)
-    expect(revealAll(start(), 5_000).timerEndsAt).toBeNull()
+    const announced = revealAll(timed, 5_000)
+    expect(announced.timerEndsAt).toBeNull()
+    expect(reduce(announced, { type: 'startPlaying', now: 9_000 }).timerEndsAt).toBe(129_000)
+    expect(play(start(), 9_000).timerEndsAt).toBeNull()
   })
 
   it('skips voting when scoring is off and just reveals', () => {
-    const r = reduce(revealAll(start({ settings: settings({ scoring: false }) })), { type: 'endDiscussion' })
+    const r = reduce(play(start({ settings: settings({ scoring: false }) })), { type: 'endDiscussion' })
     expect(r.phase).toBe('result')
     expect(r.outcome).toBeNull()
   })
@@ -118,8 +125,10 @@ describe('reduce', () => {
   })
 
   it('rejects actions that are out of order, loudly', () => {
-    const discussion = revealAll(start())
-    expect(() => reduce(discussion, { type: 'cardSeen', now: 0 })).toThrow(IllegalActionError)
+    const announced = revealAll(start())
+    expect(() => reduce(announced, { type: 'cardSeen', now: 0 })).toThrow(IllegalActionError)
+    expect(() => reduce(announced, { type: 'endDiscussion' })).toThrow(IllegalActionError)
+    expect(() => reduce(play(start()), { type: 'startPlaying', now: 0 })).toThrow(IllegalActionError)
     expect(() => reduce(start(), { type: 'setSecret', secret })).toThrow(IllegalActionError)
     expect(() => reduce(toVote(start()), { type: 'voteOut', playerId: 'stranger' })).toThrow(IllegalActionError)
     const result = reduce(toVote(start()), { type: 'voteOut', playerId: null })

@@ -98,8 +98,11 @@ const messages = {
   'reveal.hint': 'Hint: {hint}',
   'reveal.hidePass': 'Hide & pass',
 
-  'discussion.title': 'Discussion time',
-  'discussion.guide': '{name} starts. Everyone gives one clue in turn, then discuss and vote out who you think is the imposter.',
+  'discussion.starts': '{name} starts',
+  'discussion.guide': 'Starting with {name}, everyone gives one clue in turn. Then discuss and vote out who you think is the imposter.',
+  'discussion.startPlaying': 'Start playing',
+  'discussion.playing': 'Playing…',
+  'discussion.playingGuide': "Give your clues in turn, then discuss. Tap below when you're ready.",
   'discussion.imposters': { one: 'There is {count} imposter among you', other: 'There are {count} imposters among you' },
   'discussion.impostersHidden': 'How many imposters? Nobody knows…',
   'discussion.timeUp': "Time's up!",

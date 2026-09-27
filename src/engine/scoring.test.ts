@@ -18,7 +18,7 @@ function votingRound(opts: { scoring?: boolean; source?: Source; imposters?: num
   ).round
   if (r.phase === 'gmEntry') r = reduce(r, { type: 'setSecret', secret })
   for (let i = 0; i < r.participantIds.length; i++) r = reduce(r, { type: 'cardSeen', now: 0 })
-  return reduce(r, { type: 'endDiscussion' })
+  return reduce(reduce(r, { type: 'startPlaying', now: 0 }), { type: 'endDiscussion' })
 }
 const crew = (r: RoundState) => r.participantIds.filter((id) => !r.imposterIds.includes(id))
 

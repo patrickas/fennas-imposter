@@ -9,6 +9,7 @@ import PopButton from '../components/ui/PopButton.vue'
 import BetweenRounds from '../components/phases/BetweenRounds.vue'
 import GmEntry from '../components/phases/GmEntry.vue'
 import RevealStep from '../components/phases/RevealStep.vue'
+import StartingStep from '../components/phases/StartingStep.vue'
 import Discussion from '../components/phases/Discussion.vue'
 import VoteStep from '../components/phases/VoteStep.vue'
 import GuessStep from '../components/phases/GuessStep.vue'
@@ -19,7 +20,7 @@ const crashed = ref(false)
 const phase = computed(() => app.state.round?.phase ?? null)
 const revealKey = computed(() => `reveal-${app.state.round?.revealIndex ?? 0}`)
 
-useWakeLock(computed(() => phase.value === 'reveal' || phase.value === 'discussion'))
+useWakeLock(computed(() => phase.value === 'reveal' || phase.value === 'starting' || phase.value === 'discussion'))
 
 onErrorCaptured((error) => {
   console.error(error)
@@ -52,6 +53,7 @@ function abandon(): void {
     <BetweenRounds v-if="phase === null" key="between" />
     <GmEntry v-else-if="phase === 'gmEntry'" key="gm" />
     <RevealStep v-else-if="phase === 'reveal'" :key="revealKey" />
+    <StartingStep v-else-if="phase === 'starting'" key="starting" />
     <Discussion v-else-if="phase === 'discussion'" key="discussion" />
     <VoteStep v-else-if="phase === 'vote'" key="vote" />
     <GuessStep v-else-if="phase === 'guess'" key="guess" />

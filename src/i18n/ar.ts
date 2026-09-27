@@ -105,8 +105,11 @@ export const ar: Messages = {
   'reveal.hint': 'تلميح: {hint}',
   'reveal.hidePass': 'خبّي ومرّر',
 
-  'discussion.title': 'وقت النقاش',
-  'discussion.guide': '{name} بيبلّش. كل واحد بيعطي تلميح بدوره، وبعدين تناقشوا وصوّتوا على مين مفكرينه المندسّ.',
+  'discussion.starts': '{name} بيبلّش',
+  'discussion.guide': 'منبلّش من {name}، وكل واحد بيعطي تلميح بدوره. وبعدين تناقشوا وصوّتوا على مين مفكرينه المندسّ.',
+  'discussion.startPlaying': 'يلا نبلّش',
+  'discussion.playing': 'عم تلعبوا…',
+  'discussion.playingGuide': 'كل واحد بيعطي تلميحه بدوره، وبعدين تناقشوا. كبسوا تحت لما تكونوا جاهزين.',
   'discussion.imposters': {
     zero: 'ما في مندسّين',
     one: 'في مندسّ واحد بيناتكن',

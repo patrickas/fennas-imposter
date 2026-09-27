@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test'
-import { addPlayers, dealCards, startGmRound } from './helpers'
+import { addPlayers, dealCards, startGmRound, startPlaying } from './helpers'
 
 test('a player Game Master sits out, and their word is saved to My words', async ({ page }) => {
   page.on('dialog', (dialog) => void dialog.accept())
@@ -40,6 +40,8 @@ test('maximum-length words and names wrap instead of overflowing a small phone',
     expect(offenders, where).toEqual([])
   }
   await dealCards(page, 4, () => fitsOnScreen('pass/card'))
+  await fitsOnScreen('starting')
+  await startPlaying(page)
   await fitsOnScreen('discussion')
   await page.getByTestId('end-discussion').click()
   await fitsOnScreen('vote')

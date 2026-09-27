@@ -8,12 +8,12 @@ import Screen from '../ui/Screen.vue'
 import StickerCard from '../ui/StickerCard.vue'
 import PopButton from '../ui/PopButton.vue'
 import Chip from '../ui/Chip.vue'
+import ImposterCountChip from './ImposterCountChip.vue'
 import LeaveRoundButton from './LeaveRoundButton.vue'
 
 const app = useApp()
 const sound = useSound()
 const round = computed(() => app.state.round)
-const starter = computed(() => (round.value ? app.playerName(round.value.startingPlayerId) : ''))
 const timer = useTimer(
   () => round.value?.timerEndsAt ?? null,
   () => {
@@ -39,18 +39,17 @@ function end(): void {
   <Screen v-if="round" tone="sun" data-testid="discussion" @pointerdown="sound.prime()">
     <template #top>
       <Chip>{{ app.t('play.round', { n: round.number }) }}</Chip>
-      <Chip data-testid="imposter-count">
-        {{ round.settings.imposterCountHidden
-          ? app.t('discussion.impostersHidden')
-          : app.t('discussion.imposters', { count: round.imposterIds.length }) }}
-      </Chip>
+      <ImposterCountChip />
       <LeaveRoundButton />
     </template>
-    <h2 class="center">{{ app.t('discussion.title') }}</h2>
+    <!-- Waits here while the group plays: clues go round, then the discussion. -->
     <StickerCard motion="wobble">
-      <span class="title-xl" data-testid="starter">{{ starter }}</span>
+      <p class="title-xl" data-testid="playing">{{ app.t('discussion.playing') }}</p>
+      <span class="dots" aria-hidden="true">
+        <span class="dot anim-loop" /><span class="dot anim-loop" /><span class="dot anim-loop" />
+      </span>
     </StickerCard>
-    <p class="guide">{{ app.t('discussion.guide', { name: starter }) }}</p>
+    <p class="guide">{{ app.t('discussion.playingGuide') }}</p>
     <div v-if="timer.active" class="timer" :class="{ ended: timer.ended }" data-testid="timer">
       {{ timer.ended ? app.t('discussion.timeUp') : formatClock(timer.secondsLeft) }}
     </div>
@@ -70,4 +69,9 @@ function end(): void {
   font-size: 2.2rem; font-weight: 800; text-align: center; font-variant-numeric: tabular-nums; direction: ltr;
 }
 .timer.ended { background: var(--bubblegum); }
+.dots { display: inline-flex; gap: 10px; margin-top: 12px; }
+.dot { width: 14px; height: 14px; border: 2px solid var(--ink); border-radius: 50%; background: var(--grape); animation: dot-bounce 1.2s ease-in-out infinite; }
+.dot:nth-child(2) { background: var(--bubblegum); animation-delay: 0.15s; }
+.dot:nth-child(3) { background: var(--mint); animation-delay: 0.3s; }
+@keyframes dot-bounce { 0%, 80%, 100% { transform: translateY(0); } 40% { transform: translateY(-10px); } }
 </style>

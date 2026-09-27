@@ -1,5 +1,5 @@
 import { expect, test, type Locator, type Page } from '@playwright/test'
-import { addPlayers, dealCards } from './helpers'
+import { addPlayers, dealCards, startPlaying } from './helpers'
 
 // A tap that lands twice — a double tap, or an impatient re-tap — must never fall through to the
 // button that appears in the same spot on the next screen. Falling through shows a card to the
@@ -54,7 +54,7 @@ test('re-tapping "Hide & pass" never shows the next player\'s card', async ({ pa
   await expect(page.getByTestId('card-screen')).toHaveCount(0)
 })
 
-test('re-tapping the last "Hide & pass" does not skip the discussion', async ({ page }) => {
+test('re-tapping the last "Hide & pass" does not skip the starter announcement', async ({ page }) => {
   await startRound(page)
   for (let i = 0; i < PLAYERS.length - 1; i++) {
     await page.getByTestId('show-card').click()
@@ -62,14 +62,15 @@ test('re-tapping the last "Hide & pass" does not skip the discussion', async ({ 
     await expect(page.getByTestId('pass-screen')).toBeVisible()
   }
   await page.getByTestId('show-card').click()
-  await tapThenRetap(page, page.getByTestId('hide-pass'), page.getByTestId('end-discussion'))
+  await tapThenRetap(page, page.getByTestId('hide-pass'), page.getByTestId('start-playing'))
   await settle(page)
-  await expect(page.getByTestId('discussion')).toBeVisible()
+  await expect(page.getByTestId('starting')).toBeVisible()
 })
 
 test('re-tapping "Time to vote" does not vote "Nobody" for the group', async ({ page }) => {
   await startRound(page, { scoring: true })
   await dealCards(page, PLAYERS.length)
+  await startPlaying(page)
   await tapThenRetap(page, page.getByTestId('end-discussion'), page.getByTestId('vote-nobody'))
   await settle(page)
   await expect(page.getByTestId('vote')).toBeVisible()
@@ -78,8 +79,17 @@ test('re-tapping "Time to vote" does not vote "Nobody" for the group', async ({ 
 test('re-tapping "Nobody" does not skip past the result', async ({ page }) => {
   await startRound(page, { scoring: true })
   await dealCards(page, PLAYERS.length)
+  await startPlaying(page)
   await page.getByTestId('end-discussion').click()
   await tapThenRetap(page, page.getByTestId('vote-nobody'), page.getByTestId('next-round'))
   await settle(page)
   await expect(page.getByTestId('result')).toBeVisible()
+})
+
+test('re-tapping "Start playing" does not end the discussion straight away', async ({ page }) => {
+  await startRound(page)
+  await dealCards(page, PLAYERS.length)
+  await tapThenRetap(page, page.getByTestId('start-playing'), page.getByTestId('end-discussion'))
+  await settle(page)
+  await expect(page.getByTestId('discussion')).toBeVisible()
 })

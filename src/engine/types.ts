@@ -41,7 +41,8 @@ export interface Content {
   words: Word[]
 }
 
-export type Phase = 'gmEntry' | 'reveal' | 'discussion' | 'vote' | 'guess' | 'result'
+/** 'starting' announces who starts; the discussion (and its timer) begins on "Start playing". */
+export type Phase = 'gmEntry' | 'reveal' | 'starting' | 'discussion' | 'vote' | 'guess' | 'result'
 
 export type Source =
   | { kind: 'random' }
