@@ -1,0 +1,33 @@
+services:
+  web:
+    build:
+      context: ./containers
+      dockerfile: web.Containerfile
+    image: localhost/fennas-imposter-web
+    working_dir: /app
+    command: sh -c "bun install && bun run dev"
+    ports:
+      - "5180:5173" # host 5173 is taken by another project (arachne-vite)
+      - "4180:4173"
+    volumes:
+      - .:/app
+      - /app/node_modules
+
+  e2e:
+    build:
+      context: ./containers
+      dockerfile: e2e.Containerfile
+    image: localhost/fennas-imposter-e2e
+    working_dir: /app
+    ipc: host # Playwright's recommendation: Chromium can run out of shared memory without it
+    command: sh -c "bun install && bun run test:e2e"
+    environment:
+      CI: "true"
+    volumes:
+      - .:/app
+      - e2e_node_modules:/app/node_modules
+      - bun_cache:/root/.bun/install/cache
+
+volumes:
+  e2e_node_modules:
+  bun_cache:
