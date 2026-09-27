@@ -47,3 +47,12 @@ test('the dev-only test mode is never offered in the production build', async ({
   await expect(page.getByTestId('toggle-scoring')).toBeVisible()
   await expect(page.getByTestId('toggle-test-mode')).toHaveCount(0)
 })
+
+test('the discussion timer cannot be set below 1 minute (spec: 1–10 min)', async ({ page }) => {
+  await page.goto('/')
+  await page.getByTestId('nav-setup').click()
+  await page.getByTestId('toggle-timer').click()
+  const dec = page.getByTestId('timer-seconds-dec')
+  while (await dec.isEnabled()) await dec.click()
+  await expect(page.getByTestId('timer-seconds-value')).toHaveText('1:00')
+})

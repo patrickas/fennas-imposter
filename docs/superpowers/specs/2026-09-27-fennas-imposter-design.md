@@ -99,11 +99,17 @@ For each participant in roster order:
 
 1. **Pass screen:** "Pass the phone to **Name**", with guidance. Button: "I'm Name — show me".
 2. **Card screen:**
-   - **Crew** see the word, with crew guidance.
-   - **Imposters** see "You're the imposter!", with imposter guidance. If hints are on, they also see the hint: the word's per-word hint in the round language, falling back to the category name in that language.
+   - Both cards have the same two-line layout, so the card's shape never gives a role away:
+
+     | Role | Title line | Second line |
+     |---|---|---|
+     | Crew | "The secret word is" | the word |
+     | Imposter | "You're the imposter!" | the hint (per-word hint in the round language, falling back to the category name) — or "No hint this time" when hints are off |
+
+   - Each role gets its own guidance text below the card.
 3. **"Hide & pass"** hides the card and advances to the next participant.
 
-There is no back navigation, and the card is never shown again after "Hide & pass". After the last participant, the round moves to Discussion.
+There is no back navigation, and the card is never shown again after "Hide & pass". After the last participant, the round moves to Starting (§3.4).
 
 ### 3.4 Starting and discussion
 
@@ -355,7 +361,7 @@ interface Stored {
 |---|---|
 | `localStorage` unavailable or quota exceeded | Keep running in memory. Show a persistent banner: "Can't save on this device — changes will be lost when the app closes". |
 | Stored JSON corrupt / fails validation | Copy the raw string to `fennas-imposter:corrupt:<timestamp>`, start with defaults, and show a notice. |
-| Stored `version` newer than the app knows | Don't overwrite it. Run in memory with a notice to reload/update the app. |
+| Stored `version` newer than the app knows | Don't overwrite it. Run in memory with a persistent (not dismissible) notice to reload/update the app. |
 
 ## 9. Engine
 
@@ -513,6 +519,7 @@ interface RoundState {
 | `lint` | `eslint` (Bun runtime) |
 
 - All installs, builds and tests run inside the containers.
+- **Test mode (dev server only):** a Setup toggle, shown only on the Vite dev server, makes every random round deal the fixed word "Secret word" / hint "Secret hint" / category "Category" (Arabic «كلمة سرّية» / «تلميح سرّي» / «فئة») without touching the used-word history, so the UI can be exercised repeatedly. Production builds never show or honour it.
 
 ## 14. Testing
 

@@ -68,6 +68,11 @@ describe('parsePack', () => {
 })
 
 describe('planImport', () => {
+  it('still imports old backups with a 30-second timer, raised to the 1-minute minimum', () => {
+    const p = valid(pack({ settings: { ...defaultSettings(), timer: { enabled: true, seconds: 30 } } }))
+    expect(p.settings!.timer).toEqual({ enabled: true, seconds: 60 })
+  })
+
   it('counts additions and updates, merging by id so re-importing refreshes', () => {
     const first = planImport(valid(pack()), emptyTarget(), 'url', newId)
     expect(first.summary).toMatchObject({ addCategories: 1, addWords: 2, updateWords: 0 })
@@ -136,6 +141,22 @@ describe('parseJsonText / readPackFile', () => {
 })
 
 describe('fetchPackJson', () => {
+  it('stops downloading once a pack passes 1 MB, instead of reading the whole body first', async () => {
+    let pulled = 0
+    const chunk = new Uint8Array(64 * 1024).fill(32)
+    const body = new ReadableStream<Uint8Array>({
+      pull(controller) {
+        pulled++
+        if (pulled > 200) controller.close() // ~12.8 MB in total if read to the end
+        else controller.enqueue(chunk)
+      },
+    })
+    const huge: FetchFn = async () => new Response(body, { status: 200 })
+    const result = await fetchPackJson('https://example.com/p.json', { fetch: huge, isOnline: () => true, timeoutMs: 10_000 })
+    expect(result).toEqual({ ok: false, error: 'tooLarge' })
+    expect(pulled).toBeLessThan(40)
+  })
+
   const deps = (fetchImpl: FetchFn, online = true): FetchDeps => ({ fetch: fetchImpl, isOnline: () => online, timeoutMs: 20 })
   const ok = (body: string, init: ResponseInit = {}) => async () => new Response(body, { status: 200, ...init })
   const never: FetchFn = async () => { throw new Error('must not be called') }

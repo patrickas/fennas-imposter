@@ -261,7 +261,10 @@ export function createAppStore(deps: AppDeps) {
 
   function applyImport(plan: ImportPlan): void {
     applyCustom(plan.result)
+    const known = new Set(state.players.map((p) => p.id))
+    const added = plan.result.players.filter((p) => !known.has(p.id)).map((p) => p.id)
     state.players = plan.result.players
+    state.activePlayerIds = [...state.activePlayerIds, ...added] // imported players play, like typed-in ones
     state.settings = plan.result.settings
     persist()
   }

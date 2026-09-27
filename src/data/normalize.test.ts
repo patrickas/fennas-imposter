@@ -3,6 +3,17 @@ import { cleanLocalized, cleanText, normalizeText } from './normalize'
 import { textLength } from './limits'
 
 describe('normalizeText (used for matching only, never shown)', () => {
+  it('ignores invisible direction marks that sneak in with copy-paste (e.g. from WhatsApp)', () => {
+    expect(normalizeText('‏Rami‎')).toBe('rami')
+    expect(normalizeText('Ra​mi')).toBe('rami')
+    expect(normalizeText('⁧احمد⁩')).toBe('احمد')
+  })
+
+  it('treats Persian ی and ک as Arabic ي and ك, since both keyboards are common', () => {
+    expect(normalizeText('علی')).toBe(normalizeText('علي'))
+    expect(normalizeText('کمال')).toBe(normalizeText('كمال'))
+  })
+
   it('ignores case and extra whitespace', () => {
     expect(normalizeText('  Falafel   Wrap ')).toBe(normalizeText('falafel wrap'))
   })

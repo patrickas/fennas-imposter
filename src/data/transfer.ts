@@ -1,7 +1,7 @@
 import { LANGS, type Category, type Localized, type Player, type Settings, type Word } from '../engine/types'
 import { SEED_CATEGORY_IDS, SEED_WORD_IDS } from './seed'
 import { cleanLocalized, cleanText, normalizeText } from './normalize'
-import { LIMITS, MAX_IMPOSTER_SETTING, TIMER, textLength } from './limits'
+import { LIMITS, MAX_IMPOSTER_SETTING, OLDEST_TIMER_MIN, TIMER, textLength } from './limits'
 import type { Stored } from './storage'
 
 export const PACK_FORMAT = 'fennas-imposter'
@@ -96,7 +96,7 @@ function readSettings(v: unknown, fail: Fail): Settings | null {
     isRecord(t) &&
     typeof t.enabled === 'boolean' &&
     Number.isInteger(t.seconds) &&
-    (t.seconds as number) >= TIMER.min &&
+    (t.seconds as number) >= OLDEST_TIMER_MIN &&
     (t.seconds as number) <= TIMER.max &&
     (t.seconds as number) % TIMER.step === 0
   if (!valid) {
@@ -108,7 +108,7 @@ function readSettings(v: unknown, fail: Fail): Settings | null {
     randomImposterCount: v.randomImposterCount as boolean,
     hints: v.hints as boolean,
     scoring: v.scoring as boolean,
-    timer: { enabled: t.enabled as boolean, seconds: t.seconds as number },
+    timer: { enabled: t.enabled as boolean, seconds: Math.max(TIMER.min, t.seconds as number) },
   }
 }
 
@@ -303,6 +303,31 @@ export async function readPackFile(file: Blob): Promise<FetchResult> {
   return parseJsonText(await file.text())
 }
 
+/** Reads the body but stops (and cancels the download) as soon as it passes MAX_PACK_BYTES. */
+async function readCapped(res: Response): Promise<string | null> {
+  if (!res.body) return res.text()
+  const reader = res.body.getReader()
+  const chunks: Uint8Array[] = []
+  let size = 0
+  for (;;) {
+    const { done, value } = await reader.read()
+    if (done) break
+    size += value.byteLength
+    if (size > MAX_PACK_BYTES) {
+      await reader.cancel()
+      return null
+    }
+    chunks.push(value)
+  }
+  const bytes = new Uint8Array(size)
+  let offset = 0
+  for (const chunk of chunks) {
+    bytes.set(chunk, offset)
+    offset += chunk.byteLength
+  }
+  return new TextDecoder().decode(bytes)
+}
+
 export async function fetchPackJson(url: string, deps: FetchDeps = defaultFetchDeps()): Promise<FetchResult> {
   let parsed: URL
   try {
@@ -319,7 +344,8 @@ export async function fetchPackJson(url: string, deps: FetchDeps = defaultFetchD
     const res = await deps.fetch(parsed.href, { cache: 'no-store', signal: controller.signal })
     if (!res.ok) return { ok: false, error: 'httpStatus', status: res.status }
     if (Number(res.headers.get('content-length') ?? 0) > MAX_PACK_BYTES) return { ok: false, error: 'tooLarge' }
-    return parseJsonText(await res.text())
+    const text = await readCapped(res)
+    return text === null ? { ok: false, error: 'tooLarge' } : parseJsonText(text)
   } catch {
     if (controller.signal.aborted) return { ok: false, error: 'timeout' }
     return { ok: false, error: deps.isOnline() ? 'network' : 'offline' }

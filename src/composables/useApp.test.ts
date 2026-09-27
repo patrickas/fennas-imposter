@@ -49,6 +49,24 @@ describe('persistence', () => {
 })
 
 describe('rounds', () => {
+  it('deleting one GM word filed under a built-in category keeps the running round, and it is never dealt again', () => {
+    const app = setup()
+    withPlayers(app)
+    for (const id of [...app.state.selectedCategoryIds]) if (id !== 'food') app.toggleCategory(id)
+    app.beginRound({ kind: 'outsideGm' })
+    app.submitGmWord({ lang: 'en', word: 'Mansaf', hint: '', category: { existingId: 'food' } })
+    const wordId = app.state.round!.secret!.wordId
+    app.deleteCustomWord(wordId)
+    expect(app.state.round!.secret!.word).toBe('Mansaf')
+    expect(app.state.selectedCategoryIds).toContain('food')
+    playOut(app)
+    for (let i = 0; i < 30; i++) {
+      app.beginRound({ kind: 'random' })
+      expect(app.state.round!.secret!.wordId).not.toBe(wordId)
+      playOut(app)
+    }
+  })
+
   it("uses the Game Master's typed hint for the round even when the word already exists with its own hint", () => {
     const app = setup()
     withPlayers(app)
@@ -175,6 +193,17 @@ describe('rounds', () => {
 })
 
 describe('import', () => {
+  it('ticks imported players as playing, like players typed in by hand', () => {
+    const app = setup()
+    const preview = app.previewImport({
+      format: 'fennas-imposter', version: 1, categories: [], words: [], players: [{ name: 'Rami' }, { name: 'Lina' }],
+    }, 'file')
+    if (!preview.ok) throw new Error('preview failed')
+    app.applyImport(preview.plan)
+    expect(app.state.activePlayerIds).toEqual(app.state.players.map((p) => p.id))
+    expect(app.state.players).toHaveLength(2)
+  })
+
   it('applies a previewed import and makes its new categories playable', () => {
     const app = setup()
     const preview = app.previewImport({

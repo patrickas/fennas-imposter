@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'bun:test'
 import { SEED_CATEGORIES } from './seed'
 import {
-  STORAGE_KEY, defaultStored, loadStored, memoryStorage, saveStored, upgrade, type StorageLike,
+  STORAGE_KEY, browserStorage, defaultStored, loadStored, memoryStorage, saveStored, upgrade, type StorageLike,
 } from './storage'
 
 describe('loadStored', () => {
@@ -73,5 +73,24 @@ describe('upgrade', () => {
 
   it('throws when a migration step is missing rather than guessing', () => {
     expect(() => upgrade({ version: 0 }, {}, 1)).toThrow()
+  })
+})
+
+describe('browserStorage', () => {
+  it('still reads saved data when the browser refuses writes (storage full), instead of starting empty', () => {
+    const saved = defaultStored()
+    saved.players = [{ id: 'p1', name: 'Rami' }]
+    const full = {
+      getItem: () => JSON.stringify(saved),
+      setItem: () => { throw new Error('QuotaExceededError') },
+      removeItem: () => {},
+    } as unknown as Storage
+    const storage = browserStorage(() => full)
+    expect(storage).not.toBeNull()
+    expect(loadStored(storage, 1).stored.players).toEqual(saved.players)
+  })
+
+  it('reports storage as unavailable when it cannot even be read (e.g. blocked)', () => {
+    expect(browserStorage(() => { throw new Error('SecurityError') })).toBeNull()
   })
 })

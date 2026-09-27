@@ -28,6 +28,9 @@ export function normalizeText(s: string): string {
       .replace(/[أإآ]/g, 'ا')
       .replace(/ة/g, 'ه')
       .replace(/ى/g, 'ي')
+      .replace(/[​-‏‪-‮⁦-⁩﻿]/g, '') // invisible direction/format marks
+      .replace(/ی/g, 'ي') // Persian yeh
+      .replace(/ک/g, 'ك') // Persian kaf
       .toLowerCase(),
   )
 }

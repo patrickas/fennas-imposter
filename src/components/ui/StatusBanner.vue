@@ -6,10 +6,11 @@ import type { MessageKey } from '../../i18n'
 const app = useApp()
 const message = computed<MessageKey | null>(() => {
   const { status, noticeDismissed } = app.meta
-  if (status === 'unavailable') return 'storage.unavailable' // persistent: never dismissible
+  // Persistent while nothing can be saved: never dismissible.
+  if (status === 'unavailable') return 'storage.unavailable'
+  if (status === 'newer') return 'storage.newer'
   if (noticeDismissed) return null
   if (status === 'corrupt') return 'storage.corrupt'
-  if (status === 'newer') return 'storage.newer'
   return null
 })
 </script>
@@ -17,7 +18,7 @@ const message = computed<MessageKey | null>(() => {
 <template>
   <div v-if="message" class="banner" role="alert" data-testid="status-banner">
     <span>{{ app.t(message) }}</span>
-    <button v-if="app.meta.status !== 'unavailable'" type="button" class="dismiss" @click="app.dismissNotice()">
+    <button v-if="app.meta.status === 'corrupt'" type="button" class="dismiss" @click="app.dismissNotice()">
       {{ app.t('common.dismiss') }}
     </button>
   </div>

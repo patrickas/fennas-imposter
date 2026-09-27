@@ -59,6 +59,7 @@ test('an Arabic round is right-to-left and deals Arabic words', async ({ page })
   const deal = await dealCards(page, 3)
   await expect(page.locator('html')).toHaveAttribute('dir', 'rtl')
   expect(deal.crewWords[0]).toMatch(/[؀-ۿ]/)
+  expect(deal.hints[0]).toMatch(/^تلميح: .*[\u0600-\u06FF]/) // spec §14 e2e #2: the Arabic hint
 })
 
 test('too few players blocks the round with an explanation', async ({ page }) => {

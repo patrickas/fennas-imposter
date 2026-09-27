@@ -175,12 +175,14 @@ export function saveStored(storage: StorageLike | null, stored: Stored): boolean
   }
 }
 
-export function browserStorage(): StorageLike | null {
+/**
+ * The browser's localStorage if it can at least be read. A storage that refuses writes (quota full)
+ * is still returned so saved data loads; the first failed save then flips the app to "can't save".
+ */
+export function browserStorage(get: () => Storage = () => window.localStorage): StorageLike | null {
   try {
-    const s = window.localStorage
-    const probe = `${STORAGE_KEY}:probe`
-    s.setItem(probe, '1')
-    s.removeItem(probe)
+    const s = get()
+    s.getItem(STORAGE_KEY)
     return s
   } catch {
     return null
