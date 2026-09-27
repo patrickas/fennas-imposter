@@ -11,3 +11,35 @@ export async function addPlayers(page: Page, names: readonly string[], opts: { s
   if (opts.scoring) await page.getByTestId('toggle-scoring').click()
   await page.getByTestId('setup-done').click()
 }
+
+export interface Deal {
+  imposters: string[]
+  crew: string[]
+  crewWords: string[]
+  hints: string[]
+}
+
+/** Passes the phone through `count` players, recording what each one saw. `onScreen` runs on every pass/card screen. */
+export async function dealCards(page: Page, count: number, onScreen?: () => Promise<void>): Promise<Deal> {
+  const deal: Deal = { imposters: [], crew: [], crewWords: [], hints: [] }
+  for (let i = 0; i < count; i++) {
+    await expect(page.getByTestId('pass-screen')).toBeVisible()
+    const name = (await page.getByTestId('pass-name').innerText()).trim()
+    if (onScreen) await onScreen()
+    await page.getByTestId('show-card').click()
+    await expect(page.getByTestId('card-screen')).toBeVisible()
+    if (onScreen) await onScreen()
+    if ((await page.getByTestId('imposter-title').count()) > 0) {
+      deal.imposters.push(name)
+      if ((await page.getByTestId('imposter-hint').count()) > 0) {
+        deal.hints.push((await page.getByTestId('imposter-hint').innerText()).trim())
+      }
+    } else {
+      deal.crew.push(name)
+      deal.crewWords.push((await page.getByTestId('secret-word').innerText()).trim())
+    }
+    await page.getByTestId('hide-pass').click()
+  }
+  await expect(page.getByTestId('discussion')).toBeVisible()
+  return deal
+}
