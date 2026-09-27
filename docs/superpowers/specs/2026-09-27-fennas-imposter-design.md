@@ -267,7 +267,7 @@ Each scoreboard row keeps a snapshot of the player's name:
 
 ## 7. Architecture
 
-Stack: **Vue 3 + TypeScript + Vite**, `vue-router` (hash history), `vite-plugin-pwa`, `@fontsource` (self-hosted font). No Pinia, no vue-i18n, no animation library.
+Stack: **Vue 3 + TypeScript + Vite on Bun**, `vue-router` (hash history), `vite-plugin-pwa`, `@fontsource` (self-hosted font). No Pinia, no vue-i18n, no animation library.
 
 ```
 UI (Vue SFCs)        views/, components/      renders state, dispatches actions
@@ -282,7 +282,7 @@ Dependencies point downward only. The engine is deterministic given its inputs, 
 ### 7.1 Repository layout
 
 ```
-compose.yaml  package.json  pnpm-lock.yaml  vite.config.ts  playwright.config.ts
+compose.yaml  containers/  package.json  bun.lock  bunfig.toml  vite.config.ts  playwright.config.ts
 tsconfig*.json  index.html  .gitignore
 public/                 CNAME, icons (svg + png 192/512/maskable)
 src/
@@ -428,7 +428,7 @@ interface RoundState {
 - **Typography:** **Baloo Bhaijaan 2** (Latin + Arabic), self-hosted via `@fontsource`, weights 500/700/800. The secret word is shown at 40–48 px.
 - **Motion:**
   - CSS keyframes and Vue `<Transition>` only.
-  - **Phase changes:** pop-in (scale + rotate overshoot).
+  - **Phase changes:** pop-in (fade + vertical bounce). Whole screens never scale or rotate, because that overflows the viewport sideways.
   - **Stickers:** wobble.
   - **Buttons:** squish on press.
   - **Background:** drifting background shapes.
@@ -472,7 +472,7 @@ interface RoundState {
 
 ## 12. Deployment
 
-- `pnpm build` produces a static `dist/` served at the root path (`base: '/'`).
+- `bun run build` produces a static `dist/` served at the root path (`base: '/'`).
 - The GitHub Actions workflow `.github/workflows/deploy.yml` builds on push to `main` and deploys to **GitHub Pages**.
 - `public/CNAME` contains `fennas-game.abisalloum.com`.
 - **Manual steps for the user:**
@@ -484,22 +484,28 @@ interface RoundState {
 
 ## 13. Development environment
 
+- **Toolchain: Bun ≥ 1.4 (pinned 1.4.2), with Node only where a tool can't run on Bun.**
+  - **Bun runs:** install (`bun.lock`), scripts, unit tests (`bun test`), and Vite, ESLint and icon generation on the Bun runtime (`bunx --bun`).
+  - **Node 24 runs only two tools**, both verified in a dry run:
+    - `vue-tsc`: on the Bun runtime it cannot resolve `.vue` imports.
+    - Playwright's test runner: Playwright does not support Bun as its runtime.
 - `compose.yaml` (podman compose), with the repo bind-mounted at `/app`:
   - **`web` service:**
-    - `node:24` (current LTS); pnpm via corepack.
-    - Command: `pnpm dev --host 0.0.0.0`, on port `5173:5173`.
-    - `node_modules` lives in a **named volume** so Linux native binaries (esbuild/rollup) never mix with Windows ones.
-  - **`e2e` service:** the official `mcr.microsoft.com/playwright` image, pinned to the version in `package.json`. It runs `pnpm test:e2e` against `vite preview`, because the service worker only exists in production builds.
+    - Image built from `containers/web.Containerfile`: `node:24` plus the Bun 1.4.2 binary.
+    - Command: `bun install && bun run dev`, on port `5173:5173`.
+    - `node_modules` lives in a **container volume** so Linux native binaries never mix with Windows ones.
+  - **`e2e` service:** image built from `containers/e2e.Containerfile`, which is the official Playwright image (pinned to the version in `package.json`) plus Bun. It runs `bun run test:e2e` against `vite preview`, because the service worker only exists in production builds.
 - **Scripts:**
 
 | Script | Runs |
 |---|---|
-| `dev` | Vite dev server |
-| `build` | `vue-tsc --noEmit` then `vite build` |
-| `preview` | `vite preview` |
-| `test` | `vitest run` |
-| `test:e2e` | `playwright test` |
-| `lint` | `eslint` |
+| `dev` | Vite dev server (Bun runtime) |
+| `typecheck` | `vue-tsc --noEmit` over the app, test and node configs (Node runtime) |
+| `build` | `typecheck` then `vite build` (Bun runtime) |
+| `preview` | `vite preview` (Bun runtime) |
+| `test` | `bun test` |
+| `test:e2e` | `playwright test` (Node runtime) |
+| `lint` | `eslint` (Bun runtime) |
 
 - All installs, builds and tests run inside the containers.
 
@@ -507,7 +513,7 @@ interface RoundState {
 
 Tests encode *why* a rule exists, not only what the code does.
 
-**Unit tests (Vitest), colocated `*.test.ts`:**
+**Unit tests (`bun test`), colocated `*.test.ts`:**
 
 | Area | Tests |
 |---|---|
