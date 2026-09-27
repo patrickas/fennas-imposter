@@ -4,8 +4,10 @@ import { RouterView } from 'vue-router'
 import { useApp } from './composables/useApp'
 import { dirFor } from './i18n'
 import StatusBanner from './components/ui/StatusBanner.vue'
+import { usePwaUpdate } from './composables/usePwaUpdate'
 
 const app = useApp()
+usePwaUpdate()
 
 watchEffect(() => {
   document.documentElement.lang = app.state.language

@@ -10,7 +10,8 @@
     "preview": "bunx --bun vite preview",
     "test": "bun test",
     "test:e2e": "playwright test",
-    "lint": "bunx --bun eslint ."
+    "lint": "bunx --bun eslint .",
+    "icons": "bunx --bun pwa-assets-generator"
   },
   "dependencies": {
     "@fontsource/baloo-bhaijaan-2": "5.3.0",
@@ -21,6 +22,7 @@
     "@playwright/test": "1.63.0",
     "@types/bun": "1.4.2",
     "@types/node": "24.19.0",
+    "@vite-pwa/assets-generator": "1.0.4",
     "@vitejs/plugin-vue": "6.0.9",
     "@vue/eslint-config-typescript": "14.9.0",
     "@vue/tsconfig": "0.9.1",
@@ -28,6 +30,8 @@
     "eslint-plugin-vue": "10.11.1",
     "typescript": "~6.0.3",
     "vite": "8.3.1",
-    "vue-tsc": "3.3.11"
+    "vite-plugin-pwa": "1.3.0",
+    "vue-tsc": "3.3.11",
+    "workbox-window": "7.4.1"
   }
 }

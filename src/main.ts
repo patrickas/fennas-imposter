@@ -12,3 +12,6 @@ import App from './App.vue'
 import { router } from './router'
 
 createApp(App).use(router).mount('#app')
+
+// Ask the browser not to evict our localStorage under pressure (spec §8). Unsupported → no-op.
+void navigator.storage?.persist?.().catch(() => false)

@@ -4,6 +4,7 @@ import { useApp } from '../composables/useApp'
 import Screen from '../components/ui/Screen.vue'
 import StickerCard from '../components/ui/StickerCard.vue'
 import PopButton from '../components/ui/PopButton.vue'
+import UpdatePrompt from '../components/ui/UpdatePrompt.vue'
 import LanguageSwitch from '../components/ui/LanguageSwitch.vue'
 
 const app = useApp()
@@ -20,6 +21,7 @@ function play(): void {
     <template #top>
       <LanguageSwitch />
     </template>
+    <UpdatePrompt />
     <StickerCard motion="wobble">
       <h1 class="title-xl">{{ app.t('app.title') }}</h1>
     </StickerCard>

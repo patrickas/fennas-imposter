@@ -8,6 +8,7 @@ import { LIMITS, TIMER } from '../data/limits'
 import { formatClock } from '../i18n'
 import Screen from '../components/ui/Screen.vue'
 import PopButton from '../components/ui/PopButton.vue'
+import UpdatePrompt from '../components/ui/UpdatePrompt.vue'
 import Toggle from '../components/ui/Toggle.vue'
 import Stepper from '../components/ui/Stepper.vue'
 import LanguageSwitch from '../components/ui/LanguageSwitch.vue'
@@ -102,6 +103,7 @@ function done(): void {
       <LanguageSwitch />
     </template>
 
+    <UpdatePrompt />
     <section class="panel stack">
       <h2>{{ app.t('setup.players') }}</h2>
       <p>{{ app.t('setup.activeCount', { count: app.state.activePlayerIds.length }) }}</p>
