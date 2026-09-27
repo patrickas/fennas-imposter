@@ -1,3 +1,24 @@
+<script setup lang="ts">
+import { watchEffect } from 'vue'
+import { RouterView } from 'vue-router'
+import { useApp } from './composables/useApp'
+import { dirFor } from './i18n'
+import StatusBanner from './components/ui/StatusBanner.vue'
+
+const app = useApp()
+
+watchEffect(() => {
+  document.documentElement.lang = app.state.language
+  document.documentElement.dir = dirFor(app.state.language)
+  document.title = app.t('app.title')
+})
+</script>
+
 <template>
-  <h1>Fenna's Imposter</h1>
+  <StatusBanner />
+  <RouterView v-slot="{ Component }">
+    <Transition name="pop" mode="out-in">
+      <component :is="Component" />
+    </Transition>
+  </RouterView>
 </template>

@@ -1,0 +1,31 @@
+:root {
+  --sun: #ffe14d;
+  --bubblegum: #ff5da2;
+  --grape: #6c4dff;
+  --mint: #00c2a8;
+  --tangerine: #ff7a00;
+  --ink: #1b1036;
+  --paper: #ffffff;
+  --danger-text: #9b0036;
+
+  --outline: 3px solid var(--ink);
+  --shadow-x: 6px;
+  --shadow-x-sm: 3px;
+  --shadow-hard: var(--shadow-x) 6px 0 var(--ink);
+  --shadow-hard-sm: var(--shadow-x-sm) 3px 0 var(--ink);
+
+  --radius-lg: 22px;
+  --radius-md: 18px;
+  --radius-sm: 14px;
+  --radius-pill: 999px;
+
+  --font: 'Baloo Bhaijaan 2', system-ui, sans-serif;
+  --tap: 48px;
+  --max-width: 480px;
+}
+
+/* Hard shadows fall toward the end of the reading direction. Must come after :root. */
+[dir='rtl'] {
+  --shadow-x: -6px;
+  --shadow-x-sm: -3px;
+}
