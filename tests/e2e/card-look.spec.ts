@@ -1,12 +1,12 @@
 import { expect, test, type Page } from '@playwright/test'
-import { addPlayers } from './helpers'
+import { addPlayers, startGame } from './helpers'
 
 // Bystanders see the screen's colour, motion and the card's shape from across the room, even when
 // they can't read the text. If crew and imposter cards look different, the role leaks without anyone
 // peeking. So both cards share the same screen, card, motion and two-line layout; only the text differs.
 
 async function dealAndCompare(page: Page): Promise<void> {
-  await page.getByTestId('play').click()
+  await startGame(page)
   await page.getByTestId('start-round').click()
   const looks: Record<'crew' | 'imposter', Set<string>> = { crew: new Set(), imposter: new Set() }
   for (let i = 0; i < 4; i++) {

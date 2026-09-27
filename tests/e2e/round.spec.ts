@@ -1,12 +1,12 @@
 import { expect, test } from '@playwright/test'
-import { addPlayers, dealCards, startPlaying } from './helpers'
+import { addPlayers, dealCards, startGame, startPlaying } from './helpers'
 
 const PLAYERS = ['Rami', 'Lina', 'Omar', 'Sara']
 
 test('every player sees exactly one card, the crew share one word, and the imposter gets a hint', async ({ page }) => {
   await page.goto('/')
   await addPlayers(page, PLAYERS)
-  await page.getByTestId('play').click()
+  await startGame(page)
   await page.getByTestId('start-round').click()
   const deal = await dealCards(page, PLAYERS.length)
   expect(new Set([...deal.imposters, ...deal.crew])).toEqual(new Set(PLAYERS))
@@ -19,7 +19,7 @@ test('every player sees exactly one card, the crew share one word, and the impos
 test('reloading in the middle of dealing never re-shows a card', async ({ page }) => {
   await page.goto('/')
   await addPlayers(page, PLAYERS)
-  await page.getByTestId('play').click()
+  await startGame(page)
   await page.getByTestId('start-round').click()
   const first = (await page.getByTestId('pass-name').innerText()).trim()
   await page.getByTestId('show-card').click()
@@ -33,7 +33,7 @@ test('reloading in the middle of dealing never re-shows a card', async ({ page }
 test('a scored round: catching the imposter who then misses the word gives each crew member a point', async ({ page }) => {
   await page.goto('/')
   await addPlayers(page, PLAYERS, { scoring: true })
-  await page.getByTestId('play').click()
+  await startGame(page)
   await page.getByTestId('start-round').click()
   const deal = await dealCards(page, PLAYERS.length)
   await startPlaying(page)
@@ -54,7 +54,7 @@ test('an Arabic round is right-to-left and deals Arabic words', async ({ page })
   await page.goto('/')
   await page.getByTestId('lang-ar').click()
   await addPlayers(page, ['رامي', 'لينا', 'عمر'])
-  await page.getByTestId('play').click()
+  await startGame(page)
   await page.getByTestId('start-round').click()
   const deal = await dealCards(page, 3)
   await expect(page.locator('html')).toHaveAttribute('dir', 'rtl')
@@ -65,7 +65,7 @@ test('an Arabic round is right-to-left and deals Arabic words', async ({ page })
 test('too few players blocks the round with an explanation', async ({ page }) => {
   await page.goto('/')
   await addPlayers(page, ['Rami', 'Lina'])
-  await page.getByTestId('play').click()
+  await startGame(page)
   await expect(page.getByTestId('round-blocker')).toBeVisible()
   await expect(page.getByTestId('start-round')).toBeDisabled()
 })
@@ -76,7 +76,7 @@ test('after the last card the starter is announced, and the timer only starts wi
   await page.getByTestId('nav-setup').click()
   await page.getByTestId('toggle-timer').click()
   await page.getByTestId('setup-done').click()
-  await page.getByTestId('play').click()
+  await startGame(page)
   await page.getByTestId('start-round').click()
   await dealCards(page, PLAYERS.length)
   await expect(page.getByTestId('starter')).toContainText('starts')

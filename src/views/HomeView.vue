@@ -22,8 +22,8 @@ async function abandon(): Promise<void> {
 }
 
 function play(): void {
-  app.ensureSession()
-  void router.push('/play')
+  // A new game opens Setup first so the group can confirm who is playing; a running one goes straight back in.
+  void router.push(app.state.session ? '/play' : { path: '/setup', query: { start: '1' } })
 }
 </script>
 

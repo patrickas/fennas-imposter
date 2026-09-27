@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { useApp, type RosterError } from '../composables/useApp'
 import { eligibleCategories, eligibleWords } from '../engine/words'
 import { maxImposters } from '../engine/assign'
@@ -15,6 +15,7 @@ import LanguageSwitch from '../components/ui/LanguageSwitch.vue'
 
 const app = useApp()
 const router = useRouter()
+const route = useRoute()
 
 const newName = ref('')
 const addError = ref<string | null>(null)
@@ -95,7 +96,11 @@ const timerSeconds = computed({
   set: (seconds: number) => app.updateSettings({ timer: { ...app.state.settings.timer, seconds } }),
 })
 
+// Opened by "Let's play" on Home: the button here starts the game instead of going back.
+const startingGame = computed(() => route.query.start === '1' && !app.state.session)
+
 function done(): void {
+  if (startingGame.value) app.ensureSession()
   void router.push(app.state.session ? '/play' : '/')
 }
 </script>
@@ -203,7 +208,7 @@ function done(): void {
     </section>
 
     <template #actions>
-      <PopButton data-testid="setup-done" @click="done">{{ app.t('setup.done') }}</PopButton>
+      <PopButton data-testid="setup-done" @click="done">{{ startingGame ? app.t('home.play') : app.t('setup.done') }}</PopButton>
     </template>
   </Screen>
 </template>

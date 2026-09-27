@@ -1,5 +1,5 @@
 import { expect, test, type Page } from '@playwright/test'
-import { addPlayers, dealCards, startGmRound } from './helpers'
+import { addPlayers, dealCards, startGame, startGmRound } from './helpers'
 
 // Confirmations use the app's own dialog, never the browser's alert/confirm/prompt: those look
 // foreign, can't be styled or translated consistently, and are suppressed by some browsers.
@@ -17,7 +17,7 @@ test('leaving and abandoning a round ask in the app: cancel stays, confirm proce
   const native = recordNativeDialogs(page)
   await page.goto('/')
   await addPlayers(page, ['Rami', 'Lina', 'Omar'])
-  await page.getByTestId('play').click()
+  await startGame(page)
   await page.getByTestId('start-round').click()
 
   await page.getByTestId('leave-round').click()
@@ -39,7 +39,7 @@ test('ending the game asks in the app', async ({ page }) => {
   const native = recordNativeDialogs(page)
   await page.goto('/')
   await addPlayers(page, ['Rami', 'Lina', 'Omar'])
-  await page.getByTestId('play').click()
+  await startGame(page)
   await page.getByTestId('end-game').click()
   await expect(page.getByTestId('dialog')).toContainText('End the game and clear the scores?')
   await page.getByTestId('dialog-cancel').click()

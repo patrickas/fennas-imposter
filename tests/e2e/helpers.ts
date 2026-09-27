@@ -12,6 +12,13 @@ export async function addPlayers(page: Page, names: readonly string[], opts: { s
   await page.getByTestId('setup-done').click()
 }
 
+/** From Home with no game running: "Let's play" opens Setup to confirm the players, and its button starts the game. */
+export async function startGame(page: Page): Promise<void> {
+  await page.getByTestId('play').click()
+  await page.getByTestId('setup-done').click()
+  await expect(page.getByTestId('between-rounds')).toBeVisible()
+}
+
 export interface Deal {
   imposters: string[]
   crew: string[]
@@ -52,7 +59,7 @@ export async function startPlaying(page: Page): Promise<void> {
 
 /** From Home: start a GM round (player GM when `gmPlayer` is given, otherwise outside GM) and submit a word in a new category. */
 export async function startGmRound(page: Page, opts: { gmPlayer?: string; word: string; newCategory: string }): Promise<void> {
-  await page.getByTestId('play').click()
+  await startGame(page)
   if (opts.gmPlayer) {
     await page.getByTestId('source-playerGm').check()
     await page.getByTestId('gm-select').selectOption({ label: opts.gmPlayer })

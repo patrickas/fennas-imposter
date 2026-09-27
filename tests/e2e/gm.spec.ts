@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test'
-import { addPlayers, dealCards, startGmRound, startPlaying } from './helpers'
+import { addPlayers, dealCards, startGame, startGmRound, startPlaying } from './helpers'
 
 test('a player Game Master sits out, and their word is saved to My words', async ({ page }) => {
   await page.goto('/')
@@ -18,7 +18,7 @@ test('a player Game Master sits out, and their word is saved to My words', async
 test('the Game Master has to pick a category, so nothing is filed under the first one by accident', async ({ page }) => {
   await page.goto('/')
   await addPlayers(page, ['Rami', 'Lina', 'Omar'])
-  await page.getByTestId('play').click()
+  await startGame(page)
   await page.getByTestId('source-outsideGm').check()
   await page.getByTestId('start-round').click()
   await page.getByTestId('gm-ready').click()

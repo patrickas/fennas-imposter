@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test'
-import { addPlayers } from './helpers'
+import { addPlayers, startGame } from './helpers'
 
 // A spoiled round (someone peeked, a card was lost, the Game Master typo'd) needs a way out that
 // doesn't force the group to play it through and hand out points. Installed iPhone apps have no
@@ -8,7 +8,7 @@ import { addPlayers } from './helpers'
 test('a spoiled round can be left from the screen and abandoned without touching the scores', async ({ page }) => {
   await page.goto('/')
   await addPlayers(page, ['Rami', 'Lina', 'Omar'], { scoring: true })
-  await page.getByTestId('play').click()
+  await startGame(page)
   await page.getByTestId('start-round').click()
   await expect(page.getByTestId('pass-screen')).toBeVisible()
 

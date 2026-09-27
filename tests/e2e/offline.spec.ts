@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test'
-import { addPlayers, dealCards } from './helpers'
+import { addPlayers, dealCards, startGame } from './helpers'
 
 test('after one visit the whole game, fonts included, works with no network', async ({ page, context }) => {
   await page.goto('/')
@@ -27,7 +27,7 @@ test('after one visit the whole game, fonts included, works with no network', as
     expect(await page.evaluate(async (u) => (await fetch(u)).ok, url), url).toBe(true)
   }
   await addPlayers(page, ['Rami', 'Lina', 'Omar'])
-  await page.getByTestId('play').click()
+  await startGame(page)
   await page.getByTestId('start-round').click()
   const deal = await dealCards(page, 3)
   expect(deal.imposters).toHaveLength(1)

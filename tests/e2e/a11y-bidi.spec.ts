@@ -1,5 +1,5 @@
 import { expect, test, type Locator } from '@playwright/test'
-import { addPlayers, dealCards, startPlaying } from './helpers'
+import { addPlayers, dealCards, startGame, startPlaying } from './helpers'
 
 /** True when the "!" of "Sam!" is drawn to the right of the "S" — i.e. the name kept its own direction. */
 async function nameKeepsItsShape(locator: Locator): Promise<boolean> {
@@ -24,7 +24,7 @@ test('a Latin name with punctuation keeps its shape on Arabic screens ("Sam!" ne
   await page.goto('/')
   await page.getByTestId('lang-ar').click()
   await addPlayers(page, ['Sam!', 'لينا', 'عمر'], { scoring: true })
-  await page.getByTestId('play').click()
+  await startGame(page)
   await page.getByTestId('start-round').click()
   expect(await nameKeepsItsShape(page.getByTestId('pass-name'))).toBe(true)
   await page.getByTestId('show-card').click()

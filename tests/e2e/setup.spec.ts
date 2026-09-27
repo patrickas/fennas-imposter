@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test'
-import { addPlayers } from './helpers'
+import { addPlayers, dealCards } from './helpers'
 
 test('players are remembered after the app is closed and reopened', async ({ page }) => {
   await page.goto('/')
@@ -55,4 +55,35 @@ test('the discussion timer cannot be set below 1 minute (spec: 1–10 min)', asy
   const dec = page.getByTestId('timer-seconds-dec')
   while (await dec.isEnabled()) await dec.click()
   await expect(page.getByTestId('timer-seconds-value')).toHaveText('1:00')
+})
+
+// Who is in the room changes from one evening to the next, so a new game always starts on the player
+// list; a game already under way goes straight back in, so scores and rounds aren't interrupted.
+test('a new game first shows the players to confirm or change; continuing a game skips them', async ({ page }) => {
+  await page.goto('/')
+  await addPlayers(page, ['Rami', 'Lina', 'Omar'])
+
+  await page.getByTestId('play').click()
+  await expect(page.getByTestId('player-row')).toHaveCount(3)
+  await expect(page.getByTestId('setup-done')).toHaveText("Let's play")
+  await page.goBack()
+  await expect(page.getByTestId('play')).toHaveText("Let's play") // backing out started nothing
+
+  await page.getByTestId('play').click()
+  await page.getByRole('button', { name: /Remove.*Omar/ }).click()
+  await page.getByTestId('new-player').fill('Sara')
+  await page.getByTestId('add-player').click()
+  await page.getByTestId('setup-done').click()
+  await expect(page.getByTestId('between-rounds')).toBeVisible()
+
+  await page.evaluate(() => {
+    location.hash = '#/'
+  })
+  await expect(page.getByTestId('play')).toHaveText('Continue game')
+  await page.getByTestId('play').click()
+  await expect(page.getByTestId('between-rounds')).toBeVisible()
+
+  await page.getByTestId('start-round').click()
+  const deal = await dealCards(page, 3)
+  expect(new Set([...deal.crew, ...deal.imposters])).toEqual(new Set(['Rami', 'Lina', 'Sara']))
 })

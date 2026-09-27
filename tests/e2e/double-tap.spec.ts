@@ -1,5 +1,5 @@
 import { expect, test, type Locator, type Page } from '@playwright/test'
-import { addPlayers, dealCards, startPlaying } from './helpers'
+import { addPlayers, dealCards, startGame, startPlaying } from './helpers'
 
 // A tap that lands twice — a double tap, or an impatient re-tap — must never fall through to the
 // button that appears in the same spot on the next screen. Falling through shows a card to the
@@ -10,7 +10,7 @@ const PLAYERS = ['Rami', 'Lina', 'Omar']
 async function startRound(page: Page, opts: { scoring?: boolean } = {}): Promise<void> {
   await page.goto('/')
   await addPlayers(page, PLAYERS, opts)
-  await page.getByTestId('play').click()
+  await startGame(page)
   await page.getByTestId('start-round').click()
   await expect(page.getByTestId('pass-screen')).toBeVisible()
 }

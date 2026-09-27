@@ -1,5 +1,5 @@
 import { expect, test, type Page } from '@playwright/test'
-import { dealCards, startPlaying } from './helpers'
+import { dealCards, startGame, startPlaying } from './helpers'
 
 // Spec behaviours that were first checked by hand (the final verification checklist), kept as tests.
 
@@ -31,7 +31,7 @@ async function seed(page: Page, over: Record<string, unknown>, settings: Record<
 test('clamp notice, hints off, count chip, leave-round confirm with resume, and End game clearing scores', async ({ page }) => {
   await page.goto('/')
   await seed(page, {}, { imposterCount: 2, hints: false, scoring: true })
-  await page.getByTestId('play').click()
+  await startGame(page)
   await expect(page.getByTestId('clamp-notice')).toContainText('using 1')
   await page.getByTestId('start-round').click()
   const deal = await dealCards(page, 4)
@@ -66,7 +66,7 @@ test('clamp notice, hints off, count chip, leave-round confirm with resume, and 
 test('a surprise imposter count stays hidden; a GM word without a hint gives the category as hint', async ({ page }) => {
   await page.goto('/')
   await seed(page, {}, { randomImposterCount: true, hints: true })
-  await page.getByTestId('play').click()
+  await startGame(page)
   await page.getByTestId('source-outsideGm').check()
   await page.getByTestId('start-round').click()
   await page.getByTestId('gm-ready').click()
@@ -106,7 +106,7 @@ test('every Arabic screen is right-to-left with no English left (except the "Eng
   await page.getByTestId('nav-data').click()
   await check('data')
   await page.getByTestId('back').click()
-  await page.getByTestId('play').click()
+  await startGame(page)
   await check('between-rounds')
   await page.getByTestId('start-round').click()
   const deal = await dealCards(page, 4, async () => check('pass/card'))
