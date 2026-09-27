@@ -39,6 +39,18 @@ describe('loadStored', () => {
     expect(r.status).toBe('corrupt')
   })
 
+  it('switches on the built-in categories added in version 2 for players who saved before, keeping their own choices', () => {
+    const v1Seed = ['food', 'animals', 'home', 'jobs', 'places', 'sports', 'nature', 'transport', 'clothes', 'levant']
+    const added = SEED_CATEGORIES.map((c) => c.id).filter((id) => !v1Seed.includes(id))
+    expect(added).toHaveLength(10)
+    // This player had switched most categories off and added a custom one; those choices must survive.
+    const v1 = { ...defaultStored(), version: 1, selectedCategoryIds: ['food', 'c-custom'] }
+    const r = loadStored(memoryStorage({ [STORAGE_KEY]: JSON.stringify(v1) }), 1)
+    expect(r.status).toBe('ok')
+    expect(r.stored.version).toBe(2)
+    expect(r.stored.selectedCategoryIds).toEqual(['food', 'c-custom', ...added])
+  })
+
   it('never overwrites data written by a newer app version', () => {
     const r = loadStored(memoryStorage({ [STORAGE_KEY]: JSON.stringify({ version: 99 }) }), 1)
     expect(r.status).toBe('newer')

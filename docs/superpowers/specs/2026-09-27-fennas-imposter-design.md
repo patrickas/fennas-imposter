@@ -188,10 +188,11 @@ Each scoreboard row keeps a snapshot of the player's name:
 
 ### 5.1 Seed packs
 
-- There are ~10 categories × ~25 words. Every word has EN and/or AR text and a per-word hint in each language it has.
+- There are 20 categories of ~60 words (about 1,250 words). Every word has EN and/or AR text and a per-word hint in each language it has.
 - They ship as typed TS modules in `src/data/seed/` and are never copied into storage.
 - Seed IDs are hand-written and stable, such as `food` and `food.falafel`, so the used-word history survives app updates.
-- At least one category is Arabic-only culture words (e.g. «أكل شامي»: مناقيش، كبة، تبولة…). It exercises flexible pairs.
+- Two categories are Arabic-only: «من عنّا» (Levantine culture) and «أكل شامي» (Levantine food). They exercise flexible pairs.
+- Words and hints must not need American knowledge (no US-only holidays, sports, foods, brands or pop culture). No word appears twice in the seed, and no hint contains its word.
 - All Arabic seed content is drafted for the user's review before release.
 
 ### 5.2 Eligibility in language L
@@ -336,7 +337,7 @@ interface Settings {
 }
 
 interface Stored {
-  version: 1;
+  version: 2;
   language: Lang;
   players: Player[]; activePlayerIds: string[];
   settings: Settings; selectedCategoryIds: string[];
@@ -350,7 +351,7 @@ interface Stored {
 
 **Storage:**
 - One JSON document at `localStorage['fennas-imposter']`. It is written synchronously after every state change; the data is small.
-- **Migrations:** `migrations[n]` upgrades version n to n+1. They are applied in order on load.
+- **Migrations:** `migrations[n]` upgrades version n to n+1. They are applied in order on load. Version 2 switches on the categories added with it for players who saved before, leaving their other choices alone.
 - On first run the app calls `navigator.storage.persist()` to reduce eviction risk.
 - The Data screen recommends exporting a backup.
 - New ids use `crypto.randomUUID()`.

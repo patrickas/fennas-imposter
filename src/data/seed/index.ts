@@ -9,9 +9,23 @@ import { sports } from './packs/sports'
 import { nature } from './packs/nature'
 import { transport } from './packs/transport'
 import { clothes } from './packs/clothes'
+import { body } from './packs/body'
+import { fruitVeg } from './packs/fruit-veg'
+import { school } from './packs/school'
+import { tech } from './packs/tech'
+import { music } from './packs/music'
+import { occasions } from './packs/occasions'
+import { world } from './packs/world'
+import { fantasy } from './packs/fantasy'
+import { tools } from './packs/tools'
 import { levant } from './packs/levant'
+import { levantFood } from './packs/levant-food'
 
-export const SEED_PACKS: readonly SeedPack[] = [food, animals, home, jobs, places, sports, nature, transport, clothes, levant]
+export const SEED_PACKS: readonly SeedPack[] = [
+  food, animals, home, jobs, places, sports, nature, transport, clothes,
+  body, fruitVeg, school, tech, music, occasions, world, fantasy, tools,
+  levant, levantFood,
+]
 
 function localized(en: string | null, ar: string | null): Localized {
   const out: Localized = {}

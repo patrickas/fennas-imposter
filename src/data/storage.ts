@@ -3,7 +3,7 @@ import { SEED_CATEGORIES } from './seed'
 import { TIMER } from './limits'
 
 export const STORAGE_KEY = 'fennas-imposter'
-export const CURRENT_VERSION = 1
+export const CURRENT_VERSION = 2
 
 export interface StorageLike {
   getItem(key: string): string | null
@@ -21,7 +21,7 @@ export interface Session {
 }
 
 export interface Stored {
-  version: 1
+  version: 2
   language: Lang
   players: Player[]
   activePlayerIds: string[]
@@ -47,8 +47,17 @@ export interface LoadResult {
 
 export type Migration = (doc: Record<string, unknown>) => Record<string, unknown>
 
-/** migrations[n] upgrades a version-n document to version n+1. Empty until version 2 exists. */
-export const MIGRATIONS: Record<number, Migration> = {}
+/** Built-in categories that shipped with version 2. Players who saved before then never had the chance to select them. */
+const ADDED_IN_V2 = ['body', 'fruit-veg', 'school', 'tech', 'music', 'occasions', 'world', 'fantasy', 'tools', 'levant-food']
+
+/** migrations[n] upgrades a version-n document to version n+1. */
+export const MIGRATIONS: Record<number, Migration> = {
+  1: (doc) => {
+    const selected = doc.selectedCategoryIds
+    if (!Array.isArray(selected)) return { ...doc, version: 2 } // isStored rejects it as damaged
+    return { ...doc, version: 2, selectedCategoryIds: [...selected, ...ADDED_IN_V2.filter((id) => !selected.includes(id))] }
+  },
+}
 
 export function defaultSettings(): Settings {
   return {
@@ -62,7 +71,7 @@ export function defaultSettings(): Settings {
 
 export function defaultStored(): Stored {
   return {
-    version: 1,
+    version: 2,
     language: 'en',
     players: [],
     activePlayerIds: [],
