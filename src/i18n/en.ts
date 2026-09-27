@@ -96,6 +96,8 @@ const messages = {
   'reveal.imposterTitle': "You're the imposter!",
   'reveal.imposterGuide': "You don't know the word. Listen to the clues, blend in, and try to work out the word.",
   'reveal.hint': 'Hint: {hint}',
+  'reveal.noHint': 'No hint this time',
+  'reveal.secretWordIs': 'The secret word is',
   'reveal.hidePass': 'Hide & pass',
 
   'discussion.starts': '{name} starts',

@@ -52,14 +52,17 @@ function hideAndPass(): void {
     <template #top>
       <Chip>{{ name }}</Chip>
     </template>
+    <!-- Both cards: a big title line, then one second line — the same shape for every role. -->
     <StickerCard v-if="isImposter" motion="wobble">
       <p class="secret-word" data-testid="imposter-title">{{ app.t('reveal.imposterTitle') }}</p>
-      <p v-if="round.settings.hints && round.secret" class="hint" data-testid="imposter-hint">
+      <p v-if="round.settings.hints && round.secret" class="reveal-line" data-testid="imposter-hint">
         {{ app.t('reveal.hint', { hint: imposterHint(round.secret) }) }}
       </p>
+      <p v-else class="reveal-line">{{ app.t('reveal.noHint') }}</p>
     </StickerCard>
     <StickerCard v-else motion="wobble">
-      <p class="secret-word" data-testid="secret-word">{{ round.secret?.word }}</p>
+      <p class="secret-word" data-testid="crew-title">{{ app.t('reveal.secretWordIs') }}</p>
+      <p class="reveal-line" data-testid="secret-word">{{ round.secret?.word }}</p>
     </StickerCard>
     <p class="guide">{{ isImposter ? app.t('reveal.imposterGuide') : app.t('reveal.crewGuide') }}</p>
     <template #actions>
@@ -70,5 +73,5 @@ function hideAndPass(): void {
 
 <style scoped>
 .lead { font-size: 1.3rem; font-weight: 700; }
-.hint { margin-top: 12px; font-size: 1.1rem; font-weight: 700; overflow-wrap: anywhere; }
+.reveal-line { margin-top: 12px; font-size: clamp(1.5rem, 8vw, 2.1rem); font-weight: 800; line-height: 1.15; overflow-wrap: anywhere; }
 </style>

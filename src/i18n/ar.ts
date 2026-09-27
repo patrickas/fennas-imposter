@@ -103,6 +103,8 @@ export const ar: Messages = {
   'reveal.imposterTitle': 'إنت المندسّ!',
   'reveal.imposterGuide': 'ما بتعرف الكلمة. اسمع تلميحات الباقيين، اندمج معهم، وحاول تحزر شو هي.',
   'reveal.hint': 'تلميح: {hint}',
+  'reveal.noHint': 'ما في تلميح هالمرّة',
+  'reveal.secretWordIs': 'الكلمة السرّية هي',
   'reveal.hidePass': 'خبّي ومرّر',
 
   'discussion.starts': '{name} بيبلّش',
