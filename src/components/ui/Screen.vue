@@ -1,10 +1,25 @@
 <script setup lang="ts">
+import { onMounted, onUnmounted, ref } from 'vue'
 import BgShapes from './BgShapes.vue'
 
 withDefaults(defineProps<{ tone?: 'sun' | 'bubblegum' | 'mint'; align?: 'center' | 'start' }>(), {
   tone: 'sun',
   align: 'center',
 })
+
+/**
+ * Every screen puts its primary action in the same bottom spot, so a double tap (or an impatient
+ * re-tap) would land on the next screen's button — showing a card to the wrong player or skipping
+ * part of the round. The actions stay inert for a moment after a screen appears. Time-based, not
+ * animation-based, so it also holds with reduced motion.
+ */
+const ARM_DELAY_MS = 500
+const armed = ref(false)
+let armTimer: ReturnType<typeof setTimeout> | undefined
+onMounted(() => {
+  armTimer = setTimeout(() => (armed.value = true), ARM_DELAY_MS)
+})
+onUnmounted(() => clearTimeout(armTimer))
 </script>
 
 <template>
@@ -13,7 +28,7 @@ withDefaults(defineProps<{ tone?: 'sun' | 'bubblegum' | 'mint'; align?: 'center'
     <div class="inner">
       <header v-if="$slots.top" class="top"><slot name="top" /></header>
       <section class="body" :class="`align-${align}`"><slot /></section>
-      <footer v-if="$slots.actions" class="actions"><slot name="actions" /></footer>
+      <footer v-if="$slots.actions" class="actions" :inert="!armed"><slot name="actions" /></footer>
     </div>
   </main>
 </template>
