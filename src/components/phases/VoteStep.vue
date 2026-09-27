@@ -3,6 +3,7 @@ import { computed } from 'vue'
 import { useApp } from '../../composables/useApp'
 import Screen from '../ui/Screen.vue'
 import PopButton from '../ui/PopButton.vue'
+import LeaveRoundButton from './LeaveRoundButton.vue'
 
 const app = useApp()
 const round = computed(() => app.state.round)
@@ -10,6 +11,9 @@ const round = computed(() => app.state.round)
 
 <template>
   <Screen v-if="round" tone="sun" data-testid="vote">
+    <template #top>
+      <LeaveRoundButton />
+    </template>
     <h2 class="center">{{ app.t('vote.title') }}</h2>
     <div class="grid">
       <PopButton

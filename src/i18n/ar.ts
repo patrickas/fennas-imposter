@@ -20,6 +20,8 @@ export const ar: Messages = {
   'home.setup': 'اللاعبين والإعدادات',
   'home.words': 'كلماتي',
   'home.data': 'نسخ احتياطي واستيراد',
+  'home.abandonRound': 'الغي هالجولة',
+  'home.abandonConfirm': 'بدك تلغي الجولة يلي عم تنلعب؟ النقاط بتضل متل ما هي.',
 
   'setup.title': 'التحضير',
   'setup.players': 'اللاعبين',
@@ -81,6 +83,7 @@ export const ar: Messages = {
   'play.leaveConfirm': 'بدك تطلع من الجولة؟ فيك تكمّلها بعدين.',
   'play.crashed': 'صار في مشكلة بهالجولة.',
   'play.abandonRound': 'اترك الجولة',
+  'play.leaveRound': 'اطلع من الجولة',
 
   'gm.passTo': 'مرّر التلفون للحَكَم',
   'gm.passToPlayer': 'مرّر التلفون لـ{name}، الحَكَم',

@@ -7,6 +7,7 @@ import Screen from '../ui/Screen.vue'
 import StickerCard from '../ui/StickerCard.vue'
 import PopButton from '../ui/PopButton.vue'
 import Chip from '../ui/Chip.vue'
+import LeaveRoundButton from './LeaveRoundButton.vue'
 
 const NEW_CATEGORY = '__new__'
 
@@ -51,6 +52,7 @@ function submit(): void {
   <Screen v-if="!ready" tone="sun" data-testid="gm-pass">
     <template #top>
       <Chip>{{ app.t('play.round', { n: round?.number ?? 1 }) }}</Chip>
+      <LeaveRoundButton />
     </template>
     <StickerCard motion="wobble">
       <p class="title">{{ gmName ? app.t('gm.passToPlayer', { name: gmName }) : app.t('gm.passTo') }}</p>
@@ -62,6 +64,9 @@ function submit(): void {
   </Screen>
 
   <Screen v-else tone="sun" align="start" data-testid="gm-form">
+    <template #top>
+      <LeaveRoundButton />
+    </template>
     <p class="guide">{{ app.t('gm.guide') }}</p>
     <form class="panel stack" @submit.prevent="submit">
       <label class="field">

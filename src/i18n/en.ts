@@ -27,6 +27,8 @@ const messages = {
   'home.setup': 'Players & settings',
   'home.words': 'My words',
   'home.data': 'Backup & import',
+  'home.abandonRound': 'Abandon this round',
+  'home.abandonConfirm': 'Abandon the round in progress? Scores stay as they are.',
 
   'setup.title': 'Setup',
   'setup.players': 'Players',
@@ -74,6 +76,7 @@ const messages = {
   'play.leaveConfirm': 'Leave the round? You can continue it later.',
   'play.crashed': 'Something went wrong in this round.',
   'play.abandonRound': 'Abandon round',
+  'play.leaveRound': 'Leave the round',
 
   'gm.passTo': 'Pass the phone to the Game Master',
   'gm.passToPlayer': 'Pass the phone to {name}, the Game Master',

@@ -8,6 +8,7 @@ import Screen from '../ui/Screen.vue'
 import StickerCard from '../ui/StickerCard.vue'
 import PopButton from '../ui/PopButton.vue'
 import Chip from '../ui/Chip.vue'
+import LeaveRoundButton from './LeaveRoundButton.vue'
 
 const app = useApp()
 const sound = useSound()
@@ -43,6 +44,7 @@ function end(): void {
           ? app.t('discussion.impostersHidden')
           : app.t('discussion.imposters', { count: round.imposterIds.length }) }}
       </Chip>
+      <LeaveRoundButton />
     </template>
     <h2 class="center">{{ app.t('discussion.title') }}</h2>
     <StickerCard motion="wobble">

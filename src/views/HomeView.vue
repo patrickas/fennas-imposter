@@ -10,6 +10,10 @@ import LanguageSwitch from '../components/ui/LanguageSwitch.vue'
 const app = useApp()
 const router = useRouter()
 
+function abandon(): void {
+  if (window.confirm(app.t('home.abandonConfirm'))) app.abandonRound()
+}
+
 function play(): void {
   app.ensureSession()
   void router.push('/play')
@@ -29,6 +33,9 @@ function play(): void {
     <template #actions>
       <PopButton attention data-testid="play" @click="play">
         {{ app.state.session ? app.t('home.continue') : app.t('home.play') }}
+      </PopButton>
+      <PopButton v-if="app.state.round" variant="danger" data-testid="abandon-round" @click="abandon">
+        {{ app.t('home.abandonRound') }}
       </PopButton>
       <PopButton variant="secondary" data-testid="nav-setup" @click="router.push('/setup')">{{ app.t('home.setup') }}</PopButton>
       <PopButton variant="secondary" data-testid="nav-words" @click="router.push('/words')">{{ app.t('home.words') }}</PopButton>

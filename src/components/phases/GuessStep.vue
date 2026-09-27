@@ -4,6 +4,7 @@ import { useApp } from '../../composables/useApp'
 import Screen from '../ui/Screen.vue'
 import StickerCard from '../ui/StickerCard.vue'
 import PopButton from '../ui/PopButton.vue'
+import LeaveRoundButton from './LeaveRoundButton.vue'
 
 const app = useApp()
 const round = computed(() => app.state.round)
@@ -15,6 +16,9 @@ const name = computed(() => {
 
 <template>
   <Screen v-if="round" tone="bubblegum" data-testid="guess">
+    <template #top>
+      <LeaveRoundButton />
+    </template>
     <StickerCard tone="ink" motion="shake">
       <p class="title">{{ app.t('guess.title', { name }) }}</p>
     </StickerCard>

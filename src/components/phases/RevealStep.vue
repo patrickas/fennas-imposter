@@ -7,6 +7,7 @@ import Screen from '../ui/Screen.vue'
 import StickerCard from '../ui/StickerCard.vue'
 import PopButton from '../ui/PopButton.vue'
 import Chip from '../ui/Chip.vue'
+import LeaveRoundButton from './LeaveRoundButton.vue'
 
 const app = useApp()
 const sound = useSound()
@@ -34,6 +35,7 @@ function hideAndPass(): void {
   <Screen v-if="round && !shown" tone="sun" data-testid="pass-screen">
     <template #top>
       <Chip>{{ app.t('play.round', { n: round.number }) }}</Chip>
+      <LeaveRoundButton />
     </template>
     <p class="center lead">{{ app.t('reveal.passTo') }}</p>
     <StickerCard motion="wobble">
