@@ -43,3 +43,21 @@ export async function dealCards(page: Page, count: number, onScreen?: () => Prom
   await expect(page.getByTestId('discussion')).toBeVisible()
   return deal
 }
+
+/** From Home: start a GM round (player GM when `gmPlayer` is given, otherwise outside GM) and submit a word in a new category. */
+export async function startGmRound(page: Page, opts: { gmPlayer?: string; word: string; newCategory: string }): Promise<void> {
+  await page.getByTestId('play').click()
+  if (opts.gmPlayer) {
+    await page.getByTestId('source-playerGm').check()
+    await page.getByTestId('gm-select').selectOption({ label: opts.gmPlayer })
+  } else {
+    await page.getByTestId('source-outsideGm').check()
+  }
+  await page.getByTestId('start-round').click()
+  await page.getByTestId('gm-ready').click()
+  await page.getByTestId('gm-word').fill(opts.word)
+  await page.getByTestId('gm-category').selectOption('__new__')
+  await page.getByTestId('gm-new-category').fill(opts.newCategory)
+  await page.getByTestId('gm-submit').click()
+  await expect(page.getByTestId('pass-screen')).toBeVisible()
+}
