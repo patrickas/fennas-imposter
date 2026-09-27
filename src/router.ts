@@ -3,6 +3,7 @@ import HomeView from './views/HomeView.vue'
 import SetupView from './views/SetupView.vue'
 import PlayView from './views/PlayView.vue'
 import WordsView from './views/WordsView.vue'
+import DataView from './views/DataView.vue'
 
 export const router = createRouter({
   history: createWebHashHistory(),
@@ -11,6 +12,7 @@ export const router = createRouter({
     { path: '/setup', name: 'setup', component: SetupView },
     { path: '/play', name: 'play', component: PlayView },
     { path: '/words', name: 'words', component: WordsView },
+    { path: '/data', name: 'data', component: DataView },
     { path: '/:pathMatch(.*)*', redirect: '/' },
   ],
 })
