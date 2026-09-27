@@ -96,7 +96,7 @@ const messages = {
   'reveal.passTo': 'Pass the phone to',
   'reveal.passGuide': 'Hand the phone to {name}. Make sure nobody else can see the screen.',
   'reveal.show': "I'm {name} — show me",
-  'reveal.crewGuide': "Remember this word. When it's your turn, say one word that shows you know it — without giving it away.",
+  'reveal.crewGuide': "Remember this word. When it's your turn, say another word that shows you know it — without giving it away.",
   'reveal.imposterTitle': "You're the imposter!",
   'reveal.imposterGuide': "You don't know the word. Listen to the clues, blend in, and try to work out the word.",
   'reveal.hint': 'Hint: {hint}',

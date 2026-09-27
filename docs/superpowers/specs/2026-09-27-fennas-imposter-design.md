@@ -159,7 +159,7 @@ Each scoreboard row keeps a snapshot of the player's name:
 |---|---|---|
 | Pass | Hand the phone to **{name}**. Make sure nobody else can see the screen. | عطي التلفون لـ**{name}**. تأكد إنو ما حدا تاني شايف الشاشة. |
 | Pass button | I'm {name} — show me | أنا {name} — فرجيني |
-| Crew card | Remember this word. When it's your turn, say one word that shows you know it — without giving it away. | احفظ هالكلمة. لما يجي دورك، قول كلمة وحدة بتبيّن إنك بتعرفها، بس بدون ما تفضحها. |
+| Crew card | Remember this word. When it's your turn, say another word that shows you know it — without giving it away. | احفظ هالكلمة. لما يجي دورك، قول كلمة تانية بتبيّن إنك بتعرفها، بس بدون ما تفضحها. |
 | Imposter card title | You're the imposter! | إنت المندسّ! |
 | Imposter card | You don't know the word. Listen to the clues, blend in, and try to work out the word. | ما بتعرف الكلمة. اسمع تلميحات الباقيين، اندمج معهم، وحاول تحزر شو هي. |
 | Hint label | Hint: | تلميح: |
