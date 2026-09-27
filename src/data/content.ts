@@ -42,7 +42,9 @@ export function validateGmWord(input: GmWordInput, content: Content): GmWordErro
 
   const choice = input.category
   if ('existingId' in choice) {
-    if (!categoriesNamedIn(content, input.lang).some((c) => c.id === choice.existingId)) {
+    if (choice.existingId === '') {
+      errors.push({ field: 'category', code: 'empty' }) // nothing chosen yet
+    } else if (!categoriesNamedIn(content, input.lang).some((c) => c.id === choice.existingId)) {
       errors.push({ field: 'category', code: 'unknown' })
     }
   } else {

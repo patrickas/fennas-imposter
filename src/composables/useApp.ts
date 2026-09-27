@@ -11,6 +11,7 @@ import * as custom from '../data/content'
 import { parsePack, planImport, type ImportMode, type ImportPlan, type PackError } from '../data/transfer'
 import { translate, type MessageKey, type Params } from '../i18n'
 import { TEST_SECRETS } from '../data/testWord'
+import { cleanText } from '../data/normalize'
 
 export interface AppDeps {
   storage: StorageLike | null
@@ -190,7 +191,10 @@ export function createAppStore(deps: AppDeps) {
     if (errors.length > 0) return errors
     const saved = custom.addGmWord(state, input, deps.newId)
     applyCustom(saved.custom)
-    state.round = reduce(round, { type: 'setSecret', secret: makeSecret(saved.word, saved.category, round.lang) })
+    // The hint the GM just typed is the one this round uses, even if the saved word already had another.
+    const typedHint = cleanText(input.hint)
+    const secret = makeSecret(saved.word, saved.category, round.lang)
+    state.round = reduce(round, { type: 'setSecret', secret: typedHint ? { ...secret, hint: typedHint } : secret })
     persist()
     return []
   }

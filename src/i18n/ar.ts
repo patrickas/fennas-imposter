@@ -67,6 +67,7 @@ export const ar: Messages = {
   'error.tooLong': 'أقصى شي {max} حرف',
   'error.needOneLanguage': 'عبّي لغة وحدة عالأقل',
   'error.unknownCategory': 'هالفئة ما عادت موجودة',
+  'error.chooseCategory': 'اختار فئة',
 
   'play.round': 'الجولة {n}',
   'play.wordSource': 'منين بتجي الكلمة؟',
@@ -92,6 +93,7 @@ export const ar: Messages = {
   'gm.guide': 'بس للحَكَم: اكتب كلمة سرّية. الكل رح يشوفها إلا المندسّ.',
   'gm.word': 'الكلمة السرّية',
   'gm.category': 'الفئة',
+  'gm.chooseCategory': 'اختار فئة…',
   'gm.newCategory': 'فئة جديدة…',
   'gm.newCategoryName': 'اسم الفئة الجديدة',
   'gm.hint': 'تلميح للمندسّ (اختياري)',

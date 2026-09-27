@@ -49,6 +49,14 @@ describe('persistence', () => {
 })
 
 describe('rounds', () => {
+  it("uses the Game Master's typed hint for the round even when the word already exists with its own hint", () => {
+    const app = setup()
+    withPlayers(app)
+    app.beginRound({ kind: 'outsideGm' })
+    expect(app.submitGmWord({ lang: 'en', word: 'Falafel', hint: 'Crispy', category: { existingId: 'food' } })).toEqual([])
+    expect(app.state.round!.secret).toMatchObject({ wordId: 'food.falafel', word: 'Falafel', hint: 'Crispy' })
+  })
+
   it('locks the language while a round is in progress', () => {
     const app = setup()
     withPlayers(app)

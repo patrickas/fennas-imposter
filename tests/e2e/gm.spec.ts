@@ -15,6 +15,20 @@ test('a player Game Master sits out, and their word is saved to My words', async
   await expect(page.getByTestId('custom-word')).toContainText('Mansaf')
 })
 
+test('the Game Master has to pick a category, so nothing is filed under the first one by accident', async ({ page }) => {
+  await page.goto('/')
+  await addPlayers(page, ['Rami', 'Lina', 'Omar'])
+  await page.getByTestId('play').click()
+  await page.getByTestId('source-outsideGm').check()
+  await page.getByTestId('start-round').click()
+  await page.getByTestId('gm-ready').click()
+  await page.getByTestId('gm-word').fill('Mansaf')
+  await expect(page.getByTestId('gm-category')).toHaveValue('')
+  await page.getByTestId('gm-submit').click()
+  await expect(page.getByTestId('gm-form')).toContainText('Choose a category')
+  await expect(page.getByTestId('pass-screen')).toHaveCount(0)
+})
+
 test('maximum-length words and names wrap instead of overflowing a small phone', async ({ page }) => {
   // Screens clip their own overflow, so a page-level scrollWidth check could never fail. Instead,
   // check that no element inside the screen pokes outside the viewport or overflows its own box.

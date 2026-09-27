@@ -25,14 +25,14 @@ const categoryOptions = computed(() =>
 const ready = ref(false)
 const word = ref('')
 const hint = ref('')
-const categoryId = ref(categoryOptions.value[0]?.id ?? NEW_CATEGORY)
+const categoryId = ref('') // no default: the GM must choose (a silent default files words in the wrong place)
 const newCategory = ref('')
 const errors = ref<GmWordError[]>([])
 
 function errorFor(field: GmField): string | null {
   const error = errors.value.find((e) => e.field === field)
   if (!error) return null
-  if (error.code === 'empty') return app.t('error.textEmpty')
+  if (error.code === 'empty') return field === 'category' && categoryId.value === '' ? app.t('error.chooseCategory') : app.t('error.textEmpty')
   if (error.code === 'unknown') return app.t('error.unknownCategory')
   const max = field === 'category' ? LIMITS.category : field === 'hint' ? LIMITS.hint : LIMITS.word
   return app.t('error.tooLong', { max })
@@ -77,6 +77,7 @@ function submit(): void {
       <label class="field">
         {{ app.t('gm.category') }}
         <select v-model="categoryId" class="input" data-testid="gm-category">
+          <option value="" disabled>{{ app.t('gm.chooseCategory') }}</option>
           <option v-for="c in categoryOptions" :key="c.id" :value="c.id">{{ c.name }}</option>
           <option :value="NEW_CATEGORY">{{ app.t('gm.newCategory') }}</option>
         </select>

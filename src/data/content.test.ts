@@ -60,6 +60,11 @@ describe('addGmWord', () => {
 })
 
 describe('validateGmWord', () => {
+  it('requires the Game Master to actively choose a category (no silent default)', () => {
+    expect(validateGmWord(input({ category: { existingId: '' } }), allContent(none)))
+      .toEqual([{ field: 'category', code: 'empty' }])
+  })
+
   const content = allContent(none)
 
   it('reports every problem per field so the GM form can show them all at once', () => {

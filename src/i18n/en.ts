@@ -60,6 +60,7 @@ const messages = {
   'error.tooLong': 'At most {max} characters',
   'error.needOneLanguage': 'Fill in at least one language',
   'error.unknownCategory': 'That category no longer exists',
+  'error.chooseCategory': 'Choose a category',
 
   'play.round': 'Round {n}',
   'play.wordSource': 'Where does the word come from?',
@@ -85,6 +86,7 @@ const messages = {
   'gm.guide': 'Game Master only: type a secret word. Everyone except the imposter will see it.',
   'gm.word': 'Secret word',
   'gm.category': 'Category',
+  'gm.chooseCategory': 'Choose a category…',
   'gm.newCategory': 'New category…',
   'gm.newCategoryName': 'New category name',
   'gm.hint': 'Hint for the imposter (optional)',
