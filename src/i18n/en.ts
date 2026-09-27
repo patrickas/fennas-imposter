@@ -1,0 +1,188 @@
+export type PluralForms = {
+  zero?: string
+  one?: string
+  two?: string
+  few?: string
+  many?: string
+  other: string
+}
+
+const messages = {
+  'app.title': "Fenna's Imposter",
+  'app.tagline': 'One secret word. One faker. Who is it?',
+
+  'common.back': 'Back',
+  'common.cancel': 'Cancel',
+  'common.save': 'Save',
+  'common.delete': 'Delete',
+  'common.edit': 'Edit',
+  'common.dismiss': 'OK',
+
+  'lang.en': 'English',
+  'lang.ar': 'العربية',
+
+  'home.language': 'Language',
+  'home.play': "Let's play",
+  'home.continue': 'Continue game',
+  'home.setup': 'Players & settings',
+  'home.words': 'My words',
+  'home.data': 'Backup & import',
+
+  'setup.title': 'Setup',
+  'setup.players': 'Players',
+  'setup.newPlayerPlaceholder': 'Player name',
+  'setup.addPlayer': 'Add',
+  'setup.playing': 'Playing',
+  'setup.removePlayer': 'Remove {name}',
+  'setup.activeCount': { one: '{count} player playing', other: '{count} players playing' },
+  'setup.categories': 'Categories',
+  'setup.wordCount': { one: '{count} word', other: '{count} words' },
+  'setup.settings': 'Settings',
+  'setup.imposters': 'Imposters',
+  'setup.randomImposters': 'Surprise number of imposters',
+  'setup.hints': 'Give the imposter a hint',
+  'setup.timer': 'Discussion timer',
+  'setup.timerLength': 'Timer length',
+  'setup.scoring': 'Keep score',
+  'setup.done': 'Done',
+  'setup.decrease': 'Less',
+  'setup.increase': 'More',
+
+  'error.nameEmpty': 'Type a name',
+  'error.nameTooLong': 'Names can be at most {max} characters',
+  'error.nameTaken': 'That name is already taken',
+  'error.inRound': "Can't remove a player who is in the current round",
+  'error.noCategories': 'Pick at least one category',
+  'error.textEmpty': 'Type something',
+  'error.tooLong': 'At most {max} characters',
+  'error.needOneLanguage': 'Fill in at least one language',
+  'error.unknownCategory': 'That category no longer exists',
+
+  'play.round': 'Round {n}',
+  'play.wordSource': 'Where does the word come from?',
+  'play.sourceRandom': 'Random word',
+  'play.sourcePlayerGm': 'A player is Game Master',
+  'play.sourceOutsideGm': 'Outside Game Master',
+  'play.pickGm': "Who's the Game Master?",
+  'play.startRound': 'Start round',
+  'play.editSetup': 'Edit setup',
+  'play.endGame': 'End game',
+  'play.endGameConfirm': 'End the game and clear the scores?',
+  'play.needPlayers': 'You need at least 3 players (not counting the Game Master).',
+  'play.noWords': 'No words in the selected categories for this language.',
+  'play.clamped': 'Not enough players for that many imposters — using {count}.',
+  'play.leaveConfirm': 'Leave the round? You can continue it later.',
+  'play.crashed': 'Something went wrong in this round.',
+  'play.abandonRound': 'Abandon round',
+
+  'gm.passTo': 'Pass the phone to the Game Master',
+  'gm.passToPlayer': 'Pass the phone to {name}, the Game Master',
+  'gm.imGm': "I'm the Game Master",
+  'gm.guide': 'Game Master only: type a secret word. Everyone except the imposter will see it.',
+  'gm.word': 'Secret word',
+  'gm.category': 'Category',
+  'gm.newCategory': 'New category…',
+  'gm.newCategoryName': 'New category name',
+  'gm.hint': 'Hint for the imposter (optional)',
+  'gm.done': 'Done — hide it',
+
+  'reveal.passTo': 'Pass the phone to',
+  'reveal.passGuide': 'Hand the phone to {name}. Make sure nobody else can see the screen.',
+  'reveal.show': "I'm {name} — show me",
+  'reveal.crewGuide': "Remember this word. When it's your turn, say one word that shows you know it — without giving it away.",
+  'reveal.imposterTitle': "You're the imposter!",
+  'reveal.imposterGuide': "You don't know the word. Listen to the clues, blend in, and try to work out the word.",
+  'reveal.hint': 'Hint: {hint}',
+  'reveal.hidePass': 'Hide & pass',
+
+  'discussion.title': 'Discussion time',
+  'discussion.guide': '{name} starts. Everyone gives one clue in turn, then discuss and vote out who you think is the imposter.',
+  'discussion.imposters': { one: 'There is {count} imposter among you', other: 'There are {count} imposters among you' },
+  'discussion.impostersHidden': 'How many imposters? Nobody knows…',
+  'discussion.timeUp': "Time's up!",
+  'discussion.toVote': 'Time to vote',
+  'discussion.toReveal': 'Reveal the imposter',
+
+  'timer.minutesLeft': { one: '{count} minute left', other: '{count} minutes left' },
+  'timer.secondsLeft': { one: '{count} second left', other: '{count} seconds left' },
+
+  'vote.title': 'Who did the group vote out?',
+  'vote.nobody': 'Nobody',
+
+  'guess.title': '{name} was an imposter! They get one guess at the word — did they get it?',
+  'guess.yes': 'Yes, they got it',
+  'guess.no': 'No, they missed',
+
+  'result.imposters': { one: 'The imposter was', other: 'The imposters were' },
+  'result.word': 'The word was',
+  'result.category': 'Category: {category}',
+  'result.crewWins': 'The crew wins!',
+  'result.impostersWin': { one: 'The imposter wins!', other: 'The imposters win!' },
+  'result.nextRound': 'Next round',
+  'result.scores': 'Scores',
+  'result.points': { one: '{count} pt', other: '{count} pts' },
+
+  'words.title': 'My words',
+  'words.empty': 'No custom words yet. Words typed by a Game Master show up here.',
+  'words.builtIn': 'built-in',
+  'words.english': 'English',
+  'words.arabic': 'Arabic',
+  'words.word': 'Word',
+  'words.hint': 'Hint',
+  'words.name': 'Name',
+  'words.deleteWordConfirm': 'Delete this word?',
+  'words.deleteCategoryConfirm': {
+    one: 'Delete this category and its {count} word?',
+    other: 'Delete this category and its {count} words?',
+  },
+
+  'data.title': 'Backup & import',
+  'data.backupTip': 'Your players and words live only on this device. Export a backup now and then.',
+  'data.export': 'Export backup',
+  'data.importFile': 'Import from a file',
+  'data.importUrl': 'Import from a link',
+  'data.urlPlaceholder': 'https://…',
+  'data.load': 'Load',
+  'data.addsCategories': { one: 'Adds {count} category', other: 'Adds {count} categories' },
+  'data.updatesCategories': { one: 'Updates {count} category', other: 'Updates {count} categories' },
+  'data.addsWords': { one: 'Adds {count} word', other: 'Adds {count} words' },
+  'data.updatesWords': { one: 'Updates {count} word', other: 'Updates {count} words' },
+  'data.addsPlayers': { one: 'Adds {count} player', other: 'Adds {count} players' },
+  'data.replacesSettings': 'Replaces your settings',
+  'data.skipsBuiltIn': { one: 'Skips {count} built-in entry', other: 'Skips {count} built-in entries' },
+  'data.overwriteNote': 'Updated entries overwrite your local changes to them.',
+  'data.nothing': 'Nothing new to import.',
+  'data.confirm': 'Import',
+  'data.imported': 'Imported!',
+  'data.problems': 'The file has problems:',
+
+  'fetch.invalidUrl': "That doesn't look like a link",
+  'fetch.httpsOnly': 'Only https:// links are allowed',
+  'fetch.offline': "You're offline",
+  'fetch.network': "Couldn't reach that link (the server may not allow cross-site access)",
+  'fetch.timeout': 'The link took too long to answer',
+  'fetch.httpStatus': 'The server answered with error {status}',
+  'fetch.tooLarge': 'The file is too large (max 1 MB)',
+  'fetch.invalidJson': "That isn't a valid JSON file",
+
+  'pack.badFormat': "not a Fenna's Imposter file",
+  'pack.wrongType': 'wrong type',
+  'pack.missing': 'missing',
+  'pack.invalidId': 'invalid id',
+  'pack.empty': 'empty',
+  'pack.tooLong': 'too long',
+  'pack.unknownCategory': 'unknown category',
+  'pack.duplicateId': 'duplicate id',
+
+  'storage.unavailable': "Can't save on this device — changes will be lost when the app closes.",
+  'storage.corrupt': 'Saved data was damaged and has been reset. A copy was kept.',
+  'storage.newer': 'This data was saved by a newer version of the app. Reload to update.',
+
+  'update.available': 'New version available — tap to reload',
+} as const
+
+export const en = messages
+
+export type Messages = {
+  [K in keyof typeof messages]: (typeof messages)[K] extends string ? string : PluralForms
+}
