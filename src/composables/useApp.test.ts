@@ -1,11 +1,12 @@
 import { describe, expect, it } from 'bun:test'
 import { seededRng } from '../engine/rng'
 import { STORAGE_KEY, memoryStorage, type StorageLike } from '../data/storage'
+import { TEST_SECRETS } from '../data/testWord'
 import { createAppStore, type AppStore } from './useApp'
 
-function setup(storage: StorageLike | null = memoryStorage(), seed = 1): AppStore {
+function setup(storage: StorageLike | null = memoryStorage(), seed = 1, devTools = false): AppStore {
   let n = 0
-  return createAppStore({ storage, rng: seededRng(seed), now: () => 1_000, newId: () => `id${++n}` })
+  return createAppStore({ storage, rng: seededRng(seed), now: () => 1_000, newId: () => `id${++n}`, devTools })
 }
 function withPlayers(app: AppStore, names = ['Rami', 'Lina', 'Omar', 'Sara']): string[] {
   for (const name of names) expect(app.addPlayer(name)).toBeNull()
@@ -178,5 +179,38 @@ describe('import', () => {
     app.applyImport(preview.plan)
     expect(app.state.customWords.map((w) => w.id)).toEqual(['jo.mansaf'])
     expect(app.state.selectedCategoryIds).toContain('jo')
+  })
+})
+
+describe('test mode (dev server only)', () => {
+  it('always deals the same fixed word, without using up the word history, so the UI can be tried again and again', () => {
+    const app = setup(memoryStorage(), 1, true)
+    withPlayers(app)
+    app.setTestMode(true)
+    for (const id of [...app.state.selectedCategoryIds]) app.toggleCategory(id) // works even with nothing selected
+    expect(app.roundBlocker({ kind: 'random' })).toBeNull()
+    for (let i = 0; i < 3; i++) {
+      app.beginRound({ kind: 'random' })
+      expect(app.state.round!.secret).toEqual(TEST_SECRETS.en)
+      playOut(app)
+    }
+    expect(app.state.usedWordIds).toEqual({ en: [], ar: [] })
+  })
+
+  it('uses the Arabic test word in Arabic rounds', () => {
+    const app = setup(memoryStorage(), 1, true)
+    withPlayers(app)
+    app.setTestMode(true)
+    app.setLanguage('ar')
+    app.beginRound({ kind: 'random' })
+    expect(app.state.round!.secret).toEqual(TEST_SECRETS.ar)
+  })
+
+  it('is ignored outside the dev server, so real players always get real words', () => {
+    const app = setup(memoryStorage(), 1, false)
+    withPlayers(app)
+    app.setTestMode(true)
+    app.beginRound({ kind: 'random' })
+    expect(app.state.round!.secret!.wordId).not.toBe(TEST_SECRETS.en.wordId)
   })
 })

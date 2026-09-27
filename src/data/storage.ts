@@ -33,6 +33,8 @@ export interface Stored {
   lastImportUrl: string | null
   session: Session | null
   round: RoundState | null
+  /** Dev-only: deal the fixed test word (see data/testWord.ts). Absent in older documents. */
+  testMode?: boolean
 }
 
 export type LoadStatus = 'ok' | 'fresh' | 'corrupt' | 'newer' | 'unavailable'

@@ -10,12 +10,15 @@ import * as roster from '../data/roster'
 import * as custom from '../data/content'
 import { parsePack, planImport, type ImportMode, type ImportPlan, type PackError } from '../data/transfer'
 import { translate, type MessageKey, type Params } from '../i18n'
+import { TEST_SECRETS } from '../data/testWord'
 
 export interface AppDeps {
   storage: StorageLike | null
   rng: Rng
   now: () => number
   newId: () => string
+  /** True only on the dev server: enables test mode. */
+  devTools?: boolean
 }
 
 export type RoundBlocker = 'needPlayers' | 'noWords' | 'noGm'
@@ -41,6 +44,8 @@ export function createAppStore(deps: AppDeps) {
   }
 
   const content = computed(() => custom.allContent(state))
+  const devTools = deps.devTools ?? false
+  const testModeActive = computed(() => devTools && state.testMode === true)
 
   function t(key: MessageKey, params?: Params): string {
     return translate(state.language, key, params)
@@ -137,7 +142,11 @@ export function createAppStore(deps: AppDeps) {
     const active = activeIds()
     if (source.kind === 'playerGm' && !active.includes(source.gmPlayerId)) return 'noGm'
     if (participantsFor(active, source).length < MIN_PARTICIPANTS) return 'needPlayers'
-    if (source.kind === 'random' && eligibleWords(content.value, state.language, state.selectedCategoryIds).length === 0) {
+    if (
+      source.kind === 'random' &&
+      !testModeActive.value &&
+      eligibleWords(content.value, state.language, state.selectedCategoryIds).length === 0
+    ) {
       return 'noWords'
     }
     return null
@@ -156,7 +165,9 @@ export function createAppStore(deps: AppDeps) {
     if (!state.session) state.session = { scores: {}, rounds: 0 }
     const lang = state.language
     let secret: Secret | null = null
-    if (source.kind === 'random') {
+    if (source.kind === 'random' && testModeActive.value) {
+      secret = TEST_SECRETS[lang] // the word history is left untouched
+    } else if (source.kind === 'random') {
       const eligible = eligibleWords(content.value, lang, state.selectedCategoryIds)
       const picked = pickWord(eligible, state.usedWordIds[lang], deps.rng)
       const category = content.value.categories.find((c) => c.id === picked.word.categoryId)
@@ -256,6 +267,11 @@ export function createAppStore(deps: AppDeps) {
     persist()
   }
 
+  function setTestMode(on: boolean): void {
+    state.testMode = on
+    persist()
+  }
+
   function dismissNotice(): void {
     meta.noticeDismissed = true
   }
@@ -267,6 +283,7 @@ export function createAppStore(deps: AppDeps) {
     finishRound, abandonRound,
     updateCustomWord, updateCustomCategory, deleteCustomWord, deleteCustomCategory,
     previewImport, applyImport, setLastImportUrl, dismissNotice,
+    devTools, testModeActive, setTestMode,
   }
 }
 
@@ -275,6 +292,12 @@ export type AppStore = ReturnType<typeof createAppStore>
 let instance: AppStore | null = null
 
 export function useApp(): AppStore {
-  instance ??= createAppStore({ storage: browserStorage(), rng: cryptoRng, now: () => Date.now(), newId })
+  instance ??= createAppStore({
+    storage: browserStorage(),
+    rng: cryptoRng,
+    now: () => Date.now(),
+    newId,
+    devTools: import.meta.env.DEV,
+  })
   return instance
 }

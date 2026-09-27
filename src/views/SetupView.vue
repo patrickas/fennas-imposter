@@ -86,6 +86,10 @@ const timerEnabled = computed({
   get: () => app.state.settings.timer.enabled,
   set: (enabled: boolean) => app.updateSettings({ timer: { ...app.state.settings.timer, enabled } }),
 })
+const testMode = computed({
+  get: () => app.state.testMode === true,
+  set: (on: boolean) => app.setTestMode(on),
+})
 const timerSeconds = computed({
   get: () => app.state.settings.timer.seconds,
   set: (seconds: number) => app.updateSettings({ timer: { ...app.state.settings.timer, seconds } }),
@@ -187,6 +191,7 @@ function done(): void {
         testid="timer-seconds"
       />
       <Toggle v-model="scoring" :label="app.t('setup.scoring')" testid="toggle-scoring" />
+      <Toggle v-if="app.devTools" v-model="testMode" :label="app.t('setup.testMode')" testid="toggle-test-mode" />
     </section>
 
     <template #actions>

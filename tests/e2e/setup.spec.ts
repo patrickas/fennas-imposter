@@ -40,3 +40,10 @@ test('the imposter count cannot be raised past what the players allow', async ({
   await expect(page.getByTestId('imposters-value')).toHaveText('2')
   await expect(page.getByTestId('imposters-inc')).toBeDisabled()
 })
+
+test('the dev-only test mode is never offered in the production build', async ({ page }) => {
+  await page.goto('/')
+  await page.getByTestId('nav-setup').click()
+  await expect(page.getByTestId('toggle-scoring')).toBeVisible()
+  await expect(page.getByTestId('toggle-test-mode')).toHaveCount(0)
+})

@@ -46,6 +46,7 @@ const messages = {
   'setup.timer': 'Discussion timer',
   'setup.timerLength': 'Timer length',
   'setup.scoring': 'Keep score',
+  'setup.testMode': 'Test mode (dev only): always deal "Secret word"',
   'setup.done': 'Done',
   'setup.decrease': 'Less',
   'setup.increase': 'More',

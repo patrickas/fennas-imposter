@@ -53,6 +53,7 @@ export const ar: Messages = {
   'setup.timer': 'مؤقّت النقاش',
   'setup.timerLength': 'مدّة المؤقّت',
   'setup.scoring': 'احسبوا النقاط',
+  'setup.testMode': 'وضع التجربة (للتطوير بس): دايماً «كلمة سرّية»',
   'setup.done': 'خلصنا',
   'setup.decrease': 'أقل',
   'setup.increase': 'أكتر',
