@@ -7,8 +7,16 @@
     <link rel="icon" href="/favicon.ico" sizes="48x48" />
     <link rel="apple-touch-icon" href="/apple-touch-icon-180x180.png" />
     <title>Fennass, Imposter</title>
+    <!-- Startup splash: lives in the page itself so it is there from the first paint, before the app's code and CSS load. -->
+    <style>
+      #splash { position: fixed; inset: 0; z-index: 100; display: grid; place-items: center; background: #ffe14d; }
+      #splash img { width: min(50vw, 220px); height: auto; animation: splash-turn 1s ease-in-out 500ms; }
+      @keyframes splash-turn { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+      @media (prefers-reduced-motion: reduce) { #splash img { animation: none; } }
+    </style>
   </head>
   <body>
+    <div id="splash" data-testid="splash"><img src="/pwa-512x512.png" alt="" data-testid="splash-icon" /></div>
     <div id="app"></div>
     <script type="module" src="/src/main.ts"></script>
   </body>

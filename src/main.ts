@@ -13,5 +13,10 @@ import { router } from './router'
 
 createApp(App).use(router).mount('#app')
 
+// The splash in index.html holds the icon still, turns it once, then makes way for the game.
+const splash = document.getElementById('splash')
+const turned = splash?.getAnimations({ subtree: true }).map((a) => a.finished) ?? []
+void Promise.allSettled([router.isReady(), ...turned]).then(() => splash?.remove())
+
 // Ask the browser not to evict our localStorage under pressure (spec §8). Unsupported → no-op.
 void navigator.storage?.persist?.().catch(() => false)
