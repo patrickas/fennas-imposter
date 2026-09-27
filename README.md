@@ -22,7 +22,7 @@ podman compose exec web bun run build        # type-check + production build int
 podman compose run --rm e2e                  # Playwright end-to-end tests against the production preview
 ```
 
-Regenerate the app icons after editing `public/icon.svg`:
+Regenerate the app icons after replacing `public/icon.png` (a square, transparent PNG, at least 512px):
 
 ```bash
 podman compose exec web bun run icons

@@ -30,7 +30,7 @@ export default defineConfig({
     VitePWA({
       registerType: 'prompt',
       injectRegister: false,
-      includeAssets: ['favicon.ico', 'apple-touch-icon-180x180.png', 'icon.svg'],
+      includeAssets: ['favicon.ico', 'apple-touch-icon-180x180.png'],
       manifest: {
         name: 'Fennass, Imposter — فنّاص',
         short_name: 'Fennass',
@@ -50,6 +50,7 @@ export default defineConfig({
       },
       workbox: {
         globPatterns: ['**/*.{js,css,html,svg,png,ico,woff2}'],
+        globIgnores: ['icon.png'], // source image for `bun run icons`, never shown
         navigateFallback: 'index.html',
         cleanupOutdatedCaches: true,
       },
