@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { useRouter } from 'vue-router'
 import { useApp } from '../composables/useApp'
+import { confirmDialog } from '../composables/useDialog'
 import Screen from '../components/ui/Screen.vue'
 import StickerCard from '../components/ui/StickerCard.vue'
 import PopButton from '../components/ui/PopButton.vue'
@@ -10,8 +11,14 @@ import LanguageSwitch from '../components/ui/LanguageSwitch.vue'
 const app = useApp()
 const router = useRouter()
 
-function abandon(): void {
-  if (window.confirm(app.t('home.abandonConfirm'))) app.abandonRound()
+async function abandon(): Promise<void> {
+  const confirmed = await confirmDialog({
+    message: app.t('home.abandonConfirm'),
+    confirmLabel: app.t('home.abandon'),
+    cancelLabel: app.t('common.cancel'),
+    danger: true,
+  })
+  if (confirmed) app.abandonRound()
 }
 
 function play(): void {

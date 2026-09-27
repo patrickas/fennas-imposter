@@ -40,20 +40,16 @@ test('clamp notice, hints off, count chip, leave-round confirm with resume, and 
   await startPlaying(page)
   await expect(page.getByTestId('imposter-count')).toHaveText('There is 1 imposter among you')
 
-  let asked = ''
-  page.once('dialog', (d) => {
-    asked = d.message()
-    void d.dismiss()
-  })
   await page.evaluate(() => {
     location.hash = '#/'
   })
+  await expect(page.getByTestId('dialog')).toHaveText(/Leave the round\? You can continue it later\./)
+  await page.getByTestId('dialog-cancel').click()
   await expect(page.getByTestId('discussion')).toBeVisible()
-  expect(asked).toBe('Leave the round? You can continue it later.')
-  page.once('dialog', (d) => void d.accept())
   await page.evaluate(() => {
     location.hash = '#/'
   })
+  await page.getByTestId('dialog-confirm').click()
   await expect(page.getByTestId('play')).toHaveText('Continue game')
   await page.getByTestId('play').click()
   await expect(page.getByTestId('discussion')).toBeVisible()
@@ -61,8 +57,8 @@ test('clamp notice, hints off, count chip, leave-round confirm with resume, and 
   await page.getByTestId('end-discussion').click()
   await page.getByTestId('vote-nobody').click()
   await page.getByTestId('next-round').click()
-  page.once('dialog', (d) => void d.accept())
   await page.getByTestId('end-game').click()
+  await page.getByTestId('dialog-confirm').click()
   await expect(page.getByTestId('play')).toHaveText("Let's play")
   expect(await page.evaluate(() => JSON.parse(localStorage.getItem('fennas-imposter')!).session)).toBeNull()
 })

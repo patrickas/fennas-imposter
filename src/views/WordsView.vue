@@ -3,6 +3,7 @@ import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import type { Category, Lang, Localized, Word } from '../engine/types'
 import { useApp } from '../composables/useApp'
+import { confirmDialog } from '../composables/useDialog'
 import type { LocalizedError } from '../data/content'
 import { LIMITS } from '../data/limits'
 import Screen from '../components/ui/Screen.vue'
@@ -61,12 +62,16 @@ function errorText(error: LocalizedError): string {
   return app.t('error.tooLong', { max })
 }
 
-function removeWord(id: string): void {
-  if (window.confirm(app.t('words.deleteWordConfirm'))) app.deleteCustomWord(id)
+function confirmDelete(message: string): Promise<boolean> {
+  return confirmDialog({ message, confirmLabel: app.t('common.delete'), cancelLabel: app.t('common.cancel'), danger: true })
 }
 
-function removeCategory(id: string, count: number): void {
-  if (window.confirm(app.t('words.deleteCategoryConfirm', { count }))) app.deleteCustomCategory(id)
+async function removeWord(id: string): Promise<void> {
+  if (await confirmDelete(app.t('words.deleteWordConfirm'))) app.deleteCustomWord(id)
+}
+
+async function removeCategory(id: string, count: number): Promise<void> {
+  if (await confirmDelete(app.t('words.deleteCategoryConfirm', { count }))) app.deleteCustomCategory(id)
 }
 </script>
 

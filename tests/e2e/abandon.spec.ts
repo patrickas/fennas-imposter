@@ -6,7 +6,6 @@ import { addPlayers } from './helpers'
 // back button, so the way out must be on screen.
 
 test('a spoiled round can be left from the screen and abandoned without touching the scores', async ({ page }) => {
-  page.on('dialog', (dialog) => void dialog.accept())
   await page.goto('/')
   await addPlayers(page, ['Rami', 'Lina', 'Omar'], { scoring: true })
   await page.getByTestId('play').click()
@@ -14,7 +13,9 @@ test('a spoiled round can be left from the screen and abandoned without touching
   await expect(page.getByTestId('pass-screen')).toBeVisible()
 
   await page.getByTestId('leave-round').click()
+  await page.getByTestId('dialog-confirm').click()
   await page.getByTestId('abandon-round').click()
+  await page.getByTestId('dialog-confirm').click()
   await expect(page.getByTestId('abandon-round')).toHaveCount(0)
 
   const stored = await page.evaluate(() => JSON.parse(localStorage.getItem('fennas-imposter')!))

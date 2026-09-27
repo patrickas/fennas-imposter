@@ -3,6 +3,7 @@ import { computed, onErrorCaptured, ref } from 'vue'
 import { onBeforeRouteLeave } from 'vue-router'
 import { useApp } from '../composables/useApp'
 import { useWakeLock } from '../composables/useWakeLock'
+import { confirmDialog } from '../composables/useDialog'
 import Screen from '../components/ui/Screen.vue'
 import StickerCard from '../components/ui/StickerCard.vue'
 import PopButton from '../components/ui/PopButton.vue'
@@ -31,7 +32,7 @@ onErrorCaptured((error) => {
 onBeforeRouteLeave(() => {
   const round = app.state.round
   if (!round || round.phase === 'result' || crashed.value) return true
-  return window.confirm(app.t('play.leaveConfirm'))
+  return confirmDialog({ message: app.t('play.leaveConfirm'), confirmLabel: app.t('play.leave'), cancelLabel: app.t('play.stay') })
 })
 
 function abandon(): void {

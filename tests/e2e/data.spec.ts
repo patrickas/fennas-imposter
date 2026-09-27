@@ -12,12 +12,12 @@ const PACK = {
 }
 
 test('a backup exported on one phone restores players and custom words on another', async ({ page, browser }) => {
-  page.on('dialog', (dialog) => void dialog.accept())
   await page.goto('/')
   await addPlayers(page, ['Rami', 'Lina', 'Omar'])
   await startGmRound(page, { word: 'Mansaf', newCategory: 'Jordanian food' })
   await dealCards(page, 3)
   await page.goto('/#/data')
+  await page.getByTestId('dialog-confirm').click() // leave the round in progress
   const [download] = await Promise.all([page.waitForEvent('download'), page.getByTestId('export').click()])
   expect(download.suggestedFilename()).toMatch(/^fennas-imposter-\d{4}-\d{2}-\d{2}\.json$/)
   const file = await download.path()

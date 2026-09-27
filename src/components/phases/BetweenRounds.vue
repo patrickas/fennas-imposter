@@ -4,6 +4,7 @@ import { useRouter } from 'vue-router'
 import type { Source } from '../../engine/types'
 import { useApp } from '../../composables/useApp'
 import type { MessageKey } from '../../i18n'
+import { confirmDialog } from '../../composables/useDialog'
 import Screen from '../ui/Screen.vue'
 import Chip from '../ui/Chip.vue'
 import PopButton from '../ui/PopButton.vue'
@@ -53,8 +54,14 @@ function start(): void {
   app.beginRound(source.value)
 }
 
-function endGame(): void {
-  if (!window.confirm(app.t('play.endGameConfirm'))) return
+async function endGame(): Promise<void> {
+  const confirmed = await confirmDialog({
+    message: app.t('play.endGameConfirm'),
+    confirmLabel: app.t('play.endGame'),
+    cancelLabel: app.t('common.cancel'),
+    danger: true,
+  })
+  if (!confirmed) return
   app.endSession()
   void router.push('/')
 }

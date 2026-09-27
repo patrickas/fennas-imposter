@@ -2,7 +2,6 @@ import { expect, test } from '@playwright/test'
 import { addPlayers, dealCards, startGmRound, startPlaying } from './helpers'
 
 test('a player Game Master sits out, and their word is saved to My words', async ({ page }) => {
-  page.on('dialog', (dialog) => void dialog.accept())
   await page.goto('/')
   await addPlayers(page, ['Rami', 'Lina', 'Omar', 'Sara'])
   await startGmRound(page, { gmPlayer: 'Rami', word: 'Mansaf', newCategory: 'Jordanian food' })
@@ -11,6 +10,7 @@ test('a player Game Master sits out, and their word is saved to My words', async
   expect(deal.crewWords.every((w) => w === 'Mansaf')).toBe(true)
 
   await page.goto('/#/words')
+  await page.getByTestId('dialog-confirm').click() // leave the round in progress
   await expect(page.getByTestId('custom-category')).toContainText('Jordanian food')
   await expect(page.getByTestId('custom-word')).toContainText('Mansaf')
 })

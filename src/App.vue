@@ -4,6 +4,7 @@ import { RouterView } from 'vue-router'
 import { useApp } from './composables/useApp'
 import { dirFor } from './i18n'
 import StatusBanner from './components/ui/StatusBanner.vue'
+import ConfirmDialog from './components/ui/ConfirmDialog.vue'
 import { usePwaUpdate } from './composables/usePwaUpdate'
 
 const app = useApp()
@@ -23,4 +24,5 @@ watchEffect(() => {
       <component :is="Component" />
     </Transition>
   </RouterView>
+  <ConfirmDialog />
 </template>
