@@ -1,0 +1,33 @@
+import type { SeedPack } from '../types'
+
+export const jobs: SeedPack = {
+  id: 'jobs',
+  name: { en: 'Jobs', ar: 'مهن' },
+  rows: [
+    ['doctor', 'Doctor', 'دكتور', 'Hospital', 'مستشفى'],
+    ['teacher', 'Teacher', 'أستاذ', 'School', 'مدرسة'],
+    ['chef', 'Chef', 'شيف', 'Kitchen', 'مطبخ'],
+    ['police', 'Police officer', 'شرطي', 'Law', 'قانون'],
+    ['firefighter', 'Firefighter', 'إطفائي', 'Ladder', 'سلّم'],
+    ['pilot', 'Pilot', 'طيّار', 'Sky', 'سما'],
+    ['farmer', 'Farmer', 'فلّاح', 'Tractor', 'تراكتور'],
+    ['barber', 'Barber', 'حلّاق', 'Scissors', 'مقص'],
+    ['dentist', 'Dentist', 'دكتور سنان', 'Smile', 'ابتسامة'],
+    ['mechanic', 'Mechanic', 'ميكانيكي', 'Car', 'سيارة'],
+    ['baker', 'Baker', 'فرّان', 'Dough', 'عجين'],
+    ['taxi-driver', 'Taxi driver', 'شوفير تاكسي', 'Meter', 'عدّاد'],
+    ['photographer', 'Photographer', 'مصوّر', 'Camera', 'كاميرا'],
+    ['singer', 'Singer', 'مغنّي', 'Microphone', 'مايك'],
+    ['actor', 'Actor', 'ممثّل', 'Stage', 'مسرح'],
+    ['nurse', 'Nurse', 'ممرّض', 'Injection', 'إبرة'],
+    ['lawyer', 'Lawyer', 'محامي', 'Court', 'محكمة'],
+    ['engineer', 'Engineer', 'مهندس', 'Plans', 'خرايط'],
+    ['plumber', 'Plumber', 'سمكري', 'Pipes', 'قساطل'],
+    ['electrician', 'Electrician', 'كهربجي', 'Wires', 'شرطان'],
+    ['carpenter', 'Carpenter', 'نجّار', 'Wood', 'خشب'],
+    ['tailor', 'Tailor', 'خيّاط', 'Thread', 'خيطان'],
+    ['astronaut', 'Astronaut', 'رائد فضاء', 'Moon', 'قمر'],
+    ['waiter', 'Waiter', 'جرسون', 'Tray', 'صينية'],
+    ['postman', 'Postman', 'ساعي بريد', 'Letter', 'رسالة'],
+  ],
+}

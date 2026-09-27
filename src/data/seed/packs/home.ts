@@ -1,0 +1,33 @@
+import type { SeedPack } from '../types'
+
+export const home: SeedPack = {
+  id: 'home',
+  name: { en: 'Around the house', ar: 'أغراض البيت' },
+  rows: [
+    ['sofa', 'Sofa', 'كنباية', 'Living room', 'صالون'],
+    ['bed', 'Bed', 'تخت', 'Sleep', 'نوم'],
+    ['fridge', 'Fridge', 'براد', 'Cold', 'بارد'],
+    ['oven', 'Oven', 'فرن', 'Bake', 'خبيز'],
+    ['washing-machine', 'Washing machine', 'غسالة', 'Clothes', 'تياب'],
+    ['tv', 'TV', 'تلفزيون', 'Remote', 'ريموت'],
+    ['mirror', 'Mirror', 'مراية', 'Reflection', 'انعكاس'],
+    ['pillow', 'Pillow', 'مخدّة', 'Soft', 'ناعم'],
+    ['blanket', 'Blanket', 'حرام', 'Warm', 'دافي'],
+    ['lamp', 'Lamp', 'أباجورة', 'Light', 'ضو'],
+    ['door', 'Door', 'باب', 'Key', 'مفتاح'],
+    ['window', 'Window', 'شبّاك', 'Glass', 'قزاز'],
+    ['stairs', 'Stairs', 'درج', 'Up', 'فوق'],
+    ['carpet', 'Carpet', 'سجّادة', 'Floor', 'أرض'],
+    ['clock', 'Clock', 'ساعة', 'Time', 'وقت'],
+    ['toothbrush', 'Toothbrush', 'فرشاية سنان', 'Bathroom', 'حمّام'],
+    ['towel', 'Towel', 'منشفة', 'Shower', 'دوش'],
+    ['broom', 'Broom', 'مكنسة', 'Dust', 'غبرة'],
+    ['chair', 'Chair', 'كرسي', 'Table', 'طاولة'],
+    ['fan', 'Fan', 'مروحة', 'Summer', 'صيف'],
+    ['kettle', 'Kettle', 'غلّاية', 'Boil', 'غلي'],
+    ['plate', 'Plate', 'صحن', 'Dinner', 'عشا'],
+    ['spoon', 'Spoon', 'معلقة', 'Soup', 'شوربة'],
+    ['charger', 'Charger', 'شاحن', 'Battery', 'بطارية'],
+    ['balcony', 'Balcony', 'برندة', 'View', 'منظر'],
+  ],
+}

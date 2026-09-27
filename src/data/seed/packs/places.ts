@@ -1,0 +1,33 @@
+import type { SeedPack } from '../types'
+
+export const places: SeedPack = {
+  id: 'places',
+  name: { en: 'Places', ar: 'أماكن' },
+  rows: [
+    ['beach', 'Beach', 'البحر', 'Sand', 'رمل'],
+    ['hospital', 'Hospital', 'مستشفى', 'Ambulance', 'إسعاف'],
+    ['school', 'School', 'مدرسة', 'Homework', 'وظيفة'],
+    ['airport', 'Airport', 'مطار', 'Passport', 'باسبور'],
+    ['supermarket', 'Supermarket', 'سوبرماركت', 'Cart', 'عرباية'],
+    ['cinema', 'Cinema', 'سينما', 'Popcorn', 'بوشار'],
+    ['restaurant', 'Restaurant', 'مطعم', 'Menu', 'منيو'],
+    ['mosque', 'Mosque', 'جامع', 'Prayer', 'صلاة'],
+    ['church', 'Church', 'كنيسة', 'Bells', 'جرس'],
+    ['park', 'Park', 'جنينة', 'Swings', 'مراجيح'],
+    ['library', 'Library', 'مكتبة', 'Books', 'كتب'],
+    ['gym', 'Gym', 'جيم', 'Muscles', 'عضلات'],
+    ['zoo', 'Zoo', 'حديقة حيوانات', 'Cages', 'أقفاص'],
+    ['bank', 'Bank', 'بنك', 'Money', 'مصاري'],
+    ['pharmacy', 'Pharmacy', 'صيدلية', 'Medicine', 'دوا'],
+    ['mountain', 'Mountain', 'جبل', 'Snow', 'تلج'],
+    ['museum', 'Museum', 'متحف', 'History', 'تاريخ'],
+    ['stadium', 'Stadium', 'ملعب', 'Fans', 'جمهور'],
+    ['hotel', 'Hotel', 'أوتيل', 'Room', 'غرفة'],
+    ['swimming-pool', 'Swimming pool', 'مسبح', 'Diving', 'غطس'],
+    ['prison', 'Prison', 'حبس', 'Guard', 'حارس'],
+    ['wedding-hall', 'Wedding hall', 'صالة أعراس', 'Dance', 'رقص'],
+    ['gas-station', 'Gas station', 'محطة بنزين', 'Car', 'سيارة'],
+    ['bakery', 'Bakery', 'فرن', 'Bread', 'خبز'],
+    ['amusement-park', 'Amusement park', 'مدينة ملاهي', 'Rides', 'ألعاب'],
+  ],
+}

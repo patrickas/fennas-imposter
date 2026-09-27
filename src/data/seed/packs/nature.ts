@@ -1,0 +1,33 @@
+import type { SeedPack } from '../types'
+
+export const nature: SeedPack = {
+  id: 'nature',
+  name: { en: 'Nature & weather', ar: 'طبيعة وطقس' },
+  rows: [
+    ['rain', 'Rain', 'شتي', 'Umbrella', 'شمسية'],
+    ['snow', 'Snow', 'تلج', 'White', 'أبيض'],
+    ['sun', 'Sun', 'شمس', 'Hot', 'شوب'],
+    ['moon', 'Moon', 'قمر', 'Night', 'ليل'],
+    ['stars', 'Stars', 'نجوم', 'Sky', 'سما'],
+    ['rainbow', 'Rainbow', 'قوس قزح', 'Colors', 'ألوان'],
+    ['thunder', 'Thunder', 'رعد', 'Loud', 'صوت عالي'],
+    ['wind', 'Wind', 'هوا', 'Kite', 'طيّارة ورق'],
+    ['cloud', 'Cloud', 'غيمة', 'Grey', 'رمادي'],
+    ['volcano', 'Volcano', 'بركان', 'Lava', 'حمم'],
+    ['desert', 'Desert', 'صحرا', 'Camel', 'جمل'],
+    ['forest', 'Forest', 'غابة', 'Trees', 'شجر'],
+    ['river', 'River', 'نهر', 'Bridge', 'جسر'],
+    ['ocean', 'Ocean', 'محيط', 'Waves', 'موج'],
+    ['flower', 'Flower', 'وردة', 'Smell', 'ريحة'],
+    ['tree', 'Tree', 'شجرة', 'Leaves', 'ورق'],
+    ['cave', 'Cave', 'مغارة', 'Dark', 'عتمة'],
+    ['island', 'Island', 'جزيرة', 'Palm tree', 'نخلة'],
+    ['waterfall', 'Waterfall', 'شلّال', 'Height', 'علو'],
+    ['earthquake', 'Earthquake', 'هزّة أرضية', 'Cracks', 'شقوق'],
+    ['fog', 'Fog', 'ضباب', 'Driving', 'سواقة'],
+    ['lightning', 'Lightning', 'برق', 'Storm', 'عاصفة'],
+    ['rock', 'Rock', 'صخرة', 'Heavy', 'تقيل'],
+    ['sunset', 'Sunset', 'غروب', 'Orange', 'برتقاني'],
+    ['mud', 'Mud', 'وحل', 'Boots', 'جزمة'],
+  ],
+}

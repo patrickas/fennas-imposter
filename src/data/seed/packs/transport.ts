@@ -1,0 +1,33 @@
+import type { SeedPack } from '../types'
+
+export const transport: SeedPack = {
+  id: 'transport',
+  name: { en: 'Getting around', ar: 'مواصلات' },
+  rows: [
+    ['car', 'Car', 'سيارة', 'Wheel', 'دولاب'],
+    ['bus', 'Bus', 'باص', 'Stop', 'موقف'],
+    ['plane', 'Plane', 'طيارة', 'Wings', 'جوانح'],
+    ['train', 'Train', 'قطار', 'Rails', 'سكّة'],
+    ['boat', 'Boat', 'قارب', 'Sea', 'بحر'],
+    ['motorcycle', 'Motorcycle', 'موتور', 'Helmet', 'خوذة'],
+    ['taxi', 'Taxi', 'تاكسي', 'Yellow', 'أصفر'],
+    ['helicopter', 'Helicopter', 'هليكوبتر', 'Propeller', 'مروحة'],
+    ['ship', 'Ship', 'باخرة', 'Port', 'مرفأ'],
+    ['metro', 'Metro', 'مترو', 'Underground', 'تحت الأرض'],
+    ['truck', 'Truck', 'كميون', 'Heavy', 'تقيل'],
+    ['ambulance', 'Ambulance', 'إسعاف', 'Siren', 'سيرينا'],
+    ['scooter', 'Scooter', 'سكوتر', 'Kids', 'ولاد'],
+    ['rocket', 'Rocket', 'صاروخ', 'Space', 'فضا'],
+    ['hot-air-balloon', 'Hot air balloon', 'منطاد', 'Basket', 'سلّة'],
+    ['skateboard', 'Skateboard', 'سكيتبورد', 'Tricks', 'حركات'],
+    ['cable-car', 'Cable car', 'تلفريك', 'Mountain', 'جبل'],
+    ['submarine', 'Submarine', 'غوّاصة', 'Deep', 'غميق'],
+    ['tractor', 'Tractor', 'تراكتور', 'Farm', 'مزرعة'],
+    ['carriage', 'Carriage', 'عربة', 'Horse', 'حصان'],
+    ['shared-taxi', 'Shared taxi', 'سرفيس', 'Shared', 'مشترك'],
+    ['jet-ski', 'Jet ski', 'جت سكي', 'Waves', 'موج'],
+    ['fire-truck', 'Fire truck', 'سيارة إطفاء', 'Hose', 'خرطوم'],
+    ['parachute', 'Parachute', 'باراشوت', 'Jump', 'نطّة'],
+    ['roller-skates', 'Roller skates', 'باتيناج', 'Wheels', 'دواليب'],
+  ],
+}

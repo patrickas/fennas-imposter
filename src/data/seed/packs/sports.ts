@@ -1,0 +1,33 @@
+import type { SeedPack } from '../types'
+
+export const sports: SeedPack = {
+  id: 'sports',
+  name: { en: 'Sports & games', ar: 'رياضة وألعاب' },
+  rows: [
+    ['football', 'Football', 'فوتبول', 'Goal', 'غول'],
+    ['basketball', 'Basketball', 'باسكيت', 'Hoop', 'سلّة'],
+    ['tennis', 'Tennis', 'تنس', 'Racket', 'مضرب'],
+    ['swimming', 'Swimming', 'سباحة', 'Pool', 'مسبح'],
+    ['boxing', 'Boxing', 'ملاكمة', 'Gloves', 'كفوف'],
+    ['chess', 'Chess', 'شطرنج', 'King', 'ملك'],
+    ['cards', 'Playing cards', 'شدّة', 'Ace', 'آس'],
+    ['backgammon', 'Backgammon', 'طاولة زهر', 'Dice', 'زهر'],
+    ['running', 'Running', 'ركض', 'Marathon', 'ماراتون'],
+    ['bicycle', 'Bicycle', 'بسكليت', 'Pedals', 'دواسات'],
+    ['volleyball', 'Volleyball', 'فولي', 'Net', 'شبكة'],
+    ['skiing', 'Skiing', 'تزلّج', 'Snow', 'تلج'],
+    ['karate', 'Karate', 'كاراتيه', 'Belt', 'زنّار'],
+    ['hide-and-seek', 'Hide and seek', 'غمّيضة', 'Count', 'عدّ'],
+    ['ping-pong', 'Ping pong', 'بينغ بونغ', 'Small ball', 'طابة صغيرة'],
+    ['golf', 'Golf', 'غولف', 'Hole', 'جورة'],
+    ['video-games', 'Video games', 'بلايستيشن', 'Screen', 'شاشة'],
+    ['horse-riding', 'Horse riding', 'ركوب خيل', 'Saddle', 'سرج'],
+    ['fishing', 'Fishing', 'صيد سمك', 'Rod', 'صنّارة'],
+    ['dominoes', 'Dominoes', 'دومينو', 'Dots', 'نقط'],
+    ['bowling', 'Bowling', 'بولينغ', 'Strike', 'سترايك'],
+    ['wrestling', 'Wrestling', 'مصارعة', 'Ring', 'حلبة'],
+    ['jump-rope', 'Jump rope', 'نطّ الحبلة', 'Playground', 'ملعب'],
+    ['darts', 'Darts', 'سهام', 'Target', 'هدف'],
+    ['marbles', 'Marbles', 'كلل', 'Glass', 'قزاز'],
+  ],
+}

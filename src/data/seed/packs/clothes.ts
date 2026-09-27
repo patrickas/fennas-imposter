@@ -1,0 +1,33 @@
+import type { SeedPack } from '../types'
+
+export const clothes: SeedPack = {
+  id: 'clothes',
+  name: { en: 'Clothes & accessories', ar: 'تياب وإكسسوارات' },
+  rows: [
+    ['shirt', 'Shirt', 'قميص', 'Buttons', 'زرار'],
+    ['trousers', 'Trousers', 'بنطلون', 'Pockets', 'جيوب'],
+    ['dress', 'Dress', 'فستان', 'Party', 'حفلة'],
+    ['shoes', 'Shoes', 'صبّاط', 'Walk', 'مشي'],
+    ['hat', 'Hat', 'برنيطة', 'Head', 'راس'],
+    ['socks', 'Socks', 'كلسات', 'Feet', 'إجرين'],
+    ['jacket', 'Jacket', 'جاكيت', 'Zipper', 'سحّاب'],
+    ['scarf', 'Scarf', 'لفحة', 'Neck', 'رقبة'],
+    ['gloves', 'Gloves', 'كفوف', 'Hands', 'إيدين'],
+    ['sunglasses', 'Sunglasses', 'نضّارات شمس', 'Beach', 'بحر'],
+    ['watch', 'Watch', 'ساعة إيد', 'Wrist', 'معصم'],
+    ['ring', 'Ring', 'خاتم', 'Wedding', 'عرس'],
+    ['necklace', 'Necklace', 'عقد', 'Gold', 'دهب'],
+    ['pajamas', 'Pajamas', 'بيجاما', 'Bedtime', 'وقت النوم'],
+    ['swimsuit', 'Swimsuit', 'مايوه', 'Pool', 'مسبح'],
+    ['belt', 'Belt', 'زنّار', 'Buckle', 'بكلة'],
+    ['tie', 'Tie', 'كرافات', 'Suit', 'بدلة'],
+    ['boots', 'Boots', 'جزمة', 'Mud', 'وحل'],
+    ['sandals', 'Sandals', 'صندل', 'Summer', 'صيف'],
+    ['slippers', 'Slippers', 'شحّاطة', 'Home', 'بيت'],
+    ['earrings', 'Earrings', 'حلق', 'Ears', 'دينين'],
+    ['backpack', 'Backpack', 'شنطة ضهر', 'School', 'مدرسة'],
+    ['cap', 'Cap', 'كاب', 'Baseball', 'بيسبول'],
+    ['hoodie', 'Hoodie', 'هودي', 'Cozy', 'دافي'],
+    ['wallet', 'Wallet', 'جزدان', 'Money', 'مصاري'],
+  ],
+}

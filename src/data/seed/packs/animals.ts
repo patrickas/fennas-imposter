@@ -1,0 +1,33 @@
+import type { SeedPack } from '../types'
+
+export const animals: SeedPack = {
+  id: 'animals',
+  name: { en: 'Animals', ar: 'حيوانات' },
+  rows: [
+    ['cat', 'Cat', 'بسّة', 'Meow', 'مياو'],
+    ['dog', 'Dog', 'كلب', 'Bark', 'نباح'],
+    ['lion', 'Lion', 'أسد', 'King', 'ملك'],
+    ['elephant', 'Elephant', 'فيل', 'Trunk', 'خرطوم'],
+    ['monkey', 'Monkey', 'قرد', 'Banana', 'موز'],
+    ['horse', 'Horse', 'حصان', 'Ride', 'ركوب'],
+    ['donkey', 'Donkey', 'حمار', 'Stubborn', 'عنيد'],
+    ['camel', 'Camel', 'جمل', 'Desert', 'صحرا'],
+    ['chicken', 'Chicken', 'جاجة', 'Farm', 'مزرعة'],
+    ['cow', 'Cow', 'بقرة', 'Milk', 'حليب'],
+    ['sheep', 'Sheep', 'خاروف', 'Wool', 'صوف'],
+    ['fish', 'Fish', 'سمكة', 'Water', 'مي'],
+    ['shark', 'Shark', 'قرش', 'Teeth', 'سنان'],
+    ['snake', 'Snake', 'حيّة', 'Hiss', 'فحيح'],
+    ['frog', 'Frog', 'ضفدعة', 'Jump', 'نطّ'],
+    ['butterfly', 'Butterfly', 'فراشة', 'Wings', 'جوانح'],
+    ['bee', 'Bee', 'نحلة', 'Honey', 'عسل'],
+    ['owl', 'Owl', 'بومة', 'Night', 'ليل'],
+    ['penguin', 'Penguin', 'بطريق', 'Ice', 'تلج'],
+    ['giraffe', 'Giraffe', 'زرافة', 'Tall', 'طويل'],
+    ['rabbit', 'Rabbit', 'أرنب', 'Carrot', 'جزرة'],
+    ['mouse', 'Mouse', 'فارة', 'Cheese', 'جبنة'],
+    ['turtle', 'Turtle', 'سلحفة', 'Slow', 'بطيء'],
+    ['bear', 'Bear', 'دبّ', 'Forest', 'غابة'],
+    ['parrot', 'Parrot', 'ببغا', 'Talk', 'حكي'],
+  ],
+}

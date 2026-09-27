@@ -1,0 +1,33 @@
+import type { SeedPack } from '../types'
+
+export const food: SeedPack = {
+  id: 'food',
+  name: { en: 'Food & drinks', ar: 'أكل وشرب' },
+  rows: [
+    ['falafel', 'Falafel', 'فلافل', 'Fried', 'مقلي'],
+    ['hummus', 'Hummus', 'حمّص', 'Dip', 'تغميسة'],
+    ['pizza', 'Pizza', 'بيتزا', 'Italian', 'إيطالي'],
+    ['burger', 'Burger', 'برغر', 'Bun', 'خبزة'],
+    ['shawarma', 'Shawarma', 'شاورما', 'Sandwich', 'سندويشة'],
+    ['ice-cream', 'Ice cream', 'بوظة', 'Cold', 'بارد'],
+    ['chocolate', 'Chocolate', 'شوكولا', 'Sweet', 'حلو'],
+    ['coffee', 'Coffee', 'قهوة', 'Morning', 'الصبح'],
+    ['tea', 'Tea', 'شاي', 'Cup', 'كاسة'],
+    ['lemonade', 'Lemonade', 'ليموناضة', 'Summer', 'صيف'],
+    ['watermelon', 'Watermelon', 'بطيخ', 'Seeds', 'بزر'],
+    ['banana', 'Banana', 'موز', 'Yellow', 'أصفر'],
+    ['tomato', 'Tomato', 'بندورة', 'Red', 'أحمر'],
+    ['cucumber', 'Cucumber', 'خيار', 'Salad', 'سلطة'],
+    ['bread', 'Bread', 'خبز', 'Flour', 'طحين'],
+    ['rice', 'Rice', 'رز', 'Grain', 'حبّ'],
+    ['eggs', 'Eggs', 'بيض', 'Breakfast', 'فطور'],
+    ['cheese', 'Cheese', 'جبنة', 'Milk', 'حليب'],
+    ['soup', 'Soup', 'شوربة', 'Spoon', 'معلقة'],
+    ['popcorn', 'Popcorn', 'بوشار', 'Cinema', 'سينما'],
+    ['cake', 'Cake', 'كاتو', 'Birthday', 'عيد ميلاد'],
+    ['honey', 'Honey', 'عسل', 'Bees', 'نحل'],
+    ['orange-juice', 'Orange juice', 'عصير برتقال', 'Fresh', 'طازة'],
+    ['french-fries', 'French fries', 'بطاطا مقلية', 'Ketchup', 'كاتشب'],
+    ['grapes', 'Grapes', 'عنب', 'Vine', 'دالية'],
+  ],
+}
