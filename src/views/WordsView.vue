@@ -81,7 +81,7 @@ function removeCategory(id: string, count: number): void {
 
     <section v-for="group in groups" :key="group.category.id" class="panel stack" data-testid="custom-category">
       <div class="row">
-        <h2 class="grow">{{ show(group.category.name) }}</h2>
+        <h2 class="grow" dir="auto">{{ show(group.category.name) }}</h2>
         <Chip v-if="!group.isCustom">{{ app.t('words.builtIn') }}</Chip>
         <template v-else>
           <button type="button" class="icon-btn" @click="editCategory(group.category)">{{ app.t('common.edit') }}</button>
@@ -125,7 +125,7 @@ function removeCategory(id: string, count: number): void {
             </div>
           </form>
           <div v-else class="row">
-            <span class="grow word">{{ show(word.text) }}</span>
+            <span class="grow word" dir="auto">{{ show(word.text) }}</span>
             <button type="button" class="icon-btn" @click="editWord(word)">{{ app.t('common.edit') }}</button>
             <button type="button" class="icon-btn" @click="removeWord(word.id)">{{ app.t('common.delete') }}</button>
           </div>

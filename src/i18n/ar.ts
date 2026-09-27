@@ -27,7 +27,8 @@ export const ar: Messages = {
   'setup.players': 'اللاعبين',
   'setup.newPlayerPlaceholder': 'اسم اللاعب',
   'setup.addPlayer': 'زيد',
-  'setup.playing': 'عم يلعب',
+  'setup.playingName': '{name} عم يلعب',
+  'setup.renamePlayer': 'غيّر اسم {name}',
   'setup.removePlayer': 'شيل {name}',
   'setup.activeCount': {
     zero: 'ما حدا عم يلعب',

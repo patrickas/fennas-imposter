@@ -19,7 +19,7 @@ const rows = computed(() =>
     <h3>{{ app.t('result.scores') }}</h3>
     <ol class="rows">
       <li v-for="row in rows" :key="row.id" class="score" data-testid="score-row">
-        <span class="name">{{ row.name }}</span>
+        <span class="name" dir="auto">{{ row.name }}</span>
         <span class="points">{{ app.t('result.points', { count: row.points }) }}</span>
       </li>
     </ol>

@@ -39,7 +39,7 @@ function hideAndPass(): void {
     </template>
     <p class="center lead">{{ app.t('reveal.passTo') }}</p>
     <StickerCard motion="wobble">
-      <span class="title-xl" data-testid="pass-name">{{ name }}</span>
+      <span class="title-xl" data-testid="pass-name" dir="auto">{{ name }}</span>
     </StickerCard>
     <p class="guide">{{ app.t('reveal.passGuide', { name }) }}</p>
     <template #actions>
@@ -50,7 +50,7 @@ function hideAndPass(): void {
   <!-- Same screen, card and motion for every role: bystanders must not read a role from colour or movement. -->
   <Screen v-else-if="round" tone="mint" data-testid="card-screen">
     <template #top>
-      <Chip>{{ name }}</Chip>
+      <Chip><bdi>{{ name }}</bdi></Chip>
     </template>
     <!-- Both cards: a big title line, then one second line — the same shape for every role. -->
     <StickerCard v-if="isImposter" motion="wobble">

@@ -25,5 +25,5 @@ const message = computed<MessageKey | null>(() => {
 
 <style scoped>
 .banner { position: sticky; top: 0; z-index: 10; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 16px; background: var(--ink); color: var(--sun); font-weight: 700; }
-.dismiss { flex: none; min-height: 40px; padding: 4px 14px; border: 2px solid var(--sun); border-radius: var(--radius-pill); background: transparent; color: var(--sun); font-weight: 800; }
+.dismiss { flex: none; min-height: var(--tap); padding: 4px 14px; border: 2px solid var(--sun); border-radius: var(--radius-pill); background: transparent; color: var(--sun); font-weight: 800; }
 </style>

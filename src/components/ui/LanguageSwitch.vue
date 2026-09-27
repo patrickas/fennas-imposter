@@ -25,6 +25,6 @@ const app = useApp()
 
 <style scoped>
 .lang-switch { display: inline-flex; overflow: hidden; border: var(--outline); border-radius: var(--radius-pill); background: var(--paper); box-shadow: var(--shadow-hard-sm); }
-.lang { min-height: 40px; padding: 4px 14px; border: 0; background: transparent; font-weight: 800; }
+.lang { min-height: var(--tap); padding: 4px 14px; border: 0; background: transparent; font-weight: 800; }
 .lang.active { background: var(--ink); color: var(--sun); }
 </style>

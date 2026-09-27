@@ -23,7 +23,7 @@ const round = computed(() => app.state.round)
         data-testid="vote-player"
         @click="app.dispatch({ type: 'voteOut', playerId: id })"
       >
-        {{ app.playerName(id) }}
+        <bdi>{{ app.playerName(id) }}</bdi>
       </PopButton>
     </div>
     <template #actions>

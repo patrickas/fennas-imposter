@@ -118,11 +118,18 @@ function done(): void {
               <input
                 type="checkbox"
                 :checked="app.state.activePlayerIds.includes(player.id)"
-                :aria-label="app.t('setup.playing')"
+                :aria-label="app.t('setup.playingName', { name: player.name })"
                 @change="toggleActive(player.id, $event)"
               >
             </label>
-            <input class="input grow" :value="player.name" autocomplete="off" @change="rename(player.id, $event)">
+            <input
+              class="input grow"
+              :value="player.name"
+              dir="auto"
+              :aria-label="app.t('setup.renamePlayer', { name: player.name })"
+              autocomplete="off"
+              @change="rename(player.id, $event)"
+            >
             <button
               type="button"
               class="icon-btn"
@@ -140,6 +147,7 @@ function done(): void {
           v-model="newName"
           class="input grow"
           data-testid="new-player"
+          dir="auto"
           :placeholder="app.t('setup.newPlayerPlaceholder')"
           autocomplete="off"
         >

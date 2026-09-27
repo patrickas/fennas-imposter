@@ -78,7 +78,7 @@ function endGame(): void {
       <label v-if="kind === 'playerGm'" class="field">
         {{ app.t('play.pickGm') }}
         <select v-model="gmId" class="input" data-testid="gm-select">
-          <option v-for="p in activePlayers" :key="p.id" :value="p.id">{{ p.name }}</option>
+          <option v-for="p in activePlayers" :key="p.id" :value="p.id" dir="auto">{{ p.name }}</option>
         </select>
       </label>
     </section>
