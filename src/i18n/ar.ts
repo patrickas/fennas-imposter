@@ -1,7 +1,7 @@
 import type { Messages } from './en'
 
 export const ar: Messages = {
-  'app.title': 'مين المندسّ؟',
+  'app.title': 'فنّاص',
   'app.tagline': 'كلمة سرّية وحدة… وفي حدا عم يمثّل. مين هو؟',
 
   'common.back': 'رجوع',
@@ -207,7 +207,7 @@ export const ar: Messages = {
   'fetch.tooLarge': 'الملف كبير كتير (أقصى شي 1 ميغا)',
   'fetch.invalidJson': 'هاد مش ملف JSON صالح',
 
-  'pack.badFormat': 'مش ملف تبع مين المندسّ',
+  'pack.badFormat': 'مش ملف تبع فنّاص',
   'pack.wrongType': 'نوع غلط',
   'pack.missing': 'ناقص',
   'pack.invalidId': 'معرّف غلط',

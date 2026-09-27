@@ -32,8 +32,8 @@ export default defineConfig({
       injectRegister: false,
       includeAssets: ['favicon.ico', 'apple-touch-icon-180x180.png', 'icon.svg'],
       manifest: {
-        name: "Fenna's Imposter — مين المندسّ؟",
-        short_name: 'Imposter',
+        name: 'Fennass, Imposter — فنّاص',
+        short_name: 'Fennass',
         description: 'A pass-and-play word party game in English and Levantine Arabic.',
         display: 'standalone',
         orientation: 'portrait',

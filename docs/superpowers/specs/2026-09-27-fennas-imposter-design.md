@@ -1,8 +1,8 @@
-# Fenna's Imposter — Design Spec
+# Fennass, Imposter — Design Spec
 
 - **Date:** 2026-09-27
 - **Status:** Approved in brainstorming; pending written-spec review
-- **Working name:** "Fenna's Imposter" / «مين المندسّ؟» (to confirm, see §16)
+- **Name:** "Fennass, Imposter" / «فنّاص» — from فنّاص, Levantine for a liar or bluffer (spelled with ص, not س). Inside the game the imposter stays "imposter" / «المندسّ».
 
 ## 1. Overview
 
@@ -457,7 +457,7 @@ interface RoundState {
 
 | Field | Value |
 |---|---|
-| `name` / `short_name` | from §16 |
+| `name` / `short_name` | `Fennass, Imposter — فنّاص` / `Fennass` |
 | `display` | `standalone` |
 | `orientation` | `portrait` |
 | `theme_color` / `background_color` | `#FFE14D` |
@@ -547,6 +547,6 @@ Tests encode *why* a rule exists, not only what the code does.
 
 ## 16. Open items for the user to confirm
 
-1. **App name:** "Fenna's Imposter" / «مين المندسّ؟».
+1. **App name:** decided — "Fennass, Imposter" / «فنّاص».
 2. **Arabic wording:** all strings in §3.7 and all Arabic seed content are drafts. They use generic-masculine imperatives (اسمع، اكتب), as is standard in Arabic UI.
 3. **Starting player:** chosen uniformly among participants, which means an imposter can start. The alternative is excluding imposters from starting.

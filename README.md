@@ -1,4 +1,6 @@
-# Fenna's Imposter — مين المندسّ؟
+# Fennass, Imposter — فنّاص
+
+*Fennass* comes from فنّاص, Levantine for a liar or bluffer.
 
 A pass-and-play "imposter" word party game in English and Levantine Arabic. It installs as a PWA and works fully offline after the first visit.
 

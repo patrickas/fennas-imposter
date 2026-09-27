@@ -8,7 +8,7 @@ export type PluralForms = {
 }
 
 const messages = {
-  'app.title': "Fenna's Imposter",
+  'app.title': 'Fennass, Imposter',
   'app.tagline': 'One secret word. One faker. Who is it?',
 
   'common.back': 'Back',
@@ -168,7 +168,7 @@ const messages = {
   'fetch.tooLarge': 'The file is too large (max 1 MB)',
   'fetch.invalidJson': "That isn't a valid JSON file",
 
-  'pack.badFormat': "not a Fenna's Imposter file",
+  'pack.badFormat': 'not a Fennass, Imposter file',
   'pack.wrongType': 'wrong type',
   'pack.missing': 'missing',
   'pack.invalidId': 'invalid id',
