@@ -8,12 +8,16 @@ const secret = { wordId: 'w', word: 'Falafel', hint: null, categoryName: 'Food' 
 
 function votingRound(opts: { scoring?: boolean; source?: Source; imposters?: number } = {}): RoundState {
   const settings: Settings = {
-    imposterCount: opts.imposters ?? 1, randomImposterCount: false, hints: true, showCategory: false,
+    imposterCount: opts.imposters ?? 1, randomImposterCount: false, hints: true, showCategory: false, rotateStarter: false,
     timer: { enabled: false, seconds: 180 }, scoring: opts.scoring ?? true,
   }
   const source = opts.source ?? { kind: 'random' }
+  const ids = ['p1', 'p2', 'p3', 'p4', 'p5']
   let r = startRound(
-    { number: 1, lang: 'en', source, activePlayerIds: ['p1', 'p2', 'p3', 'p4', 'p5'], settings, secret: source.kind === 'random' ? secret : null },
+    {
+      number: 1, lang: 'en', source, rosterIds: ids, activePlayerIds: ids, settings,
+      secret: source.kind === 'random' ? secret : null, lastStarterId: null,
+    },
     seededRng(11),
   ).round
   if (r.phase === 'gmEntry') r = reduce(r, { type: 'setSecret', secret })

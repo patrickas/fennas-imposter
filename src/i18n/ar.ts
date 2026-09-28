@@ -53,6 +53,7 @@ export const ar: Messages = {
   'setup.randomImposters': 'عدد مندسّين مفاجأة',
   'setup.hints': 'اعطي المندسّ تلميح',
   'setup.showCategory': 'فرجي الفئة عالكروت',
+  'setup.rotateStarter': 'البداية بالدور',
   'setup.timer': 'مؤقّت النقاش',
   'setup.timerLength': 'مدّة المؤقّت',
   'setup.scoring': 'احسبوا النقاط',

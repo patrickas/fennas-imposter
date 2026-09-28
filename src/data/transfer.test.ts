@@ -81,6 +81,14 @@ describe('planImport', () => {
     expect(parsePack(pack({ settings: { ...defaultSettings(), showCategory: 'yes' } }), SEED_CATEGORY_IDS).ok).toBe(false)
   })
 
+  it('still imports backups made before the take-turns option existed, with turns on (the default)', () => {
+    const old: Record<string, unknown> = { ...defaultSettings() }
+    delete old.rotateStarter
+    expect(valid(pack({ settings: old })).settings!.rotateStarter).toBe(true)
+    expect(valid(pack({ settings: { ...defaultSettings(), rotateStarter: false } })).settings!.rotateStarter).toBe(false)
+    expect(parsePack(pack({ settings: { ...defaultSettings(), rotateStarter: 'no' } }), SEED_CATEGORY_IDS).ok).toBe(false)
+  })
+
   it('counts additions and updates, merging by id so re-importing refreshes', () => {
     const first = planImport(valid(pack()), emptyTarget(), 'url', newId)
     expect(first.summary).toMatchObject({ addCategories: 1, addWords: 2, updateWords: 0 })

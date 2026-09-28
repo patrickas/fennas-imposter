@@ -178,7 +178,11 @@ export function createAppStore(deps: AppDeps) {
       state.usedWordIds = { ...state.usedWordIds, [lang]: picked.used }
     }
     state.round = startRound(
-      { number: state.session.rounds + 1, lang, source, activePlayerIds: activeIds(), settings: state.settings, secret },
+      {
+        number: state.session.rounds + 1, lang, source,
+        rosterIds: state.players.map((p) => p.id), activePlayerIds: activeIds(),
+        settings: state.settings, secret, lastStarterId: state.session.lastStarterId ?? null,
+      },
       deps.rng,
     ).round
     persist()
@@ -210,7 +214,8 @@ export function createAppStore(deps: AppDeps) {
       for (const id of next.participantIds) {
         scores[id] = { name: playerName(id), points: (scores[id]?.points ?? 0) + (deltas[id] ?? 0) }
       }
-      state.session = { scores, rounds: state.session.rounds + 1 }
+      // Only a finished round passes the turn to start; one left early is replayed by the same starter.
+      state.session = { scores, rounds: state.session.rounds + 1, lastStarterId: next.startingPlayerId }
     }
     state.round = next
     persist()

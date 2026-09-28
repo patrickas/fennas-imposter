@@ -1,5 +1,5 @@
 import { expect, test, type Page } from '@playwright/test'
-import { dealCards, startGame, startPlaying } from './helpers'
+import { dealCards, openSetupPanel, startGame, startPlaying } from './helpers'
 
 // Spec behaviours that were first checked by hand (the final verification checklist), kept as tests.
 
@@ -86,6 +86,7 @@ test('"Show the category on the cards" shows it to crew and imposter alike, and 
   await page.goto('/')
   await seed(page, {}, { hints: true })
   await page.getByTestId('nav-setup').click()
+  await openSetupPanel(page, 'settings')
   await page.getByTestId('toggle-show-category').click()
   await page.getByTestId('setup-done').click()
   await startGame(page)

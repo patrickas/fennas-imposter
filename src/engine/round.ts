@@ -1,6 +1,6 @@
 import type { Lang, RoundState, Secret, Settings, Source } from './types'
 import type { Rng } from './rng'
-import { MIN_PARTICIPANTS, assignImposters, pickStartingPlayer, resolveImposterCount } from './assign'
+import { MIN_PARTICIPANTS, assignImposters, nextStartingPlayer, pickStartingPlayer, resolveImposterCount } from './assign'
 
 export class IllegalActionError extends Error {
   constructor(message: string) {
@@ -13,11 +13,15 @@ export interface StartRoundInput {
   number: number
   lang: Lang
   source: Source
+  /** Every player in roster order, playing or not: the take-turns order. */
+  rosterIds: readonly string[]
   /** Active players in roster order; this is the pass order. */
   activePlayerIds: readonly string[]
   settings: Settings
   /** Required for the random source; must be null for GM sources (the GM types it). */
   secret: Secret | null
+  /** Who started the last finished round of this game; null in a new game. */
+  lastStarterId: string | null
 }
 
 export type RoundAction =
@@ -53,7 +57,9 @@ export function startRound(input: StartRoundInput, rng: Rng): { round: RoundStat
     source,
     participantIds,
     imposterIds: assignImposters(participantIds, count, rng),
-    startingPlayerId: pickStartingPlayer(participantIds, rng),
+    startingPlayerId: settings.rotateStarter
+      ? nextStartingPlayer(input.rosterIds, participantIds, input.lastStarterId)
+      : pickStartingPlayer(participantIds, rng),
     secret,
     settings: {
       hints: settings.hints,

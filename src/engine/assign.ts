@@ -27,3 +27,22 @@ export function assignImposters(participantIds: readonly string[], count: number
 export function pickStartingPlayer(participantIds: readonly string[], rng: Rng): string {
   return pickOne(rng, participantIds)
 }
+
+/**
+ * Take-turns mode: the first participant after the last starter in player-list order, wrapping around.
+ * With no last starter (a new game), or one who was removed from the list, the first participant starts.
+ */
+export function nextStartingPlayer(
+  rosterIds: readonly string[],
+  participantIds: readonly string[],
+  lastStarterId: string | null,
+): string {
+  const from = lastStarterId === null ? -1 : rosterIds.indexOf(lastStarterId)
+  if (from === -1) return participantIds[0]
+  const playing = new Set(participantIds)
+  for (let step = 1; step <= rosterIds.length; step++) {
+    const id = rosterIds[(from + step) % rosterIds.length]
+    if (playing.has(id)) return id
+  }
+  throw new Error('nextStartingPlayer: no participant is on the player list')
+}

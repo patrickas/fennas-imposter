@@ -8,8 +8,16 @@ export async function addPlayers(page: Page, names: readonly string[], opts: { s
     await page.getByTestId('add-player').click()
   }
   await expect(page.getByTestId('player-row')).toHaveCount(names.length)
-  if (opts.scoring) await page.getByTestId('toggle-scoring').click()
+  if (opts.scoring) {
+    await openSetupPanel(page, 'settings')
+    await page.getByTestId('toggle-scoring').click()
+  }
   await page.getByTestId('setup-done').click()
+}
+
+/** On Setup: open a folded panel (Categories and Settings start closed) so its controls can be reached. */
+export async function openSetupPanel(page: Page, panel: 'categories' | 'settings'): Promise<void> {
+  await page.getByTestId(`fold-${panel}`).click()
 }
 
 /** From Home with no game running: "Let's play" opens Setup to confirm the players, and its button starts the game. */

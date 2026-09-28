@@ -34,6 +34,8 @@ export interface Settings {
   hints: boolean
   /** Both reveal cards also show the category. */
   showCategory: boolean
+  /** Players take turns to start, in list order; off picks the starter at random. */
+  rotateStarter: boolean
   timer: TimerSettings
   scoring: boolean
 }

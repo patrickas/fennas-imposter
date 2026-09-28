@@ -182,6 +182,60 @@ describe('rounds', () => {
     expect(app.roundBlocker({ kind: 'outsideGm' })).toBeNull()
   })
 
+  // Players felt the random starter kept landing on the same people; by default everyone gets a turn instead.
+  it('by default lets players take turns to start, in list order, looping back to the first', () => {
+    const app = setup()
+    const ids = withPlayers(app)
+    const starters: string[] = []
+    for (let i = 0; i < 6; i++) {
+      app.beginRound({ kind: 'random' })
+      starters.push(app.state.round!.startingPlayerId)
+      playOut(app)
+    }
+    expect(starters).toEqual([ids[0], ids[1], ids[2], ids[3], ids[0], ids[1]])
+  })
+
+  it('keeps the turn when a round is left early, remembers it after a reload, and starts over for a new game', () => {
+    const storage = memoryStorage()
+    const app = setup(storage)
+    const ids = withPlayers(app)
+    app.beginRound({ kind: 'random' })
+    playOut(app) // ids[0] started
+    app.beginRound({ kind: 'random' })
+    expect(app.state.round!.startingPlayerId).toBe(ids[1])
+    app.abandonRound()
+    const reloaded = setup(storage)
+    reloaded.beginRound({ kind: 'random' })
+    expect(reloaded.state.round!.startingPlayerId).toBe(ids[1])
+    playOut(reloaded)
+    reloaded.endSession()
+    reloaded.beginRound({ kind: 'random' })
+    expect(reloaded.state.round!.startingPlayerId).toBe(ids[0])
+  })
+
+  it('never gives a player Game Master the turn to start, and moves on to the next player', () => {
+    const app = setup()
+    const ids = withPlayers(app)
+    app.beginRound({ kind: 'random' })
+    playOut(app) // ids[0] started
+    app.beginRound({ kind: 'playerGm', gmPlayerId: ids[1] })
+    app.submitGmWord({ lang: 'en', word: 'Mansaf', hint: '', category: { existingId: 'food' } })
+    expect(app.state.round!.startingPlayerId).toBe(ids[2])
+  })
+
+  it('picks the starter at random when taking turns is switched off', () => {
+    const app = setup()
+    withPlayers(app)
+    app.updateSettings({ rotateStarter: false })
+    const seen = new Set<string>()
+    for (let i = 0; i < 40; i++) {
+      app.beginRound({ kind: 'random' })
+      seen.add(app.state.round!.startingPlayerId)
+      app.abandonRound()
+    }
+    expect(seen.size).toBe(4) // with turns this would stay on the first player, since abandoned rounds keep the turn
+  })
+
   it('tells the between-rounds screen when the imposter count will be lowered', () => {
     const app = setup()
     withPlayers(app)

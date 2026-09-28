@@ -3,7 +3,7 @@ import { SEED_CATEGORIES } from './seed'
 import { TIMER } from './limits'
 
 export const STORAGE_KEY = 'fennas-imposter'
-export const CURRENT_VERSION = 3
+export const CURRENT_VERSION = 4
 
 export interface StorageLike {
   getItem(key: string): string | null
@@ -18,10 +18,12 @@ export interface SessionScore {
 export interface Session {
   scores: Record<string, SessionScore>
   rounds: number
+  /** Who started the last finished round, so take-turns mode knows who is next. Absent before the first one. */
+  lastStarterId?: string
 }
 
 export interface Stored {
-  version: 3
+  version: 4
   language: Lang
   players: Player[]
   activePlayerIds: string[]
@@ -66,6 +68,12 @@ export const MIGRATIONS: Record<number, Migration> = {
     }
     return next // anything malformed is left for isStored to reject as damaged
   },
+  // Version 4 added "take turns to start", on by default: a random starter felt like the same people every time.
+  3: (doc) => {
+    const next: Record<string, unknown> = { ...doc, version: 4 }
+    if (isRecord(doc.settings)) next.settings = { ...doc.settings, rotateStarter: true }
+    return next
+  },
 }
 
 export function defaultSettings(): Settings {
@@ -74,6 +82,7 @@ export function defaultSettings(): Settings {
     randomImposterCount: false,
     hints: true,
     showCategory: false,
+    rotateStarter: true,
     timer: { enabled: false, seconds: TIMER.default },
     scoring: false,
   }
@@ -81,7 +90,7 @@ export function defaultSettings(): Settings {
 
 export function defaultStored(): Stored {
   return {
-    version: 3,
+    version: 4,
     language: 'en',
     players: [],
     activePlayerIds: [],
@@ -121,6 +130,7 @@ function isSettings(x: unknown): x is Settings {
     typeof x.randomImposterCount === 'boolean' &&
     typeof x.hints === 'boolean' &&
     typeof x.showCategory === 'boolean' &&
+    typeof x.rotateStarter === 'boolean' &&
     typeof x.scoring === 'boolean' &&
     isRecord(x.timer) &&
     typeof x.timer.enabled === 'boolean' &&

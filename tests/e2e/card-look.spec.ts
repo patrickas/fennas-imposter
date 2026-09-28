@@ -1,5 +1,5 @@
 import { expect, test, type Page } from '@playwright/test'
-import { addPlayers, startGame } from './helpers'
+import { addPlayers, openSetupPanel, startGame } from './helpers'
 
 // Bystanders see the screen's colour, motion and the card's shape from across the room, even when
 // they can't read the text. If crew and imposter cards look different, the role leaks without anyone
@@ -39,6 +39,7 @@ test('crew and imposter cards look the same with hints off too', async ({ page }
   await page.goto('/')
   await addPlayers(page, ['Rami', 'Lina', 'Omar', 'Sara'])
   await page.getByTestId('nav-setup').click()
+  await openSetupPanel(page, 'settings')
   await page.getByTestId('toggle-hints').click()
   await page.getByTestId('setup-done').click()
   await dealAndCompare(page)
@@ -48,6 +49,7 @@ test('crew and imposter cards look the same with the category shown too', async 
   await page.goto('/')
   await addPlayers(page, ['Rami', 'Lina', 'Omar', 'Sara'])
   await page.getByTestId('nav-setup').click()
+  await openSetupPanel(page, 'settings')
   await page.getByTestId('toggle-show-category').click()
   await page.getByTestId('setup-done').click()
   expect(await dealAndCompare(page)).toContain('category-line')

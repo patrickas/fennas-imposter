@@ -93,6 +93,7 @@ function readSettings(v: unknown, fail: Fail): Settings | null {
     typeof v.randomImposterCount === 'boolean' &&
     typeof v.hints === 'boolean' &&
     (v.showCategory === undefined || typeof v.showCategory === 'boolean') && // absent in backups from before the option
+    (v.rotateStarter === undefined || typeof v.rotateStarter === 'boolean') && // likewise
     typeof v.scoring === 'boolean' &&
     isRecord(t) &&
     typeof t.enabled === 'boolean' &&
@@ -109,6 +110,7 @@ function readSettings(v: unknown, fail: Fail): Settings | null {
     randomImposterCount: v.randomImposterCount as boolean,
     hints: v.hints as boolean,
     showCategory: v.showCategory === true,
+    rotateStarter: v.rotateStarter !== false,
     scoring: v.scoring as boolean,
     timer: { enabled: t.enabled as boolean, seconds: Math.max(TIMER.min, t.seconds as number) },
   }

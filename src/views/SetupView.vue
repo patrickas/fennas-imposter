@@ -11,6 +11,7 @@ import PopButton from '../components/ui/PopButton.vue'
 import UpdatePrompt from '../components/ui/UpdatePrompt.vue'
 import Toggle from '../components/ui/Toggle.vue'
 import Stepper from '../components/ui/Stepper.vue'
+import Collapsible from '../components/ui/Collapsible.vue'
 import LanguageSwitch from '../components/ui/LanguageSwitch.vue'
 
 const app = useApp()
@@ -82,6 +83,10 @@ const hints = computed({
 const showCategory = computed({
   get: () => app.state.settings.showCategory,
   set: (value: boolean) => app.updateSettings({ showCategory: value }),
+})
+const rotateStarter = computed({
+  get: () => app.state.settings.rotateStarter,
+  set: (value: boolean) => app.updateSettings({ rotateStarter: value }),
 })
 const scoring = computed({
   get: () => app.state.settings.scoring,
@@ -166,50 +171,54 @@ function done(): void {
     </section>
 
     <section class="panel stack">
-      <h2>{{ app.t('setup.categories') }}</h2>
-      <label v-for="c in categories" :key="c.id" class="category">
-        <input
-          type="checkbox"
-          :checked="app.state.selectedCategoryIds.includes(c.id)"
-          :data-testid="`category-${c.id}`"
-          @change="app.toggleCategory(c.id)"
-        >
-        <span class="grow">{{ c.name }}</span>
-        <span class="count">{{ app.t('setup.wordCount', { count: c.count }) }}</span>
-      </label>
+      <Collapsible :title="app.t('setup.categories')" testid="fold-categories">
+        <label v-for="c in categories" :key="c.id" class="category">
+          <input
+            type="checkbox"
+            :checked="app.state.selectedCategoryIds.includes(c.id)"
+            :data-testid="`category-${c.id}`"
+            @change="app.toggleCategory(c.id)"
+          >
+          <span class="grow">{{ c.name }}</span>
+          <span class="count">{{ app.t('setup.wordCount', { count: c.count }) }}</span>
+        </label>
+      </Collapsible>
+      <!-- Outside the fold, so a closed Categories panel still says why a round can't start. -->
       <p v-if="noneSelected" class="error-text">{{ app.t('error.noCategories') }}</p>
     </section>
 
-    <section class="panel stack">
-      <h2>{{ app.t('setup.settings') }}</h2>
-      <Stepper
-        v-model="imposters"
-        :min="1"
-        :max="imposterMax"
-        :label="app.t('setup.imposters')"
-        :decrease-label="app.t('setup.decrease')"
-        :increase-label="app.t('setup.increase')"
-        :disabled="randomImposters"
-        testid="imposters"
-      />
-      <Toggle v-model="randomImposters" :label="app.t('setup.randomImposters')" testid="toggle-random-imposters" />
-      <Toggle v-model="hints" :label="app.t('setup.hints')" testid="toggle-hints" />
-      <Toggle v-model="showCategory" :label="app.t('setup.showCategory')" testid="toggle-show-category" />
-      <Toggle v-model="timerEnabled" :label="app.t('setup.timer')" testid="toggle-timer" />
-      <Stepper
-        v-if="timerEnabled"
-        v-model="timerSeconds"
-        :min="TIMER.min"
-        :max="TIMER.max"
-        :step="TIMER.step"
-        :display="formatClock(timerSeconds)"
-        :label="app.t('setup.timerLength')"
-        :decrease-label="app.t('setup.decrease')"
-        :increase-label="app.t('setup.increase')"
-        testid="timer-seconds"
-      />
-      <Toggle v-model="scoring" :label="app.t('setup.scoring')" testid="toggle-scoring" />
-      <Toggle v-if="app.devTools" v-model="testMode" :label="app.t('setup.testMode')" testid="toggle-test-mode" />
+    <section class="panel">
+      <Collapsible :title="app.t('setup.settings')" testid="fold-settings">
+        <Stepper
+          v-model="imposters"
+          :min="1"
+          :max="imposterMax"
+          :label="app.t('setup.imposters')"
+          :decrease-label="app.t('setup.decrease')"
+          :increase-label="app.t('setup.increase')"
+          :disabled="randomImposters"
+          testid="imposters"
+        />
+        <Toggle v-model="randomImposters" :label="app.t('setup.randomImposters')" testid="toggle-random-imposters" />
+        <Toggle v-model="hints" :label="app.t('setup.hints')" testid="toggle-hints" />
+        <Toggle v-model="showCategory" :label="app.t('setup.showCategory')" testid="toggle-show-category" />
+        <Toggle v-model="rotateStarter" :label="app.t('setup.rotateStarter')" testid="toggle-rotate-starter" />
+        <Toggle v-model="timerEnabled" :label="app.t('setup.timer')" testid="toggle-timer" />
+        <Stepper
+          v-if="timerEnabled"
+          v-model="timerSeconds"
+          :min="TIMER.min"
+          :max="TIMER.max"
+          :step="TIMER.step"
+          :display="formatClock(timerSeconds)"
+          :label="app.t('setup.timerLength')"
+          :decrease-label="app.t('setup.decrease')"
+          :increase-label="app.t('setup.increase')"
+          testid="timer-seconds"
+        />
+        <Toggle v-model="scoring" :label="app.t('setup.scoring')" testid="toggle-scoring" />
+        <Toggle v-if="app.devTools" v-model="testMode" :label="app.t('setup.testMode')" testid="toggle-test-mode" />
+      </Collapsible>
     </section>
 
     <template #actions>

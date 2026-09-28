@@ -46,6 +46,7 @@ const messages = {
   'setup.randomImposters': 'Surprise number of imposters',
   'setup.hints': 'Give the imposter a hint',
   'setup.showCategory': 'Show the category on the cards',
+  'setup.rotateStarter': 'Take turns to start',
   'setup.timer': 'Discussion timer',
   'setup.timerLength': 'Timer length',
   'setup.scoring': 'Keep score',

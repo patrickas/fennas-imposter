@@ -49,6 +49,7 @@ The game is bilingual: **English** and **Levantine Arabic in Arabic script**. It
 - **Roster:** add, rename and remove players. Tick who is playing today (the *active* players).
   - Names are trimmed, 1–20 characters, and unique ignoring case.
 - **Categories:** a checklist of categories that have at least one eligible word in the current language (§5.2). At least one must be selected.
+- **On the Setup screen**, Categories and Settings are folded panels with an arrow, closed each time Setup opens; the "pick at least one category" warning stays visible when folded.
 - **Settings:**
 
 | Setting | Values | Default |
@@ -57,6 +58,7 @@ The game is bilingual: **English** and **Levantine Arabic in Arabic script**. It
 | Random imposter count | on/off; picks uniformly from 1…max, count hidden from players | off |
 | Imposter hint | on/off | on |
 | Show the category on the cards | on/off; both reveal cards get a "Category: …" line | off |
+| Take turns to start | on: each finished round passes the start to the next player in list order, looping back to the top and skipping anyone not in the round (e.g. a player GM); a new game starts with the first player. Off: picked at random | on |
 | Discussion timer | off, or 1–10 min in 30 s steps | off (3 min when first enabled) |
 | Scoring | on/off | off |
 
@@ -91,7 +93,7 @@ The between-rounds screen offers:
 - **All randomness happens at round start:**
   - the imposter set
   - the imposter count, in random mode
-  - the starting player
+  - the starting player, when taking turns is off
   - the word, for the random source
 
 ### 3.3 Reveal (pass-and-play)
@@ -117,7 +119,7 @@ There is no back navigation, and the card is never shown again after "Hide & pas
 
 Two screens follow the last card:
 
-1. **Starting:** a card announces "**Omar** starts" / «**عمر** بيبلّش». The starting player is picked uniformly among participants. The screen also shows turn-taking guidance, the imposter count (or "?" in random mode), and a **"Start playing"** button.
+1. **Starting:** a card announces "**Omar** starts" / «**عمر** بيبلّش». The starting player is the next one in turn (§3.1), or picked uniformly among participants when taking turns is off. The screen also shows turn-taking guidance, the imposter count (or "?" in random mode), and a **"Start playing"** button.
 2. **Playing:** a "Playing…" card waits while the group gives clues and discusses. It shows the imposter count, and the countdown if the timer is on.
    - **The timer starts when "Start playing" is tapped**, not at the last card, so the group can settle first.
    - When it ends, the app beeps and vibrates where the device supports it. The timer can be ended early.
@@ -335,25 +337,25 @@ interface Player { id: string; name: string }
 
 interface Settings {
   imposterCount: number; randomImposterCount: boolean;
-  hints: boolean; showCategory: boolean; timer: { enabled: boolean; seconds: number }; scoring: boolean;
+  hints: boolean; showCategory: boolean; rotateStarter: boolean; timer: { enabled: boolean; seconds: number }; scoring: boolean;
 }
 
 interface Stored {
-  version: 3;
+  version: 4;
   language: Lang;
   players: Player[]; activePlayerIds: string[];
   settings: Settings; selectedCategoryIds: string[];
   customCategories: Category[]; customWords: Word[];
   usedWordIds: Record<Lang, string[]>;
   lastImportUrl: string | null;
-  session: { scores: Record<string, { name: string; points: number }>; rounds: number } | null;
+  session: { scores: Record<string, { name: string; points: number }>; rounds: number; lastStarterId?: string } | null;
   round: RoundState | null;
 }
 ```
 
 **Storage:**
 - One JSON document at `localStorage['fennas-imposter']`. It is written synchronously after every state change; the data is small.
-- **Migrations:** `migrations[n]` upgrades version n to n+1. They are applied in order on load. Version 2 switches on the categories added with it for players who saved before, leaving their other choices alone. Version 3 adds `showCategory: false` to the settings and to a round in progress.
+- **Migrations:** `migrations[n]` upgrades version n to n+1. They are applied in order on load. Version 2 switches on the categories added with it for players who saved before, leaving their other choices alone. Version 3 adds `showCategory: false` to the settings and to a round in progress. Version 4 adds `rotateStarter: true`, the new default.
 - On first run the app calls `navigator.storage.persist()` to reduce eviction risk.
 - The Data screen recommends exporting a backup.
 - New ids use `crypto.randomUUID()`.
@@ -400,6 +402,7 @@ interface RoundState {
 - `pickWord(eligible, used, rng): { word, used: string[] }`: applies the reset rule from §5.4.
 - `maxImposters(n) = Math.floor((n - 1) / 2)`
 - `assignImposters(participantIds, settings, rng): string[]`
+- `nextStartingPlayer(rosterIds, participantIds, lastStarterId): string`: the take-turns pick; the first participant when there is no last starter or they were removed.
 - `startRound(input, rng): RoundState`
   - Validates that there are at least 3 participants and at least one eligible word (random source).
   - Does all the random picks.
@@ -564,4 +567,4 @@ Tests encode *why* a rule exists, not only what the code does.
 
 1. **App name:** decided — "Fennass, Imposter" / «فنّاص».
 2. **Arabic wording:** all strings in §3.7 and all Arabic seed content are drafts. They use generic-masculine imperatives (اسمع، اكتب), as is standard in Arabic UI.
-3. **Starting player:** chosen uniformly among participants, which means an imposter can start. The alternative is excluding imposters from starting.
+3. **Starting player:** decided — players take turns by default (random is a setting), since a random starter felt like the same people every time. Either way an imposter can start. The alternative is excluding imposters from starting.

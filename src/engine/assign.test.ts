@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'bun:test'
 import { seededRng } from './rng'
-import { assignImposters, maxImposters, pickStartingPlayer, resolveImposterCount } from './assign'
+import { assignImposters, maxImposters, nextStartingPlayer, pickStartingPlayer, resolveImposterCount } from './assign'
 
 describe('maxImposters', () => {
   it.each([
@@ -58,5 +58,32 @@ describe('assignImposters / pickStartingPlayer', () => {
 
   it('picks a starting player from the participants', () => {
     expect(ids).toContain(pickStartingPlayer(ids, seededRng(9)))
+  })
+})
+
+describe('nextStartingPlayer', () => {
+  const roster = ['a', 'b', 'c', 'd']
+
+  it('lets the first player start the first round, then everyone in list order, looping back to the top', () => {
+    const starters: string[] = []
+    let last: string | null = null
+    for (let i = 0; i < 6; i++) {
+      last = nextStartingPlayer(roster, roster, last)
+      starters.push(last)
+    }
+    expect(starters).toEqual(['a', 'b', 'c', 'd', 'a', 'b'])
+  })
+
+  it('skips whoever sits this round out (not playing, or the Game Master) without losing the place in line', () => {
+    expect(nextStartingPlayer(roster, ['a', 'b', 'd'], 'b')).toBe('d')
+    expect(nextStartingPlayer(roster, ['b', 'c', 'd'], 'd')).toBe('b')
+  })
+
+  it('carries on after the last starter even when they sit this round out', () => {
+    expect(nextStartingPlayer(roster, ['a', 'c', 'd'], 'b')).toBe('c')
+  })
+
+  it('starts again from the top when the last starter was removed from the player list', () => {
+    expect(nextStartingPlayer(roster, ['b', 'c', 'd'], 'gone')).toBe('b')
   })
 })

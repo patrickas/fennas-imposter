@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test'
-import { addPlayers, dealCards, startGame, startPlaying } from './helpers'
+import { addPlayers, dealCards, openSetupPanel, startGame, startPlaying } from './helpers'
 
 const PLAYERS = ['Rami', 'Lina', 'Omar', 'Sara']
 
@@ -71,10 +71,27 @@ test('too few players blocks the round with an explanation', async ({ page }) =>
   await expect(page.getByTestId('start-round')).toBeDisabled()
 })
 
+// A random starter kept landing on the same people, so by default everyone gets a turn, in player-list order.
+test('players take turns to start, in the order of the player list', async ({ page }) => {
+  test.slow() // three full deals
+  await page.goto('/')
+  await addPlayers(page, PLAYERS)
+  await startGame(page)
+  for (const name of PLAYERS.slice(0, 3)) {
+    await page.getByTestId('start-round').click()
+    await dealCards(page, PLAYERS.length)
+    await expect(page.getByTestId('starter')).toContainText(name)
+    await startPlaying(page)
+    await page.getByTestId('end-discussion').click()
+    await page.getByTestId('next-round').click()
+  }
+})
+
 test('after the last card the starter is announced, and the timer only starts with "Start playing"', async ({ page }) => {
   await page.goto('/')
   await addPlayers(page, PLAYERS)
   await page.getByTestId('nav-setup').click()
+  await openSetupPanel(page, 'settings')
   await page.getByTestId('toggle-timer').click()
   await page.getByTestId('setup-done').click()
   await startGame(page)

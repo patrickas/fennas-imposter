@@ -13,6 +13,7 @@ describe('loadStored', () => {
     expect(r.stored.settings.scoring).toBe(false)
     expect(r.stored.settings.hints).toBe(true)
     expect(r.stored.settings.showCategory).toBe(false)
+    expect(r.stored.settings.rotateStarter).toBe(true)
   })
 
   it('reads back exactly what was saved', () => {
@@ -59,11 +60,22 @@ describe('loadStored', () => {
     v2.round = { phase: 'reveal', settings: { hints: true, scoring: true, timer: { enabled: false, seconds: 180 }, imposterCountHidden: false } }
     const r = loadStored(memoryStorage({ [STORAGE_KEY]: JSON.stringify(v2) }), 1)
     expect(r.status).toBe('ok')
-    expect(r.stored.version).toBe(3)
+    expect(r.stored.version).toBe(CURRENT_VERSION)
     expect(r.stored.settings.showCategory).toBe(false)
     expect(r.stored.settings.scoring).toBe(true)
     expect(r.stored.round?.settings.showCategory).toBe(false)
     expect(r.stored.round?.phase).toBe('reveal')
+  })
+
+  it('upgrades version-3 data to players taking turns to start, the new default, keeping every other setting', () => {
+    const v3 = JSON.parse(JSON.stringify({ ...defaultStored(), version: 3 }))
+    delete v3.settings.rotateStarter
+    v3.settings.hints = false
+    const r = loadStored(memoryStorage({ [STORAGE_KEY]: JSON.stringify(v3) }), 1)
+    expect(r.status).toBe('ok')
+    expect(r.stored.version).toBe(4)
+    expect(r.stored.settings.rotateStarter).toBe(true)
+    expect(r.stored.settings.hints).toBe(false)
   })
 
   it('never overwrites data written by a newer app version', () => {

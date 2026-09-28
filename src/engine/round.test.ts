@@ -8,6 +8,7 @@ const settings = (over: Partial<Settings> = {}): Settings => ({
   randomImposterCount: false,
   hints: true,
   showCategory: false,
+  rotateStarter: false,
   timer: { enabled: false, seconds: 180 },
   scoring: true,
   ...over,
@@ -17,7 +18,10 @@ const players = ['p1', 'p2', 'p3', 'p4']
 
 function start(over: Partial<StartRoundInput> = {}, seed = 1): RoundState {
   return startRound(
-    { number: 1, lang: 'en', source: { kind: 'random' }, activePlayerIds: players, settings: settings(), secret, ...over },
+    {
+      number: 1, lang: 'en', source: { kind: 'random' }, rosterIds: players, activePlayerIds: players,
+      settings: settings(), secret, lastStarterId: null, ...over,
+    },
     seededRng(seed),
   ).round
 }
@@ -78,6 +82,20 @@ describe('startRound', () => {
   it('keeps showing (or hiding) the category on the cards as the round started, even if Setup changes mid-deal', () => {
     expect(start({ settings: settings({ showCategory: true }) }).settings.showCategory).toBe(true)
     expect(start().settings.showCategory).toBe(false)
+  })
+
+  it('in take-turns mode, lets the player after the last starter start, whatever the dice say', () => {
+    const turns = settings({ rotateStarter: true })
+    for (let seed = 0; seed < 10; seed++) {
+      expect(start({ settings: turns }, seed).startingPlayerId).toBe('p1')
+      expect(start({ settings: turns, lastStarterId: 'p2' }, seed).startingPlayerId).toBe('p3')
+      expect(start({ settings: turns, lastStarterId: 'p4' }, seed).startingPlayerId).toBe('p1')
+    }
+  })
+
+  it('in take-turns mode, passes over a player Game Master', () => {
+    const r = start({ settings: settings({ rotateStarter: true }), source: { kind: 'playerGm', gmPlayerId: 'p3' }, secret: null, lastStarterId: 'p2' })
+    expect(r.startingPlayerId).toBe('p4')
   })
 })
 
