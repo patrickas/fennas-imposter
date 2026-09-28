@@ -2,6 +2,7 @@
 import { computed } from 'vue'
 import { useApp } from '../../composables/useApp'
 import { formatList } from '../../i18n'
+import { imposterHint } from '../../engine/words'
 import Screen from '../ui/Screen.vue'
 import StickerCard from '../ui/StickerCard.vue'
 import PopButton from '../ui/PopButton.vue'
@@ -27,6 +28,7 @@ const winner = computed(() => {
     <StickerCard tone="ink">
       <p>{{ app.t('result.imposters', { count: round.imposterIds.length }) }}</p>
       <p class="names" data-testid="result-imposters">{{ imposterNames }}</p>
+      <p v-if="round.settings.hints" data-testid="result-hint">{{ app.t('reveal.hint', { hint: imposterHint(round.secret) }) }}</p>
     </StickerCard>
     <StickerCard motion="wobble">
       <p>{{ app.t('result.word') }}</p>

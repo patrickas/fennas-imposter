@@ -79,6 +79,10 @@ const hints = computed({
   get: () => app.state.settings.hints,
   set: (value: boolean) => app.updateSettings({ hints: value }),
 })
+const showCategory = computed({
+  get: () => app.state.settings.showCategory,
+  set: (value: boolean) => app.updateSettings({ showCategory: value }),
+})
 const scoring = computed({
   get: () => app.state.settings.scoring,
   set: (value: boolean) => app.updateSettings({ scoring: value }),
@@ -106,7 +110,7 @@ function done(): void {
 </script>
 
 <template>
-  <Screen tone="sun" align="start">
+  <Screen tone="sun" align="start" sticky-actions>
     <template #top>
       <h1>{{ app.t('setup.title') }}</h1>
       <LanguageSwitch />
@@ -190,6 +194,7 @@ function done(): void {
       />
       <Toggle v-model="randomImposters" :label="app.t('setup.randomImposters')" testid="toggle-random-imposters" />
       <Toggle v-model="hints" :label="app.t('setup.hints')" testid="toggle-hints" />
+      <Toggle v-model="showCategory" :label="app.t('setup.showCategory')" testid="toggle-show-category" />
       <Toggle v-model="timerEnabled" :label="app.t('setup.timer')" testid="toggle-timer" />
       <Stepper
         v-if="timerEnabled"

@@ -7,6 +7,7 @@ const settings = (over: Partial<Settings> = {}): Settings => ({
   imposterCount: 1,
   randomImposterCount: false,
   hints: true,
+  showCategory: false,
   timer: { enabled: false, seconds: 180 },
   scoring: true,
   ...over,
@@ -72,6 +73,11 @@ describe('startRound', () => {
   it('remembers that the imposter count is a surprise in random-count mode', () => {
     expect(start({ settings: settings({ randomImposterCount: true }) }).settings.imposterCountHidden).toBe(true)
     expect(start().settings.imposterCountHidden).toBe(false)
+  })
+
+  it('keeps showing (or hiding) the category on the cards as the round started, even if Setup changes mid-deal', () => {
+    expect(start({ settings: settings({ showCategory: true }) }).settings.showCategory).toBe(true)
+    expect(start().settings.showCategory).toBe(false)
   })
 })
 

@@ -9,6 +9,19 @@ test('players are remembered after the app is closed and reopened', async ({ pag
   await expect(page.getByTestId('player-row')).toHaveCount(3)
 })
 
+test('Done is on screen without scrolling Setup, and never covers the last setting', async ({ page }) => {
+  await page.goto('/')
+  await addPlayers(page, ['Rami', 'Lina', 'Omar', 'Sara', 'Nour', 'Hadi', 'Maya', 'Karim'])
+  await page.getByTestId('nav-setup').click()
+  const done = page.getByTestId('setup-done')
+  await expect(done).toBeInViewport()
+  await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight))
+  await expect(done).toBeInViewport()
+  const last = (await page.getByTestId('toggle-scoring').boundingBox())!
+  const bar = (await done.boundingBox())!
+  expect(last.y + last.height).toBeLessThanOrEqual(bar.y)
+})
+
 test('names that only differ by case, spacing or Arabic spelling are rejected', async ({ page }) => {
   await page.goto('/')
   await page.getByTestId('nav-setup').click()

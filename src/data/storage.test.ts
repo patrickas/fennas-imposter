@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'bun:test'
 import { SEED_CATEGORIES } from './seed'
 import {
-  STORAGE_KEY, browserStorage, defaultStored, loadStored, memoryStorage, saveStored, upgrade, type StorageLike,
+  CURRENT_VERSION, STORAGE_KEY, browserStorage, defaultStored, loadStored, memoryStorage, saveStored, upgrade, type StorageLike,
 } from './storage'
 
 describe('loadStored', () => {
@@ -12,6 +12,7 @@ describe('loadStored', () => {
     expect(r.stored.selectedCategoryIds).toEqual(SEED_CATEGORIES.map((c) => c.id))
     expect(r.stored.settings.scoring).toBe(false)
     expect(r.stored.settings.hints).toBe(true)
+    expect(r.stored.settings.showCategory).toBe(false)
   })
 
   it('reads back exactly what was saved', () => {
@@ -47,8 +48,22 @@ describe('loadStored', () => {
     const v1 = { ...defaultStored(), version: 1, selectedCategoryIds: ['food', 'c-custom'] }
     const r = loadStored(memoryStorage({ [STORAGE_KEY]: JSON.stringify(v1) }), 1)
     expect(r.status).toBe('ok')
-    expect(r.stored.version).toBe(2)
+    expect(r.stored.version).toBe(CURRENT_VERSION)
     expect(r.stored.selectedCategoryIds).toEqual(['food', 'c-custom', ...added])
+  })
+
+  it('upgrades version-2 data with the category kept off the cards, so saved games and a round in progress play as before', () => {
+    const v2 = JSON.parse(JSON.stringify({ ...defaultStored(), version: 2 }))
+    delete v2.settings.showCategory
+    v2.settings.scoring = true
+    v2.round = { phase: 'reveal', settings: { hints: true, scoring: true, timer: { enabled: false, seconds: 180 }, imposterCountHidden: false } }
+    const r = loadStored(memoryStorage({ [STORAGE_KEY]: JSON.stringify(v2) }), 1)
+    expect(r.status).toBe('ok')
+    expect(r.stored.version).toBe(3)
+    expect(r.stored.settings.showCategory).toBe(false)
+    expect(r.stored.settings.scoring).toBe(true)
+    expect(r.stored.round?.settings.showCategory).toBe(false)
+    expect(r.stored.round?.phase).toBe('reveal')
   })
 
   it('never overwrites data written by a newer app version', () => {

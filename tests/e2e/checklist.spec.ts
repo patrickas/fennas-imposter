@@ -56,6 +56,8 @@ test('clamp notice, hints off, count chip, leave-round confirm with resume, and 
 
   await page.getByTestId('end-discussion').click()
   await page.getByTestId('vote-nobody').click()
+  await expect(page.getByTestId('result-imposters')).toBeVisible()
+  await expect(page.getByTestId('result-hint')).toHaveCount(0) // hints were off: there is no hint to tell
   await page.getByTestId('next-round').click()
   await page.getByTestId('end-game').click()
   await page.getByTestId('dialog-confirm').click()
@@ -78,6 +80,31 @@ test('a surprise imposter count stays hidden; a GM word without a hint gives the
   expect(deal.hints.length).toBeGreaterThan(0)
   for (const hint of deal.hints) expect(hint).toBe('Hint: ⁨Jordanian food⁩')
   await expect(page.getByTestId('imposter-count')).toHaveText('How many imposters? Nobody knows…')
+})
+
+test('"Show the category on the cards" shows it to crew and imposter alike, and the result tells the hint the imposter got', async ({ page }) => {
+  await page.goto('/')
+  await seed(page, {}, { hints: true })
+  await page.getByTestId('nav-setup').click()
+  await page.getByTestId('toggle-show-category').click()
+  await page.getByTestId('setup-done').click()
+  await startGame(page)
+  await page.getByTestId('source-outsideGm').check()
+  await page.getByTestId('start-round').click()
+  await page.getByTestId('gm-ready').click()
+  await page.getByTestId('gm-word').fill('Mansaf')
+  await page.getByTestId('gm-category').selectOption('__new__')
+  await page.getByTestId('gm-new-category').fill('Jordanian food')
+  await page.getByTestId('gm-hint').fill('Rice and yogurt')
+  await page.getByTestId('gm-submit').click()
+  const deal = await dealCards(page, 4)
+  // Every card, whatever the role, so the extra line never gives a role away.
+  expect(deal.categories).toEqual(Array(4).fill('Category: ⁨Jordanian food⁩'))
+  expect(deal.hints).toEqual(['Hint: ⁨Rice and yogurt⁩'])
+  await startPlaying(page)
+  await page.getByTestId('end-discussion').click()
+  await expect(page.getByTestId('result-imposters')).toContainText(deal.imposters[0])
+  await expect(page.getByTestId('result-hint')).toHaveText('Hint: ⁨Rice and yogurt⁩')
 })
 
 test('every Arabic screen is right-to-left with no English left (except the "English" switch label)', async ({ page }) => {

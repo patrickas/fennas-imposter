@@ -24,11 +24,13 @@ export interface Deal {
   crew: string[]
   crewWords: string[]
   hints: string[]
+  /** The "Category: …" line on each card, when the option shows it. */
+  categories: string[]
 }
 
 /** Passes the phone through `count` players, recording what each one saw, and ends on the Starting screen. `onScreen` runs on every pass/card screen. */
 export async function dealCards(page: Page, count: number, onScreen?: () => Promise<void>): Promise<Deal> {
-  const deal: Deal = { imposters: [], crew: [], crewWords: [], hints: [] }
+  const deal: Deal = { imposters: [], crew: [], crewWords: [], hints: [], categories: [] }
   for (let i = 0; i < count; i++) {
     await expect(page.getByTestId('pass-screen')).toBeVisible()
     const name = (await page.getByTestId('pass-name').innerText()).trim()
@@ -44,6 +46,9 @@ export async function dealCards(page: Page, count: number, onScreen?: () => Prom
     } else {
       deal.crew.push(name)
       deal.crewWords.push((await page.getByTestId('secret-word').innerText()).trim())
+    }
+    if ((await page.getByTestId('card-category').count()) > 0) {
+      deal.categories.push((await page.getByTestId('card-category').innerText()).trim())
     }
     await page.getByTestId('hide-pass').click()
   }

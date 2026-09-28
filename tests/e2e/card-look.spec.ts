@@ -3,9 +3,9 @@ import { addPlayers, startGame } from './helpers'
 
 // Bystanders see the screen's colour, motion and the card's shape from across the room, even when
 // they can't read the text. If crew and imposter cards look different, the role leaks without anyone
-// peeking. So both cards share the same screen, card, motion and two-line layout; only the text differs.
+// peeking. So both cards share the same screen, card, motion and line layout (two lines, or three with the category); only the text differs.
 
-async function dealAndCompare(page: Page): Promise<void> {
+async function dealAndCompare(page: Page): Promise<string> {
   await startGame(page)
   await page.getByTestId('start-round').click()
   const looks: Record<'crew' | 'imposter', Set<string>> = { crew: new Set(), imposter: new Set() }
@@ -26,6 +26,7 @@ async function dealAndCompare(page: Page): Promise<void> {
   }
   expect(looks.imposter.size).toBe(1)
   expect([...looks.crew]).toEqual([...looks.imposter])
+  return [...looks.imposter][0]
 }
 
 test('crew and imposter cards look the same (with hints): only the text differs', async ({ page }) => {
@@ -41,4 +42,13 @@ test('crew and imposter cards look the same with hints off too', async ({ page }
   await page.getByTestId('toggle-hints').click()
   await page.getByTestId('setup-done').click()
   await dealAndCompare(page)
+})
+
+test('crew and imposter cards look the same with the category shown too', async ({ page }) => {
+  await page.goto('/')
+  await addPlayers(page, ['Rami', 'Lina', 'Omar', 'Sara'])
+  await page.getByTestId('nav-setup').click()
+  await page.getByTestId('toggle-show-category').click()
+  await page.getByTestId('setup-done').click()
+  expect(await dealAndCompare(page)).toContain('category-line')
 })

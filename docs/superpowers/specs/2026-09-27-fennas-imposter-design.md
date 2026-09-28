@@ -56,6 +56,7 @@ The game is bilingual: **English** and **Levantine Arabic in Arabic script**. It
 | Imposter count | 1 … max, where **max = ⌊(participants − 1) / 2⌋** | 1 |
 | Random imposter count | on/off; picks uniformly from 1…max, count hidden from players | off |
 | Imposter hint | on/off | on |
+| Show the category on the cards | on/off; both reveal cards get a "Category: …" line | off |
 | Discussion timer | off, or 1–10 min in 30 s steps | off (3 min when first enabled) |
 | Scoring | on/off | off |
 
@@ -99,13 +100,14 @@ For each participant in roster order:
 
 1. **Pass screen:** "Pass the phone to **Name**", with guidance. Button: "I'm Name — show me".
 2. **Card screen:**
-   - Both cards have the same two-line layout, so the card's shape never gives a role away:
+   - Both cards have the same layout (two lines, or three with the category), so the card's shape never gives a role away:
 
      | Role | Title line | Second line |
      |---|---|---|
      | Crew | "The secret word is" | the word |
      | Imposter | "You're the imposter!" | the hint (per-word hint in the round language, falling back to the category name) — or "No hint this time" when hints are off |
 
+   - With "Show the category on the cards" on, both cards get a third line, "Category: …" — the imposter sees it too, even with hints off.
    - Each role gets its own guidance text below the card.
 3. **"Hide & pass"** hides the card and advances to the next participant.
 
@@ -125,12 +127,12 @@ A screen wake-lock is held during Reveal, Starting and Playing.
 
 ### 3.5 End of round & scoring
 
-**Scoring off:** the Result screen shows the imposter(s), the word and the category.
+**Scoring off:** the Result screen shows the imposter(s), the hint they were given (when hints are on), the word and the category.
 
 **Scoring on:**
 1. **Vote:** "Who did the group vote out?". Tap one participant, or "Nobody".
 2. If the voted-out player is an imposter, **Guess:** "Name was an imposter! They get one guess at the word — did they get it?". Answer yes or no.
-3. **Result:** reveal the imposters and the word, name the winning side, update the scoreboard, and show confetti for the winners.
+3. **Result:** reveal the imposters, their hint (when hints are on) and the word, name the winning side, update the scoreboard, and show confetti for the winners.
 
 **Scoring rule:**
 
@@ -316,7 +318,7 @@ docs/superpowers/       specs/  plans/
 | Route | View | Purpose |
 |---|---|---|
 | `#/` | Home | Title, language switch, Play / Continue, My Words, Data |
-| `#/setup` | Setup | Roster, active players, categories, settings |
+| `#/setup` | Setup | Roster, active players, categories, settings. The Done button stays pinned to the bottom while the page scrolls |
 | `#/play` | Play | Between-rounds screen and the whole round. Phases are driven by engine state and add no history entries, so the back button can never step into another player's card. Back during a round asks "Leave the round?" and keeps it resumable. |
 | `#/words` | My Words | Edit/delete custom content (§5.5) |
 | `#/data` | Data | Export, file import, URL import |
@@ -333,11 +335,11 @@ interface Player { id: string; name: string }
 
 interface Settings {
   imposterCount: number; randomImposterCount: boolean;
-  hints: boolean; timer: { enabled: boolean; seconds: number }; scoring: boolean;
+  hints: boolean; showCategory: boolean; timer: { enabled: boolean; seconds: number }; scoring: boolean;
 }
 
 interface Stored {
-  version: 2;
+  version: 3;
   language: Lang;
   players: Player[]; activePlayerIds: string[];
   settings: Settings; selectedCategoryIds: string[];
@@ -351,7 +353,7 @@ interface Stored {
 
 **Storage:**
 - One JSON document at `localStorage['fennas-imposter']`. It is written synchronously after every state change; the data is small.
-- **Migrations:** `migrations[n]` upgrades version n to n+1. They are applied in order on load. Version 2 switches on the categories added with it for players who saved before, leaving their other choices alone.
+- **Migrations:** `migrations[n]` upgrades version n to n+1. They are applied in order on load. Version 2 switches on the categories added with it for players who saved before, leaving their other choices alone. Version 3 adds `showCategory: false` to the settings and to a round in progress.
 - On first run the app calls `navigator.storage.persist()` to reduce eviction risk.
 - The Data screen recommends exporting a backup.
 - New ids use `crypto.randomUUID()`.
@@ -382,7 +384,7 @@ interface RoundState {
   imposterIds: string[];
   startingPlayerId: string;
   secret: Secret | null;             // null only during gmEntry; a snapshot so later edits don't alter the round
-  settings: Pick<Settings, 'hints' | 'scoring' | 'timer'> & { imposterCountHidden: boolean };
+  settings: Pick<Settings, 'hints' | 'showCategory' | 'scoring' | 'timer'> & { imposterCountHidden: boolean };
   phase: Phase;
   revealIndex: number;               // next participant to see their card
   timerEndsAt: number | null;        // epoch ms

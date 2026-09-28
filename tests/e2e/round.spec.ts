@@ -13,6 +13,7 @@ test('every player sees exactly one card, the crew share one word, and the impos
   expect(deal.imposters).toHaveLength(1)
   expect(new Set(deal.crewWords).size).toBe(1)
   expect(deal.hints).toHaveLength(1)
+  expect(deal.categories).toHaveLength(0) // the category stays off the cards unless Setup switches it on
   await expect(page.getByTestId('lang-en')).toHaveCount(0) // language is locked mid-round
 })
 

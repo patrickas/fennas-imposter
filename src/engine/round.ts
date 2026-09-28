@@ -57,6 +57,7 @@ export function startRound(input: StartRoundInput, rng: Rng): { round: RoundStat
     secret,
     settings: {
       hints: settings.hints,
+      showCategory: settings.showCategory,
       scoring: settings.scoring,
       timer: { ...settings.timer },
       imposterCountHidden: settings.randomImposterCount,

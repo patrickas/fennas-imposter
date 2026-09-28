@@ -2,7 +2,7 @@
 import { onMounted, onUnmounted, ref } from 'vue'
 import BgShapes from './BgShapes.vue'
 
-withDefaults(defineProps<{ tone?: 'sun' | 'bubblegum' | 'mint'; align?: 'center' | 'start' }>(), {
+withDefaults(defineProps<{ tone?: 'sun' | 'bubblegum' | 'mint'; align?: 'center' | 'start'; stickyActions?: boolean }>(), {
   tone: 'sun',
   align: 'center',
 })
@@ -28,16 +28,17 @@ onUnmounted(() => clearTimeout(armTimer))
     <div class="inner">
       <header v-if="$slots.top" class="top"><slot name="top" /></header>
       <section class="body" :class="`align-${align}`"><slot /></section>
-      <footer v-if="$slots.actions" class="actions" :inert="!armed"><slot name="actions" /></footer>
+      <footer v-if="$slots.actions" class="actions" :class="{ sticky: stickyActions }" :inert="!armed"><slot name="actions" /></footer>
     </div>
   </main>
 </template>
 
 <style scoped>
-.screen { position: relative; min-height: 100dvh; overflow: hidden; }
-.tone-sun { background: var(--sun); }
-.tone-bubblegum { background: var(--bubblegum); }
-.tone-mint { background: var(--mint); }
+/* clip, not hidden: hidden makes .screen a scroll container, which stops sticky actions from sticking. hidden stays as the fallback. */
+.screen { position: relative; min-height: 100dvh; overflow: hidden; overflow: clip; background: var(--tone); }
+.tone-sun { --tone: var(--sun); }
+.tone-bubblegum { --tone: var(--bubblegum); }
+.tone-mint { --tone: var(--mint); }
 .inner {
   position: relative; z-index: 1; display: flex; flex-direction: column; gap: 16px;
   max-width: var(--max-width); min-height: 100dvh; margin-inline: auto;
@@ -48,4 +49,11 @@ onUnmounted(() => clearTimeout(armTimer))
 .align-center { justify-content: center; }
 .align-start { justify-content: flex-start; }
 .actions { display: flex; flex-direction: column; gap: 10px; }
+/* A strip of the screen's colour, so the page scrolls under it; the negative margins cover .inner's gutters and bottom padding. */
+.actions.sticky {
+  position: sticky; bottom: 0; z-index: 1;
+  margin: 0 -16px calc(-20px - env(safe-area-inset-bottom));
+  padding: 12px 16px calc(12px + env(safe-area-inset-bottom));
+  background: var(--tone);
+}
 </style>

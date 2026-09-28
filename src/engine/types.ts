@@ -32,6 +32,8 @@ export interface Settings {
   imposterCount: number
   randomImposterCount: boolean
   hints: boolean
+  /** Both reveal cards also show the category. */
+  showCategory: boolean
   timer: TimerSettings
   scoring: boolean
 }
@@ -59,6 +61,7 @@ export interface Secret {
 
 export interface RoundSettings {
   hints: boolean
+  showCategory: boolean
   scoring: boolean
   timer: TimerSettings
   imposterCountHidden: boolean

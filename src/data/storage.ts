@@ -3,7 +3,7 @@ import { SEED_CATEGORIES } from './seed'
 import { TIMER } from './limits'
 
 export const STORAGE_KEY = 'fennas-imposter'
-export const CURRENT_VERSION = 2
+export const CURRENT_VERSION = 3
 
 export interface StorageLike {
   getItem(key: string): string | null
@@ -21,7 +21,7 @@ export interface Session {
 }
 
 export interface Stored {
-  version: 2
+  version: 3
   language: Lang
   players: Player[]
   activePlayerIds: string[]
@@ -57,6 +57,15 @@ export const MIGRATIONS: Record<number, Migration> = {
     if (!Array.isArray(selected)) return { ...doc, version: 2 } // isStored rejects it as damaged
     return { ...doc, version: 2, selectedCategoryIds: [...selected, ...ADDED_IN_V2.filter((id) => !selected.includes(id))] }
   },
+  // Version 3 added "show the category on the cards"; off keeps saved games (and a round in progress) as they were.
+  2: (doc) => {
+    const next: Record<string, unknown> = { ...doc, version: 3 }
+    if (isRecord(doc.settings)) next.settings = { ...doc.settings, showCategory: false }
+    if (isRecord(doc.round) && isRecord(doc.round.settings)) {
+      next.round = { ...doc.round, settings: { ...doc.round.settings, showCategory: false } }
+    }
+    return next // anything malformed is left for isStored to reject as damaged
+  },
 }
 
 export function defaultSettings(): Settings {
@@ -64,6 +73,7 @@ export function defaultSettings(): Settings {
     imposterCount: 1,
     randomImposterCount: false,
     hints: true,
+    showCategory: false,
     timer: { enabled: false, seconds: TIMER.default },
     scoring: false,
   }
@@ -71,7 +81,7 @@ export function defaultSettings(): Settings {
 
 export function defaultStored(): Stored {
   return {
-    version: 2,
+    version: 3,
     language: 'en',
     players: [],
     activePlayerIds: [],
@@ -110,6 +120,7 @@ function isSettings(x: unknown): x is Settings {
     typeof x.imposterCount === 'number' &&
     typeof x.randomImposterCount === 'boolean' &&
     typeof x.hints === 'boolean' &&
+    typeof x.showCategory === 'boolean' &&
     typeof x.scoring === 'boolean' &&
     isRecord(x.timer) &&
     typeof x.timer.enabled === 'boolean' &&

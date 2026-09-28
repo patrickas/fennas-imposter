@@ -73,6 +73,14 @@ describe('planImport', () => {
     expect(p.settings!.timer).toEqual({ enabled: true, seconds: 60 })
   })
 
+  it('still imports backups made before the category option existed, with the category kept off the cards', () => {
+    const old: Record<string, unknown> = { ...defaultSettings() }
+    delete old.showCategory
+    expect(valid(pack({ settings: old })).settings!.showCategory).toBe(false)
+    expect(valid(pack({ settings: { ...defaultSettings(), showCategory: true } })).settings!.showCategory).toBe(true)
+    expect(parsePack(pack({ settings: { ...defaultSettings(), showCategory: 'yes' } }), SEED_CATEGORY_IDS).ok).toBe(false)
+  })
+
   it('counts additions and updates, merging by id so re-importing refreshes', () => {
     const first = planImport(valid(pack()), emptyTarget(), 'url', newId)
     expect(first.summary).toMatchObject({ addCategories: 1, addWords: 2, updateWords: 0 })
