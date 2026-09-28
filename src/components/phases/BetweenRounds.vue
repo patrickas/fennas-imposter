@@ -1,38 +1,20 @@
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue'
+import { computed } from 'vue'
 import { useRouter } from 'vue-router'
-import type { Source } from '../../engine/types'
 import { useApp } from '../../composables/useApp'
-import type { MessageKey } from '../../i18n'
 import { confirmDialog } from '../../composables/useDialog'
 import Screen from '../ui/Screen.vue'
 import Chip from '../ui/Chip.vue'
 import PopButton from '../ui/PopButton.vue'
+import StickerCard from '../ui/StickerCard.vue'
 import LanguageSwitch from '../ui/LanguageSwitch.vue'
 import Scoreboard from './Scoreboard.vue'
-
-type SourceKind = Source['kind']
-const SOURCES: { kind: SourceKind; label: MessageKey }[] = [
-  { kind: 'random', label: 'play.sourceRandom' },
-  { kind: 'playerGm', label: 'play.sourcePlayerGm' },
-  { kind: 'outsideGm', label: 'play.sourceOutsideGm' },
-]
 
 const app = useApp()
 const router = useRouter()
 
-const kind = ref<SourceKind>('random')
-const activePlayers = computed(() => app.state.players.filter((p) => app.state.activePlayerIds.includes(p.id)))
-const gmId = ref(activePlayers.value[0]?.id ?? '')
-watch(activePlayers, (list) => {
-  if (!list.some((p) => p.id === gmId.value)) gmId.value = list[0]?.id ?? ''
-})
-
-const source = computed<Source>(() => {
-  if (kind.value === 'playerGm') return { kind: 'playerGm', gmPlayerId: gmId.value }
-  if (kind.value === 'outsideGm') return { kind: 'outsideGm' }
-  return { kind: 'random' }
-})
+// Where the word comes from is chosen in Setup → Settings.
+const source = computed(() => app.roundSource())
 const blocker = computed(() => app.roundBlocker(source.value))
 const blockerText = computed(() => {
   switch (blocker.value) {
@@ -74,21 +56,9 @@ async function endGame(): Promise<void> {
       <LanguageSwitch />
     </template>
 
-    <section class="panel stack">
-      <h2>{{ app.t('play.wordSource') }}</h2>
-      <div class="sources" role="radiogroup" :aria-label="app.t('play.wordSource')">
-        <label v-for="s in SOURCES" :key="s.kind" class="source" :class="{ chosen: kind === s.kind }">
-          <input v-model="kind" type="radio" name="source" :value="s.kind" :data-testid="`source-${s.kind}`">
-          <span>{{ app.t(s.label) }}</span>
-        </label>
-      </div>
-      <label v-if="kind === 'playerGm'" class="field">
-        {{ app.t('play.pickGm') }}
-        <select v-model="gmId" class="input" data-testid="gm-select">
-          <option v-for="p in activePlayers" :key="p.id" :value="p.id" dir="auto">{{ p.name }}</option>
-        </select>
-      </label>
-    </section>
+    <StickerCard motion="wobble" data-testid="title-card">
+      <h1 class="title-xl">{{ app.t('app.title') }}</h1>
+    </StickerCard>
 
     <p v-if="blockerText" class="guide" data-testid="round-blocker">{{ blockerText }}</p>
     <p v-else-if="clamped !== null" class="guide" data-testid="clamp-notice">{{ app.t('play.clamped', { count: clamped }) }}</p>
@@ -104,10 +74,3 @@ async function endGame(): Promise<void> {
     </template>
   </Screen>
 </template>
-
-<style scoped>
-.sources { display: flex; flex-direction: column; gap: 8px; }
-.source { display: flex; align-items: center; gap: 10px; min-height: var(--tap); padding: 6px 12px; border: var(--outline); border-radius: var(--radius-sm); font-weight: 700; }
-.source.chosen { background: var(--sun); }
-.source input { width: 22px; height: 22px; accent-color: var(--grape); }
-</style>

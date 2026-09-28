@@ -128,6 +128,23 @@ export function createAppStore(deps: AppDeps) {
     persist()
   }
 
+  function setGameMaster(id: string): void {
+    state.gmPlayerId = id
+    persist()
+  }
+
+  /** The chosen player Game Master; the first playing player until one is chosen, or while the chosen one sits out. */
+  function gameMasterId(): string | null {
+    const active = activeIds()
+    return state.gmPlayerId !== null && active.includes(state.gmPlayerId) ? state.gmPlayerId : (active[0] ?? null)
+  }
+
+  /** Where the next round's word comes from, as set in Settings. */
+  function roundSource(): Source {
+    const kind = state.settings.wordSource
+    return kind === 'playerGm' ? { kind, gmPlayerId: gameMasterId() ?? '' } : { kind }
+  }
+
   function ensureSession(): void {
     if (state.session) return
     state.session = { scores: {}, rounds: 0 }
@@ -292,6 +309,7 @@ export function createAppStore(deps: AppDeps) {
   return {
     state, meta, content, t, playerName,
     setLanguage, addPlayer, renamePlayer, removePlayer, setActive, toggleCategory, updateSettings,
+    setGameMaster, gameMasterId, roundSource,
     ensureSession, endSession, roundBlocker, clampedImposterCount, beginRound, submitGmWord, dispatch,
     finishRound, abandonRound,
     updateCustomWord, updateCustomCategory, deleteCustomWord, deleteCustomCategory,

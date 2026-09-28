@@ -9,6 +9,7 @@ const settings = (over: Partial<Settings> = {}): Settings => ({
   hints: true,
   showCategory: false,
   rotateStarter: false,
+  wordSource: 'random',
   timer: { enabled: false, seconds: 180 },
   scoring: true,
   ...over,

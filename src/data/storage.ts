@@ -1,9 +1,11 @@
-import { LANGS, type Category, type Lang, type Player, type RoundState, type Settings, type Word } from '../engine/types'
+import {
+  LANGS, SOURCE_KINDS, type Category, type Lang, type Player, type RoundState, type Settings, type SourceKind, type Word,
+} from '../engine/types'
 import { SEED_CATEGORIES } from './seed'
 import { TIMER } from './limits'
 
 export const STORAGE_KEY = 'fennas-imposter'
-export const CURRENT_VERSION = 4
+export const CURRENT_VERSION = 5
 
 export interface StorageLike {
   getItem(key: string): string | null
@@ -23,7 +25,7 @@ export interface Session {
 }
 
 export interface Stored {
-  version: 4
+  version: 5
   language: Lang
   players: Player[]
   activePlayerIds: string[]
@@ -33,6 +35,8 @@ export interface Stored {
   customWords: Word[]
   usedWordIds: Record<Lang, string[]>
   lastImportUrl: string | null
+  /** The player Game Master picked in Settings. Not a setting: player ids differ between devices, so backups leave it out. */
+  gmPlayerId: string | null
   session: Session | null
   round: RoundState | null
   /** Dev-only: deal the fixed test word (see data/testWord.ts). Absent = on (dev server only); false = off. */
@@ -74,6 +78,12 @@ export const MIGRATIONS: Record<number, Migration> = {
     if (isRecord(doc.settings)) next.settings = { ...doc.settings, rotateStarter: true }
     return next
   },
+  // Version 5 made where the word comes from a setting; it used to be picked before every round.
+  4: (doc) => {
+    const next: Record<string, unknown> = { ...doc, version: 5, gmPlayerId: null }
+    if (isRecord(doc.settings)) next.settings = { ...doc.settings, wordSource: 'random' }
+    return next
+  },
 }
 
 export function defaultSettings(): Settings {
@@ -83,6 +93,7 @@ export function defaultSettings(): Settings {
     hints: true,
     showCategory: false,
     rotateStarter: true,
+    wordSource: 'random',
     timer: { enabled: false, seconds: TIMER.default },
     scoring: false,
   }
@@ -90,7 +101,7 @@ export function defaultSettings(): Settings {
 
 export function defaultStored(): Stored {
   return {
-    version: 4,
+    version: 5,
     language: 'en',
     players: [],
     activePlayerIds: [],
@@ -100,6 +111,7 @@ export function defaultStored(): Stored {
     customWords: [],
     usedWordIds: { en: [], ar: [] },
     lastImportUrl: null,
+    gmPlayerId: null,
     session: null,
     round: null,
   }
@@ -131,6 +143,7 @@ function isSettings(x: unknown): x is Settings {
     typeof x.hints === 'boolean' &&
     typeof x.showCategory === 'boolean' &&
     typeof x.rotateStarter === 'boolean' &&
+    SOURCE_KINDS.includes(x.wordSource as SourceKind) &&
     typeof x.scoring === 'boolean' &&
     isRecord(x.timer) &&
     typeof x.timer.enabled === 'boolean' &&
@@ -153,6 +166,7 @@ export function isStored(x: unknown): x is Stored {
     isRecord(x.usedWordIds) &&
     LANGS.every((l) => Array.isArray((x.usedWordIds as Record<string, unknown>)[l])) &&
     (x.lastImportUrl === null || typeof x.lastImportUrl === 'string') &&
+    (x.gmPlayerId === null || typeof x.gmPlayerId === 'string') &&
     (x.session === null || isRecord(x.session)) &&
     (x.round === null || isRecord(x.round))
   )

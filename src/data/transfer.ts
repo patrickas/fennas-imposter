@@ -1,4 +1,6 @@
-import { LANGS, type Category, type Localized, type Player, type Settings, type Word } from '../engine/types'
+import {
+  LANGS, SOURCE_KINDS, type Category, type Localized, type Player, type Settings, type SourceKind, type Word,
+} from '../engine/types'
 import { SEED_CATEGORY_IDS, SEED_WORD_IDS } from './seed'
 import { cleanLocalized, cleanText, normalizeText } from './normalize'
 import { LIMITS, MAX_IMPOSTER_SETTING, OLDEST_TIMER_MIN, TIMER, textLength } from './limits'
@@ -94,6 +96,7 @@ function readSettings(v: unknown, fail: Fail): Settings | null {
     typeof v.hints === 'boolean' &&
     (v.showCategory === undefined || typeof v.showCategory === 'boolean') && // absent in backups from before the option
     (v.rotateStarter === undefined || typeof v.rotateStarter === 'boolean') && // likewise
+    (v.wordSource === undefined || SOURCE_KINDS.includes(v.wordSource as SourceKind)) && // likewise
     typeof v.scoring === 'boolean' &&
     isRecord(t) &&
     typeof t.enabled === 'boolean' &&
@@ -111,6 +114,7 @@ function readSettings(v: unknown, fail: Fail): Settings | null {
     hints: v.hints as boolean,
     showCategory: v.showCategory === true,
     rotateStarter: v.rotateStarter !== false,
+    wordSource: (v.wordSource as SourceKind | undefined) ?? 'random',
     scoring: v.scoring as boolean,
     timer: { enabled: t.enabled as boolean, seconds: Math.max(TIMER.min, t.seconds as number) },
   }

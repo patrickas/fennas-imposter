@@ -89,6 +89,14 @@ describe('planImport', () => {
     expect(parsePack(pack({ settings: { ...defaultSettings(), rotateStarter: 'no' } }), SEED_CATEGORY_IDS).ok).toBe(false)
   })
 
+  it('still imports backups made before the word source was a setting, with a random word', () => {
+    const old: Record<string, unknown> = { ...defaultSettings() }
+    delete old.wordSource
+    expect(valid(pack({ settings: old })).settings!.wordSource).toBe('random')
+    expect(valid(pack({ settings: { ...defaultSettings(), wordSource: 'outsideGm' } })).settings!.wordSource).toBe('outsideGm')
+    expect(parsePack(pack({ settings: { ...defaultSettings(), wordSource: 'anyone' } }), SEED_CATEGORY_IDS).ok).toBe(false)
+  })
+
   it('counts additions and updates, merging by id so re-importing refreshes', () => {
     const first = planImport(valid(pack()), emptyTarget(), 'url', newId)
     expect(first.summary).toMatchObject({ addCategories: 1, addWords: 2, updateWords: 0 })

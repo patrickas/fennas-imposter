@@ -36,6 +36,8 @@ export interface Settings {
   showCategory: boolean
   /** Players take turns to start, in list order; off picks the starter at random. */
   rotateStarter: boolean
+  /** Where each round's word comes from. The player Game Master is stored apart (Stored.gmPlayerId). */
+  wordSource: SourceKind
   timer: TimerSettings
   scoring: boolean
 }
@@ -52,6 +54,8 @@ export type Source =
   | { kind: 'random' }
   | { kind: 'playerGm'; gmPlayerId: string }
   | { kind: 'outsideGm' }
+export type SourceKind = Source['kind']
+export const SOURCE_KINDS: readonly SourceKind[] = ['random', 'playerGm', 'outsideGm']
 
 /** Snapshot of the round's word, so later edits/deletes never change a running round. */
 export interface Secret {

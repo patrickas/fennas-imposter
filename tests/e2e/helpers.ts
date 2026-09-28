@@ -20,11 +20,22 @@ export async function openSetupPanel(page: Page, panel: 'categories' | 'settings
   await page.getByTestId(`fold-${panel}`).click()
 }
 
-/** From Home with no game running: "Let's play" opens Setup to confirm the players, and its button starts the game. */
-export async function startGame(page: Page): Promise<void> {
+/**
+ * From Home with no game running: "Let's play" opens Setup to confirm the players (and, when given, to choose
+ * where the word comes from), and its button starts the game.
+ */
+export async function startGame(page: Page, opts: { source?: 'playerGm' | 'outsideGm'; gmPlayer?: string } = {}): Promise<void> {
   await page.getByTestId('play').click()
+  if (opts.source) await chooseWordSource(page, opts.source, opts.gmPlayer)
   await page.getByTestId('setup-done').click()
   await expect(page.getByTestId('between-rounds')).toBeVisible()
+}
+
+/** On Setup: choose where the word comes from, and the player Game Master, in the Settings panel. */
+export async function chooseWordSource(page: Page, source: 'random' | 'playerGm' | 'outsideGm', gmPlayer?: string): Promise<void> {
+  await openSetupPanel(page, 'settings')
+  await page.getByTestId(`source-${source}`).check()
+  if (gmPlayer) await page.getByTestId('gm-select').selectOption({ label: gmPlayer })
 }
 
 export interface Deal {
@@ -72,13 +83,7 @@ export async function startPlaying(page: Page): Promise<void> {
 
 /** From Home: start a GM round (player GM when `gmPlayer` is given, otherwise outside GM) and submit a word in a new category. */
 export async function startGmRound(page: Page, opts: { gmPlayer?: string; word: string; newCategory: string }): Promise<void> {
-  await startGame(page)
-  if (opts.gmPlayer) {
-    await page.getByTestId('source-playerGm').check()
-    await page.getByTestId('gm-select').selectOption({ label: opts.gmPlayer })
-  } else {
-    await page.getByTestId('source-outsideGm').check()
-  }
+  await startGame(page, { source: opts.gmPlayer ? 'playerGm' : 'outsideGm', gmPlayer: opts.gmPlayer })
   await page.getByTestId('start-round').click()
   await page.getByTestId('gm-ready').click()
   await page.getByTestId('gm-word').fill(opts.word)

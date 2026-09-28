@@ -54,6 +54,7 @@ The game is bilingual: **English** and **Levantine Arabic in Arabic script**. It
 
 | Setting | Values | Default |
 |---|---|---|
+| Word source | Random, Player GM (with the GM chosen from the active players) or Outside GM; see §3.2. Kept until changed. The chosen GM is not in backups, and while they are not playing the first active player is GM | Random |
 | Imposter count | 1 … max, where **max = ⌊(participants − 1) / 2⌋** | 1 |
 | Random imposter count | on/off; picks uniformly from 1…max, count hidden from players | off |
 | Imposter hint | on/off | on |
@@ -69,7 +70,7 @@ The max rule guarantees the crew always outnumbers the imposters.
 ### 3.2 Round setup
 
 The between-rounds screen offers:
-- a choice of **word source**
+- a **title card** with the game name (the word source is chosen in Settings, §3.1)
 - a **Start round** button
 - a language switch
 - **Edit setup**, which keeps the session scores
@@ -337,17 +338,18 @@ interface Player { id: string; name: string }
 
 interface Settings {
   imposterCount: number; randomImposterCount: boolean;
-  hints: boolean; showCategory: boolean; rotateStarter: boolean; timer: { enabled: boolean; seconds: number }; scoring: boolean;
+  hints: boolean; showCategory: boolean; rotateStarter: boolean; wordSource: 'random' | 'playerGm' | 'outsideGm'; timer: { enabled: boolean; seconds: number }; scoring: boolean;
 }
 
 interface Stored {
-  version: 4;
+  version: 5;
   language: Lang;
   players: Player[]; activePlayerIds: string[];
   settings: Settings; selectedCategoryIds: string[];
   customCategories: Category[]; customWords: Word[];
   usedWordIds: Record<Lang, string[]>;
   lastImportUrl: string | null;
+  gmPlayerId: string | null; // the chosen player GM; not in backups (player ids differ between devices)
   session: { scores: Record<string, { name: string; points: number }>; rounds: number; lastStarterId?: string } | null;
   round: RoundState | null;
 }
@@ -355,7 +357,7 @@ interface Stored {
 
 **Storage:**
 - One JSON document at `localStorage['fennas-imposter']`. It is written synchronously after every state change; the data is small.
-- **Migrations:** `migrations[n]` upgrades version n to n+1. They are applied in order on load. Version 2 switches on the categories added with it for players who saved before, leaving their other choices alone. Version 3 adds `showCategory: false` to the settings and to a round in progress. Version 4 adds `rotateStarter: true`, the new default.
+- **Migrations:** `migrations[n]` upgrades version n to n+1. They are applied in order on load. Version 2 switches on the categories added with it for players who saved before, leaving their other choices alone. Version 3 adds `showCategory: false` to the settings and to a round in progress. Version 4 adds `rotateStarter: true`, the new default. Version 5 adds `wordSource: 'random'` and `gmPlayerId: null`.
 - On first run the app calls `navigator.storage.persist()` to reduce eviction risk.
 - The Data screen recommends exporting a backup.
 - New ids use `crypto.randomUUID()`.

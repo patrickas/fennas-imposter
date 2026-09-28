@@ -14,6 +14,8 @@ describe('loadStored', () => {
     expect(r.stored.settings.hints).toBe(true)
     expect(r.stored.settings.showCategory).toBe(false)
     expect(r.stored.settings.rotateStarter).toBe(true)
+    expect(r.stored.settings.wordSource).toBe('random')
+    expect(r.stored.gmPlayerId).toBeNull()
   })
 
   it('reads back exactly what was saved', () => {
@@ -73,9 +75,22 @@ describe('loadStored', () => {
     v3.settings.hints = false
     const r = loadStored(memoryStorage({ [STORAGE_KEY]: JSON.stringify(v3) }), 1)
     expect(r.status).toBe('ok')
-    expect(r.stored.version).toBe(4)
+    expect(r.stored.version).toBe(CURRENT_VERSION)
     expect(r.stored.settings.rotateStarter).toBe(true)
     expect(r.stored.settings.hints).toBe(false)
+  })
+
+  it('upgrades version-4 data to a random word with no Game Master chosen yet, keeping every other setting', () => {
+    const v4 = JSON.parse(JSON.stringify({ ...defaultStored(), version: 4 }))
+    delete v4.settings.wordSource
+    delete v4.gmPlayerId
+    v4.settings.rotateStarter = false
+    const r = loadStored(memoryStorage({ [STORAGE_KEY]: JSON.stringify(v4) }), 1)
+    expect(r.status).toBe('ok')
+    expect(r.stored.version).toBe(5)
+    expect(r.stored.settings.wordSource).toBe('random')
+    expect(r.stored.gmPlayerId).toBeNull()
+    expect(r.stored.settings.rotateStarter).toBe(false)
   })
 
   it('never overwrites data written by a newer app version', () => {

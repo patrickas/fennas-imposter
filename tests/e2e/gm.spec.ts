@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test'
-import { addPlayers, dealCards, startGame, startGmRound, startPlaying } from './helpers'
+import { addPlayers, dealCards, openSetupPanel, startGame, startGmRound, startPlaying } from './helpers'
 
 test('a player Game Master sits out, and their word is saved to My words', async ({ page }) => {
   await page.goto('/')
@@ -15,11 +15,28 @@ test('a player Game Master sits out, and their word is saved to My words', async
   await expect(page.getByTestId('custom-word')).toContainText('Mansaf')
 })
 
+// The source used to be picked on the round screen and went back to "Random word" before every round.
+test('where the word comes from is set in Settings and kept for the next rounds; the round screen shows the title', async ({ page }) => {
+  await page.goto('/')
+  await addPlayers(page, ['Rami', 'Lina', 'Omar', 'Sara'])
+  await startGame(page, { source: 'playerGm', gmPlayer: 'Lina' })
+  await expect(page.getByTestId('title-card')).toHaveText('Fennass, Imposter')
+  await expect(page.getByTestId('source-random')).toHaveCount(0)
+
+  await page.reload()
+  await page.getByTestId('edit-setup').click()
+  await openSetupPanel(page, 'settings')
+  await expect(page.getByTestId('source-playerGm')).toBeChecked()
+  await expect(page.getByTestId('gm-select').locator('option:checked')).toHaveText('Lina')
+  await page.getByTestId('setup-done').click()
+  await page.getByTestId('start-round').click()
+  await expect(page.getByTestId('gm-pass')).toContainText('Lina')
+})
+
 test('the Game Master has to pick a category, so nothing is filed under the first one by accident', async ({ page }) => {
   await page.goto('/')
   await addPlayers(page, ['Rami', 'Lina', 'Omar'])
-  await startGame(page)
-  await page.getByTestId('source-outsideGm').check()
+  await startGame(page, { source: 'outsideGm' })
   await page.getByTestId('start-round').click()
   await page.getByTestId('gm-ready').click()
   await page.getByTestId('gm-word').fill('Mansaf')

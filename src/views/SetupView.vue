@@ -5,7 +5,8 @@ import { useApp, type RosterError } from '../composables/useApp'
 import { eligibleCategories, eligibleWords } from '../engine/words'
 import { maxImposters } from '../engine/assign'
 import { LIMITS, TIMER } from '../data/limits'
-import { formatClock } from '../i18n'
+import { formatClock, type MessageKey } from '../i18n'
+import type { SourceKind } from '../engine/types'
 import Screen from '../components/ui/Screen.vue'
 import PopButton from '../components/ui/PopButton.vue'
 import UpdatePrompt from '../components/ui/UpdatePrompt.vue'
@@ -83,6 +84,20 @@ const hints = computed({
 const showCategory = computed({
   get: () => app.state.settings.showCategory,
   set: (value: boolean) => app.updateSettings({ showCategory: value }),
+})
+const SOURCES: { kind: SourceKind; label: MessageKey }[] = [
+  { kind: 'random', label: 'play.sourceRandom' },
+  { kind: 'playerGm', label: 'play.sourcePlayerGm' },
+  { kind: 'outsideGm', label: 'play.sourceOutsideGm' },
+]
+const wordSource = computed({
+  get: () => app.state.settings.wordSource,
+  set: (value: SourceKind) => app.updateSettings({ wordSource: value }),
+})
+const activePlayers = computed(() => app.state.players.filter((p) => app.state.activePlayerIds.includes(p.id)))
+const gameMaster = computed({
+  get: () => app.gameMasterId() ?? '',
+  set: (id: string) => app.setGameMaster(id),
 })
 const rotateStarter = computed({
   get: () => app.state.settings.rotateStarter,
@@ -189,6 +204,19 @@ function done(): void {
 
     <section class="panel">
       <Collapsible :title="app.t('setup.settings')" testid="fold-settings">
+        <h3>{{ app.t('play.wordSource') }}</h3>
+        <div class="sources" role="radiogroup" :aria-label="app.t('play.wordSource')">
+          <label v-for="s in SOURCES" :key="s.kind" class="source" :class="{ chosen: wordSource === s.kind }">
+            <input v-model="wordSource" type="radio" name="source" :value="s.kind" :data-testid="`source-${s.kind}`">
+            <span>{{ app.t(s.label) }}</span>
+          </label>
+        </div>
+        <label v-if="wordSource === 'playerGm'" class="field">
+          {{ app.t('play.pickGm') }}
+          <select v-model="gameMaster" class="input" data-testid="gm-select">
+            <option v-for="p in activePlayers" :key="p.id" :value="p.id" dir="auto">{{ p.name }}</option>
+          </select>
+        </label>
         <Stepper
           v-model="imposters"
           :min="1"
@@ -235,4 +263,8 @@ h1 { font-size: 1.8rem; }
 .category { display: flex; align-items: center; gap: 12px; min-height: var(--tap); font-weight: 700; }
 .category .grow { overflow-wrap: anywhere; }
 .count { font-weight: 500; opacity: 0.75; white-space: nowrap; }
+.sources { display: flex; flex-direction: column; gap: 8px; }
+.source { display: flex; align-items: center; gap: 10px; min-height: var(--tap); padding: 6px 12px; border: var(--outline); border-radius: var(--radius-sm); font-weight: 700; }
+.source.chosen { background: var(--sun); }
+.source input { width: 22px; height: 22px; accent-color: var(--grape); }
 </style>

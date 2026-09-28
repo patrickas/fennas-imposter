@@ -236,6 +236,32 @@ describe('rounds', () => {
     expect(seen.size).toBe(4) // with turns this would stay on the first player, since abandoned rounds keep the turn
   })
 
+  // Where the word comes from is a setting now, not a per-round pick that fell back to "random" every round.
+  it('remembers where the word comes from and who the Game Master is, even after a reload', () => {
+    const storage = memoryStorage()
+    const app = setup(storage)
+    const ids = withPlayers(app)
+    expect(app.roundSource()).toEqual({ kind: 'random' })
+    app.updateSettings({ wordSource: 'playerGm' })
+    app.setGameMaster(ids[2])
+    const reloaded = setup(storage)
+    expect(reloaded.roundSource()).toEqual({ kind: 'playerGm', gmPlayerId: ids[2] })
+    reloaded.updateSettings({ wordSource: 'outsideGm' })
+    expect(reloaded.roundSource()).toEqual({ kind: 'outsideGm' })
+  })
+
+  it('makes the first playing player Game Master until one is chosen, and while the chosen one sits out', () => {
+    const app = setup()
+    const ids = withPlayers(app)
+    app.updateSettings({ wordSource: 'playerGm' })
+    expect(app.roundSource()).toEqual({ kind: 'playerGm', gmPlayerId: ids[0] })
+    app.setGameMaster(ids[1])
+    app.setActive(ids[1], false)
+    expect(app.roundSource()).toEqual({ kind: 'playerGm', gmPlayerId: ids[0] })
+    app.setActive(ids[1], true)
+    expect(app.roundSource()).toEqual({ kind: 'playerGm', gmPlayerId: ids[1] })
+  })
+
   it('tells the between-rounds screen when the imposter count will be lowered', () => {
     const app = setup()
     withPlayers(app)
