@@ -156,6 +156,7 @@ export const ar: Messages = {
 
   'result.imposters': { one: 'المندسّ كان', other: 'المندسّين كانوا' },
   'result.word': 'الكلمة كانت',
+  'result.hint': 'التلميح كان',
   'result.category': 'الفئة: {category}',
   'result.crewWins': 'ربحت الجماعة!',
   'result.impostersWin': { one: 'ربح المندسّ!', other: 'ربحوا المندسّين!' },

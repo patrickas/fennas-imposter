@@ -132,6 +132,7 @@ const messages = {
 
   'result.imposters': { one: 'The imposter was', other: 'The imposters were' },
   'result.word': 'The word was',
+  'result.hint': 'The hint was',
   'result.category': 'Category: {category}',
   'result.crewWins': 'The crew wins!',
   'result.impostersWin': { one: 'The imposter wins!', other: 'The imposters win!' },

@@ -103,7 +103,7 @@ test('"Show the category on the cards" shows it to crew and imposter alike, and 
   await startPlaying(page)
   await page.getByTestId('end-discussion').click()
   await expect(page.getByTestId('result-imposters')).toContainText(deal.imposters[0])
-  await expect(page.getByTestId('result-hint')).toHaveText('Hint: ⁨Rice and yogurt⁩')
+  await expect(page.getByTestId('result-hint')).toHaveText('Rice and yogurt')
 })
 
 test('every Arabic screen is right-to-left with no English left (except the "English" switch label)', async ({ page }) => {

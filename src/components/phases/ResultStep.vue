@@ -28,7 +28,10 @@ const winner = computed(() => {
     <StickerCard tone="ink">
       <p>{{ app.t('result.imposters', { count: round.imposterIds.length }) }}</p>
       <p class="names" data-testid="result-imposters">{{ imposterNames }}</p>
-      <p v-if="round.settings.hints" data-testid="result-hint">{{ app.t('reveal.hint', { hint: imposterHint(round.secret) }) }}</p>
+      <template v-if="round.settings.hints">
+        <p class="hint-label">{{ app.t('result.hint') }}</p>
+        <p class="hint" data-testid="result-hint">{{ imposterHint(round.secret) }}</p>
+      </template>
     </StickerCard>
     <StickerCard motion="wobble">
       <p>{{ app.t('result.word') }}</p>
@@ -43,5 +46,6 @@ const winner = computed(() => {
 </template>
 
 <style scoped>
-.names { font-size: 1.6rem; font-weight: 800; overflow-wrap: anywhere; }
+.names, .hint { font-size: 1.6rem; font-weight: 800; overflow-wrap: anywhere; }
+.hint-label { margin-top: 12px; }
 </style>
