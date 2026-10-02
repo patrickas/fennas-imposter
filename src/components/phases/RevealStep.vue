@@ -52,7 +52,7 @@ function hideAndPass(): void {
          (Comments stay inside the Screen: a root-level comment makes this a multi-root component in dev
          builds, and <Transition mode="out-in"> then never finishes — a blank page.) -->
     <template #top>
-      <Chip><bdi>{{ name }}</bdi></Chip>
+      <Chip class="name-chip"><bdi class="card-name">{{ name }}</bdi></Chip>
     </template>
     <!-- Both cards: a big title line, then one second line (and the category, when shown) — the same shape for every role. -->
     <StickerCard v-if="isImposter" motion="wobble">
@@ -81,6 +81,8 @@ function hideAndPass(): void {
 
 <style scoped>
 .lead { font-size: 1.3rem; font-weight: 700; }
+.name-chip { margin-inline: auto; }
+.card-name { font-size: 2rem; font-weight: 800; }
 .reveal-line { margin-top: 12px; color: var(--grape); }
 .category-line { margin-top: 10px; font-size: 1.2rem; font-weight: 700; overflow-wrap: anywhere; }
 </style>
