@@ -1,5 +1,5 @@
-import type { Category, Localized, Word } from '../../engine/types'
-import type { SeedPack } from './types'
+import type { Category, Localized, SubtleHint, Word } from '../../engine/types'
+import type { SeedPack, SeedRow } from './types'
 import { food } from './packs/food'
 import { animals } from './packs/animals'
 import { home } from './packs/home'
@@ -36,15 +36,22 @@ function localized(en: string | null, ar: string | null): Localized {
 
 export const SEED_CATEGORIES: readonly Category[] = SEED_PACKS.map((p) => ({ id: p.id, name: p.name, builtIn: true }))
 
-export const SEED_WORDS: readonly Word[] = SEED_PACKS.flatMap((p) =>
-  p.rows.map(([slug, en, ar, hintEn, hintAr]) => ({
-    id: `${p.id}.${slug}`,
-    categoryId: p.id,
-    builtIn: true,
-    text: localized(en, ar),
-    hint: localized(hintEn, hintAr),
-  })),
-)
+function seedWord(pack: SeedPack, [slug, en, ar, hintEn, hintAr]: SeedRow): Word {
+  return { id: `${pack.id}.${slug}`, categoryId: pack.id, builtIn: true, text: localized(en, ar), hint: localized(hintEn, hintAr) }
+}
+
+export const SEED_WORDS: readonly Word[] = SEED_PACKS.flatMap((p) => {
+  const subtle = new Map<string, SubtleHint>(
+    p.subtle.map(([slug, hintEn, hintAr, whyEn, whyAr]) => [slug, { hint: localized(hintEn, hintAr), why: localized(whyEn, whyAr) }]),
+  )
+  return [
+    ...p.rows.map((row): Word => {
+      const s = subtle.get(row[0])
+      return s ? { ...seedWord(p, row), subtle: s } : seedWord(p, row)
+    }),
+    ...p.hard.map((row): Word => ({ ...seedWord(p, row), level: 'hard' })),
+  ]
+})
 
 export const SEED_CATEGORY_IDS: ReadonlySet<string> = new Set(SEED_CATEGORIES.map((c) => c.id))
 export const SEED_WORD_IDS: ReadonlySet<string> = new Set(SEED_WORDS.map((w) => w.id))

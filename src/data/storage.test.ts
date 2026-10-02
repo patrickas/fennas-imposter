@@ -15,6 +15,7 @@ describe('loadStored', () => {
     expect(r.stored.settings.showCategory).toBe(false)
     expect(r.stored.settings.rotateStarter).toBe(true)
     expect(r.stored.settings.wordSource).toBe('random')
+    expect(r.stored.settings.difficulty).toBe('easy')
     expect(r.stored.gmPlayerId).toBeNull()
   })
 
@@ -87,10 +88,32 @@ describe('loadStored', () => {
     v4.settings.rotateStarter = false
     const r = loadStored(memoryStorage({ [STORAGE_KEY]: JSON.stringify(v4) }), 1)
     expect(r.status).toBe('ok')
-    expect(r.stored.version).toBe(5)
+    expect(r.stored.version).toBe(CURRENT_VERSION)
     expect(r.stored.settings.wordSource).toBe('random')
     expect(r.stored.gmPlayerId).toBeNull()
     expect(r.stored.settings.rotateStarter).toBe(false)
+  })
+
+  it('upgrades version-5 data to easy rounds, so saved games and a round in progress play exactly as before', () => {
+    const v5 = JSON.parse(JSON.stringify({ ...defaultStored(), version: 5 }))
+    delete v5.settings.difficulty
+    v5.settings.hints = false
+    v5.customWords = [{ id: 'w1', categoryId: 'food', builtIn: false, text: { en: 'Mansaf' }, hint: {} }]
+    v5.round = { phase: 'reveal', secret: { wordId: 'food.cat', word: 'Cat', hint: 'Meow', categoryName: 'Food' } }
+    const r = loadStored(memoryStorage({ [STORAGE_KEY]: JSON.stringify(v5) }), 1)
+    expect(r.status).toBe('ok')
+    expect(r.stored.version).toBe(CURRENT_VERSION)
+    expect(r.stored.settings.difficulty).toBe('easy')
+    expect(r.stored.settings.hints).toBe(false)
+    // Words without a level are easy, and a round without one shows no badge: neither needs rewriting.
+    expect(r.stored.customWords).toEqual(v5.customWords)
+    expect(r.stored.round?.secret?.level).toBeUndefined()
+  })
+
+  it('treats an unknown difficulty as damaged data rather than guessing', () => {
+    const doc = JSON.parse(JSON.stringify(defaultStored()))
+    doc.settings.difficulty = 'insane'
+    expect(loadStored(memoryStorage({ [STORAGE_KEY]: JSON.stringify(doc) }), 1).status).toBe('corrupt')
   })
 
   it('never overwrites data written by a newer app version', () => {

@@ -53,6 +53,7 @@ export const ar: Messages = {
   'setup.randomImposters': 'عدد مندسّين مفاجأة',
   'setup.hints': 'اعطي المندسّ تلميح',
   'setup.showCategory': 'فرجي الفئة عالكروت',
+  'setup.difficulty': 'الصعوبة',
   'setup.rotateStarter': 'البداية بالدور',
   'setup.timer': 'مؤقّت النقاش',
   'setup.timerLength': 'مدّة المؤقّت',
@@ -74,6 +75,9 @@ export const ar: Messages = {
   'error.chooseCategory': 'اختار فئة',
 
   'play.round': 'الجولة {n}',
+  'difficulty.easy': 'سهل',
+  'difficulty.hard': 'صعب',
+  'difficulty.random': 'عشوائي',
   'play.wordSource': 'منين بتجي الكلمة؟',
   'play.sourceRandom': 'كلمة عشوائية',
   'play.sourcePlayerGm': 'لاعب بيكون الحَكَم',
@@ -239,6 +243,7 @@ export const ar: Messages = {
   'pack.tooLong': 'طويل كتير',
   'pack.unknownCategory': 'فئة مش معروفة',
   'pack.duplicateId': 'معرّف مكرّر',
+  'pack.subtleOnHard': 'الكلمة الصعبة ما بيصير إلها تلميح خفي',
 
   'storage.unavailable': 'ما فينا نحفظ عهالجهاز — التغييرات رح تروح لما تسكّر التطبيق.',
   'storage.corrupt': 'البيانات المحفوظة كانت خربانة ورجّعناها للأساس. خلّينا نسخة منها.',

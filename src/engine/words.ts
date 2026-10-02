@@ -1,4 +1,4 @@
-import type { Category, Content, Lang, Secret, Word } from './types'
+import type { Category, Content, Difficulty, Lang, Level, Secret, Word } from './types'
 import { pickOne, type Rng } from './rng'
 
 const present = (v: string | undefined): v is string => typeof v === 'string' && v.trim() !== ''
@@ -38,7 +38,43 @@ export function pickWord(
   return { word, used: [...history, word.id] }
 }
 
-export function makeSecret(word: Word, category: Category, lang: Lang): Secret {
+/**
+ * The three kinds of random-word round (spec §4.2): an easy word with its hint, a hard word with its
+ * hint, or an easy word whose imposter gets the subtle hint.
+ */
+export type RoundKind = 'easy' | 'hardWord' | 'subtle'
+
+/** The words each kind of round can deal from the selected categories, in language `lang`. */
+export function roundPools(content: Content, lang: Lang, categoryIds: readonly string[]): Record<RoundKind, Word[]> {
+  const words = eligibleWords(content, lang, categoryIds)
+  const easy = words.filter((w) => w.level !== 'hard')
+  return {
+    easy,
+    hardWord: words.filter((w) => w.level === 'hard'),
+    subtle: easy.filter((w) => present(w.subtle?.hint[lang])),
+  }
+}
+
+/**
+ * Settles the round's kind (spec §4.3). `available` says which pools have words. A hard round falls
+ * back to easy rather than mislabel itself, and subtle rounds need the imposter hint switched on.
+ */
+export function chooseKind(
+  difficulty: Difficulty,
+  available: Record<RoundKind, boolean>,
+  hints: boolean,
+  rng: Rng,
+): RoundKind {
+  const level: Level = difficulty === 'random' ? pickOne(rng, ['easy', 'hard'] as const) : difficulty
+  const hardKinds = (['hardWord', 'subtle'] as const).filter((k) => available[k] && (k === 'hardWord' || hints))
+  if (level === 'easy' && available.easy) return 'easy'
+  if (hardKinds.length > 0) return hardKinds.length === 1 ? hardKinds[0] : pickOne(rng, hardKinds)
+  if (available.easy) return 'easy'
+  throw new Error('chooseKind: no playable word')
+}
+
+/** `kind` is null for Game Master rounds, which have no level. */
+export function makeSecret(word: Word, category: Category, lang: Lang, kind: RoundKind | null = null): Secret {
   const text = word.text[lang]
   const categoryName = category.name[lang]
   if (word.categoryId !== category.id) {
@@ -47,13 +83,22 @@ export function makeSecret(word: Word, category: Category, lang: Lang): Secret {
   if (!present(text) || !present(categoryName)) {
     throw new Error(`makeSecret: ${word.id} is not playable in ${lang}`)
   }
+  if (kind !== null && (kind === 'hardWord') !== (word.level === 'hard')) {
+    throw new Error(`makeSecret: ${word.id} does not fit a "${kind}" round`)
+  }
   const hint = word.hint[lang]
-  return {
+  const secret: Secret = {
     wordId: word.id,
     word: text.trim(),
     hint: present(hint) ? hint.trim() : null,
     categoryName: categoryName.trim(),
   }
+  if (kind === null) return secret
+  if (kind !== 'subtle') return { ...secret, level: kind === 'easy' ? 'easy' : 'hard' }
+  const subtle = word.subtle?.hint[lang]
+  if (!present(subtle)) throw new Error(`makeSecret: ${word.id} has no subtle hint in ${lang}`)
+  const why = word.subtle?.why[lang]
+  return { ...secret, level: 'hard', hint: subtle.trim(), ...(present(why) ? { hintWhy: why.trim() } : {}) }
 }
 
 export function imposterHint(secret: Secret): string {

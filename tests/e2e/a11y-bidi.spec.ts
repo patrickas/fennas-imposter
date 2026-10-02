@@ -28,7 +28,7 @@ test('a Latin name with punctuation keeps its shape on Arabic screens ("Sam!" ne
   await page.getByTestId('start-round').click()
   expect(await nameKeepsItsShape(page.getByTestId('pass-name'))).toBe(true)
   await page.getByTestId('show-card').click()
-  expect(await nameKeepsItsShape(page.getByTestId('card-screen').locator('.chip'))).toBe(true)
+  expect(await nameKeepsItsShape(page.getByTestId('card-screen').locator('.name-chip'))).toBe(true)
   await page.getByTestId('hide-pass').click()
   await dealCards(page, 2)
   await startPlaying(page)

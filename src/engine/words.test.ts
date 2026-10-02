@@ -1,7 +1,9 @@
 import { describe, expect, it } from 'bun:test'
 import type { Category, Content, Localized, Word } from './types'
-import { seededRng } from './rng'
-import { eligibleCategories, eligibleWords, imposterHint, makeSecret, pickWord } from './words'
+import { seededRng, type Rng } from './rng'
+import {
+  chooseKind, eligibleCategories, eligibleWords, imposterHint, makeSecret, pickWord, roundPools,
+} from './words'
 
 const categories: Category[] = [
   { id: 'food', name: { en: 'Food', ar: 'أكل' }, builtIn: true },
@@ -94,5 +96,115 @@ describe('makeSecret / imposterHint', () => {
 
   it('refuses a word paired with the wrong category', () => {
     expect(() => makeSecret(words[0], categories[1], 'ar')).toThrow()
+  })
+})
+
+describe('roundPools', () => {
+  const hard: Word = { ...w('food.saffron', 'food', { en: 'Saffron', ar: 'زعفران' }, { en: 'Gold' }), level: 'hard' }
+  const subtleBoth: Word = {
+    ...w('food.cake', 'food', { en: 'Cake', ar: 'كيكة' }, { en: 'Candles' }),
+    subtle: { hint: { en: 'Lie', ar: 'كذبة' }, why: { en: 'The cake is a lie' } },
+  }
+  const subtleArOnly: Word = {
+    ...w('food.rice', 'food', { en: 'Rice', ar: 'رز' }),
+    subtle: { hint: { ar: 'عرس' }, why: {} },
+  }
+  const pools = (lang: 'en' | 'ar') =>
+    roundPools({ categories, words: [...words, hard, subtleBoth, subtleArOnly] }, lang, ['food'])
+
+  it('keeps hard words out of easy rounds and easy words out of hard-word rounds', () => {
+    const en = pools('en')
+    expect(ids(en.easy)).toEqual(['food.falafel', 'food.pizza', 'food.cake', 'food.rice'])
+    expect(ids(en.hardWord)).toEqual(['food.saffron'])
+  })
+
+  it('offers a subtle-hint round only for words whose subtle hint exists in the round language', () => {
+    expect(ids(pools('en').subtle)).toEqual(['food.cake'])
+    expect(ids(pools('ar').subtle)).toEqual(['food.cake', 'food.rice'])
+  })
+})
+
+/** Hands out the given coin values in order; 0.2 picks the first option of two, 0.7 the second. */
+function coins(...values: number[]): Rng {
+  return {
+    next: () => {
+      const v = values.shift()
+      if (v === undefined) throw new Error('flipped one coin too many')
+      return v
+    },
+  }
+}
+const all = { easy: true, hardWord: true, subtle: true }
+
+describe('chooseKind', () => {
+  it('deals easy rounds on Easy and hard ones on Hard, splitting Hard between its two kinds', () => {
+    expect(chooseKind('easy', all, true, coins())).toBe('easy')
+    expect(chooseKind('hard', all, true, coins(0.2))).toBe('hardWord')
+    expect(chooseKind('hard', all, true, coins(0.7))).toBe('subtle')
+  })
+
+  it('flips for the level on Random, then for the kind of hard round', () => {
+    expect(chooseKind('random', all, true, coins(0.2))).toBe('easy')
+    expect(chooseKind('random', all, true, coins(0.7, 0.2))).toBe('hardWord')
+    expect(chooseKind('random', all, true, coins(0.7, 0.7))).toBe('subtle')
+  })
+
+  it('uses the other kind of hard round when one has no words in the selected categories', () => {
+    expect(chooseKind('hard', { ...all, hardWord: false }, true, coins())).toBe('subtle')
+    expect(chooseKind('hard', { ...all, subtle: false }, true, coins())).toBe('hardWord')
+  })
+
+  it('never deals a subtle-hint round with hints off: the imposter would not see the hint, so it would not be hard', () => {
+    expect(chooseKind('hard', all, false, coins())).toBe('hardWord')
+  })
+
+  it('falls back to easy when no hard round is possible, so the badge never claims a hard round', () => {
+    expect(chooseKind('hard', { easy: true, hardWord: false, subtle: false }, true, coins())).toBe('easy')
+    expect(chooseKind('hard', { easy: true, hardWord: false, subtle: true }, false, coins())).toBe('easy')
+  })
+
+  it('deals a hard word on Easy when the selected categories hold only hard words', () => {
+    expect(chooseKind('easy', { easy: false, hardWord: true, subtle: false }, true, coins())).toBe('hardWord')
+  })
+
+  it('refuses loudly when there is no word at all (starting a round is blocked before this)', () => {
+    expect(() => chooseKind('easy', { easy: false, hardWord: false, subtle: false }, true, coins())).toThrow()
+  })
+})
+
+describe('makeSecret with a round kind', () => {
+  const food = categories[0]
+  const hard: Word = { ...w('food.saffron', 'food', { en: 'Saffron' }, { en: 'Gold' }), level: 'hard' }
+  const cake: Word = {
+    ...w('food.cake', 'food', { en: 'Cake', ar: 'كيكة' }, { en: 'Candles', ar: 'شمع' }),
+    subtle: { hint: { en: 'Lie', ar: 'كذبة' }, why: { en: ' The cake is a lie ' } },
+  }
+
+  it('labels easy and hard-word rounds with their level, keeping the normal hint', () => {
+    expect(makeSecret(cake, food, 'en', 'easy')).toMatchObject({ level: 'easy', hint: 'Candles' })
+    expect(makeSecret(hard, food, 'en', 'hardWord')).toMatchObject({ level: 'hard', hint: 'Gold' })
+    expect(makeSecret(cake, food, 'en', 'easy').hintWhy).toBeUndefined()
+  })
+
+  it('gives the imposter the subtle hint in a subtle round, with its explanation for the end', () => {
+    const secret = makeSecret(cake, food, 'en', 'subtle')
+    expect(secret).toMatchObject({ level: 'hard', word: 'Cake', hint: 'Lie', hintWhy: 'The cake is a lie' })
+    expect(imposterHint(secret)).toBe('Lie')
+  })
+
+  it('still plays a subtle hint that has no explanation in the round language', () => {
+    const secret = makeSecret(cake, food, 'ar', 'subtle')
+    expect(secret.hint).toBe('كذبة')
+    expect(secret.hintWhy).toBeUndefined()
+  })
+
+  it('leaves Game Master rounds without a level, so they show no badge', () => {
+    expect(makeSecret(cake, food, 'en').level).toBeUndefined()
+  })
+
+  it('refuses a word that does not fit the kind of round', () => {
+    expect(() => makeSecret(words[0], food, 'en', 'subtle')).toThrow()
+    expect(() => makeSecret(cake, food, 'en', 'hardWord')).toThrow()
+    expect(() => makeSecret(hard, food, 'en', 'easy')).toThrow()
   })
 })

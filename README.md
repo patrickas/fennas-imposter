@@ -30,7 +30,7 @@ podman compose exec web bun run icons
 
 ## Word packs
 
-Packs are JSON files in the format described in spec §6.1. You can import them on the *Backup & import* screen, from a file or from an `https://` link. The host serving the link must allow cross-origin requests; raw GitHub and Gist URLs do.
+Packs are JSON files in the format described in spec §6.1. A word can be marked `"level": "hard"`, and an easy word can carry a `subtle` hint (with an optional `why`) for hard rounds; see `docs/superpowers/specs/2026-10-03-difficulty-design.md` §3.2. You can import them on the *Backup & import* screen, from a file or from an `https://` link. The host serving the link must allow cross-origin requests; raw GitHub and Gist URLs do.
 
 On the dev server, **test mode** is on by default: every random round deals "Secret word" / "Secret hint" / "Category", so the UI can be tried again and again. Switch it off in *Players & settings* to play real words. Production builds never show or use it.
 

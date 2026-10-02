@@ -1,7 +1,7 @@
 import { computed, reactive } from 'vue'
 import type { Lang, Localized, Secret, Settings, Source } from '../engine/types'
 import { cryptoRng, newId, type Rng } from '../engine/rng'
-import { eligibleWords, makeSecret, pickWord } from '../engine/words'
+import { chooseKind, eligibleWords, makeSecret, pickWord, roundPools } from '../engine/words'
 import { MIN_PARTICIPANTS, maxImposters } from '../engine/assign'
 import { participantsFor, reduce, startRound, type RoundAction } from '../engine/round'
 import { scoreDeltas } from '../engine/scoring'
@@ -10,7 +10,7 @@ import * as roster from '../data/roster'
 import * as custom from '../data/content'
 import { parsePack, planImport, type ImportMode, type ImportPlan, type PackError } from '../data/transfer'
 import { translate, type MessageKey, type Params } from '../i18n'
-import { TEST_SECRETS } from '../data/testWord'
+import { testSecret } from '../data/testWord'
 import { cleanText } from '../data/normalize'
 
 export interface AppDeps {
@@ -184,14 +184,19 @@ export function createAppStore(deps: AppDeps) {
     if (!state.session) state.session = { scores: {}, rounds: 0 }
     const lang = state.language
     let secret: Secret | null = null
+    const { difficulty, hints } = state.settings
     if (source.kind === 'random' && testModeActive.value) {
-      secret = TEST_SECRETS[lang] // the word history is left untouched
+      // Every kind counts as available, and the word history is left untouched.
+      const kind = chooseKind(difficulty, { easy: true, hardWord: true, subtle: true }, hints, deps.rng)
+      secret = testSecret(lang, kind)
     } else if (source.kind === 'random') {
-      const eligible = eligibleWords(content.value, lang, state.selectedCategoryIds)
-      const picked = pickWord(eligible, state.usedWordIds[lang], deps.rng)
+      const pools = roundPools(content.value, lang, state.selectedCategoryIds)
+      const available = { easy: pools.easy.length > 0, hardWord: pools.hardWord.length > 0, subtle: pools.subtle.length > 0 }
+      const kind = chooseKind(difficulty, available, hints, deps.rng)
+      const picked = pickWord(pools[kind], state.usedWordIds[lang], deps.rng)
       const category = content.value.categories.find((c) => c.id === picked.word.categoryId)
       if (!category) throw new Error(`Category ${picked.word.categoryId} is missing`)
-      secret = makeSecret(picked.word, category, lang)
+      secret = makeSecret(picked.word, category, lang, kind)
       state.usedWordIds = { ...state.usedWordIds, [lang]: picked.used }
     }
     state.round = startRound(

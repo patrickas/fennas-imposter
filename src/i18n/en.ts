@@ -46,6 +46,7 @@ const messages = {
   'setup.randomImposters': 'Surprise number of imposters',
   'setup.hints': 'Give the imposter a hint',
   'setup.showCategory': 'Show the category on the cards',
+  'setup.difficulty': 'Difficulty',
   'setup.rotateStarter': 'Take turns to start',
   'setup.timer': 'Discussion timer',
   'setup.timerLength': 'Timer length',
@@ -67,6 +68,9 @@ const messages = {
   'error.chooseCategory': 'Choose a category',
 
   'play.round': 'Round {n}',
+  'difficulty.easy': 'Easy',
+  'difficulty.hard': 'Hard',
+  'difficulty.random': 'Random',
   'play.wordSource': 'Where does the word come from?',
   'play.sourceRandom': 'Random word',
   'play.sourcePlayerGm': 'A player is Game Master',
@@ -200,6 +204,7 @@ const messages = {
   'pack.tooLong': 'too long',
   'pack.unknownCategory': 'unknown category',
   'pack.duplicateId': 'duplicate id',
+  'pack.subtleOnHard': "a hard word can't have a subtle hint",
 
   'storage.unavailable': "Can't save on this device — changes will be lost when the app closes.",
   'storage.corrupt': 'Saved data was damaged and has been reset. A copy was kept.',

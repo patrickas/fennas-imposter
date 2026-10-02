@@ -1,12 +1,12 @@
 import {
-  LANGS, SOURCE_KINDS, type Category, type Lang, type Outcome, type Player, type RoundState, type Settings, type SourceKind,
-  type Word,
+  DIFFICULTIES, LANGS, SOURCE_KINDS, type Category, type Difficulty, type Lang, type Outcome, type Player, type RoundState,
+  type Settings, type SourceKind, type Word,
 } from '../engine/types'
 import { SEED_CATEGORIES } from './seed'
 import { TIMER } from './limits'
 
 export const STORAGE_KEY = 'fennas-imposter'
-export const CURRENT_VERSION = 5
+export const CURRENT_VERSION = 6
 
 export interface StorageLike {
   getItem(key: string): string | null
@@ -37,7 +37,7 @@ export interface Session {
 }
 
 export interface Stored {
-  version: 5
+  version: 6
   language: Lang
   players: Player[]
   activePlayerIds: string[]
@@ -96,6 +96,13 @@ export const MIGRATIONS: Record<number, Migration> = {
     if (isRecord(doc.settings)) next.settings = { ...doc.settings, wordSource: 'random' }
     return next
   },
+  // Version 6 added difficulty; easy deals exactly what was dealt before. Words without a level are easy
+  // and a round without one shows no badge, so neither needs rewriting.
+  5: (doc) => {
+    const next: Record<string, unknown> = { ...doc, version: 6 }
+    if (isRecord(doc.settings)) next.settings = { ...doc.settings, difficulty: 'easy' }
+    return next
+  },
 }
 
 export function defaultSettings(): Settings {
@@ -106,6 +113,7 @@ export function defaultSettings(): Settings {
     showCategory: false,
     rotateStarter: true,
     wordSource: 'random',
+    difficulty: 'easy',
     timer: { enabled: false, seconds: TIMER.default },
     scoring: false,
   }
@@ -113,7 +121,7 @@ export function defaultSettings(): Settings {
 
 export function defaultStored(): Stored {
   return {
-    version: 5,
+    version: 6,
     language: 'en',
     players: [],
     activePlayerIds: [],
@@ -156,6 +164,7 @@ function isSettings(x: unknown): x is Settings {
     typeof x.showCategory === 'boolean' &&
     typeof x.rotateStarter === 'boolean' &&
     SOURCE_KINDS.includes(x.wordSource as SourceKind) &&
+    DIFFICULTIES.includes(x.difficulty as Difficulty) &&
     typeof x.scoring === 'boolean' &&
     isRecord(x.timer) &&
     typeof x.timer.enabled === 'boolean' &&

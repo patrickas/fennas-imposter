@@ -60,6 +60,50 @@ describe('parsePack', () => {
     }
   })
 
+  it('reads hard words and subtle hints; words without a level are easy', () => {
+    const p = valid(pack({
+      words: [
+        { id: 'w.hard', categoryId: 'food', level: 'hard', text: { en: 'Saffron' }, hint: { en: 'Gold' } },
+        { id: 'w.easy', categoryId: 'food', level: 'easy', text: { en: 'Bread' } },
+        { id: 'w.plain', categoryId: 'food', text: { en: 'Rice' } },
+        {
+          id: 'w.cake', categoryId: 'food', text: { en: 'Cake' },
+          subtle: { hint: { en: ' Lie ' }, why: { en: 'The cake is a lie' } },
+        },
+        { id: 'w.nowhy', categoryId: 'food', text: { en: 'Soup' }, subtle: { hint: { en: 'Spoon' } } },
+      ],
+    }))
+    expect(p.words.map((w) => w.level)).toEqual(['hard', undefined, undefined, undefined, undefined])
+    expect(p.words[3].subtle).toEqual({ hint: { en: 'Lie' }, why: { en: 'The cake is a lie' } })
+    // The explanation is optional: a subtle hint without one still plays.
+    expect(p.words[4].subtle).toEqual({ hint: { en: 'Spoon' }, why: {} })
+  })
+
+  it('rejects broken levels and subtle hints, pointing at each one', () => {
+    const r = parsePack(pack({
+      words: [
+        { id: 'w1', categoryId: 'food', level: 'expert', text: { en: 'A' } },
+        { id: 'w2', categoryId: 'food', text: { en: 'B' }, subtle: 'sneaky' },
+        { id: 'w3', categoryId: 'food', text: { en: 'C' }, subtle: { why: { en: 'Because' } } },
+        { id: 'w4', categoryId: 'food', text: { en: 'D' }, subtle: { hint: { en: 'x' }, why: { en: 'y'.repeat(81) } } },
+        { id: 'w5', categoryId: 'food', text: { en: 'E' }, subtle: { hint: { en: 'x'.repeat(41) } } },
+        // A subtle hint on a hard word would never be dealt, so the pack author should hear about it.
+        { id: 'w6', categoryId: 'food', level: 'hard', text: { en: 'F' }, subtle: { hint: { en: 'x' } } },
+      ],
+    }), SEED_CATEGORY_IDS)
+    expect(r.ok).toBe(false)
+    if (!r.ok) {
+      expect(r.errors).toEqual([
+        { path: 'words[0].level', code: 'wrongType' },
+        { path: 'words[1].subtle', code: 'wrongType' },
+        { path: 'words[2].subtle.hint', code: 'missing' },
+        { path: 'words[3].subtle.why.en', code: 'tooLong' },
+        { path: 'words[4].subtle.hint.en', code: 'tooLong' },
+        { path: 'words[5].subtle', code: 'subtleOnHard' },
+      ])
+    }
+  })
+
   it('caps the error list at 10 so a garbage file does not flood the screen', () => {
     const words = Array.from({ length: 30 }, (_, i) => ({ id: `w${i}`, categoryId: 'nowhere', text: { en: 'A' } }))
     const r = parsePack(pack({ words }), SEED_CATEGORY_IDS)
@@ -95,6 +139,26 @@ describe('planImport', () => {
     expect(valid(pack({ settings: old })).settings!.wordSource).toBe('random')
     expect(valid(pack({ settings: { ...defaultSettings(), wordSource: 'outsideGm' } })).settings!.wordSource).toBe('outsideGm')
     expect(parsePack(pack({ settings: { ...defaultSettings(), wordSource: 'anyone' } }), SEED_CATEGORY_IDS).ok).toBe(false)
+  })
+
+  it('still imports backups made before difficulty existed, with easy rounds', () => {
+    const old: Record<string, unknown> = { ...defaultSettings() }
+    delete old.difficulty
+    expect(valid(pack({ settings: old })).settings!.difficulty).toBe('easy')
+    expect(valid(pack({ settings: { ...defaultSettings(), difficulty: 'random' } })).settings!.difficulty).toBe('random')
+    expect(parsePack(pack({ settings: { ...defaultSettings(), difficulty: 'insane' } }), SEED_CATEGORY_IDS).ok).toBe(false)
+  })
+
+  it('keeps the level and subtle hint of imported words, and an update can make a word easy again', () => {
+    const hard = { id: 'w.hard', categoryId: 'food', level: 'hard', text: { en: 'Saffron' } }
+    const cake = { id: 'w.cake', categoryId: 'food', text: { en: 'Cake' }, subtle: { hint: { en: 'Lie' } } }
+    const first = planImport(valid(pack({ words: [hard, cake] })), emptyTarget(), 'url', newId).result
+    expect(first.customWords.map((w) => [w.level, w.subtle])).toEqual([
+      ['hard', undefined], [undefined, { hint: { en: 'Lie' }, why: {} }],
+    ])
+    const plain = [{ ...hard, level: undefined }, { ...cake, subtle: undefined }]
+    const again = planImport(valid(pack({ words: plain })), first, 'url', newId).result
+    expect(again.customWords.map((w) => [w.level, w.subtle])).toEqual([[undefined, undefined], [undefined, undefined]])
   })
 
   it('counts additions and updates, merging by id so re-importing refreshes', () => {
@@ -142,6 +206,20 @@ describe('export', () => {
     expect(restored.customWords).toEqual(original.customWords)
     expect(restored.players.map((p) => p.name)).toEqual(['Rami'])
     expect(restored.settings).toEqual(original.settings)
+  })
+
+  it('round-trips hard words and subtle hints, writing them only where set', () => {
+    const words = [
+      { id: 'w.hard', categoryId: 'food', level: 'hard', text: { en: 'Saffron' } },
+      { id: 'w.cake', categoryId: 'food', text: { en: 'Cake' }, subtle: { hint: { en: 'Lie' }, why: { en: 'A lie' } } },
+      { id: 'w.rice', categoryId: 'food', text: { en: 'Rice' } },
+    ]
+    const original = planImport(valid(pack({ words })), emptyTarget(), 'file', newId).result
+    const json = JSON.parse(exportPack(original))
+    expect(json.words.map((w: Record<string, unknown>) => Object.keys(w).filter((k) => k === 'level' || k === 'subtle')))
+      .toEqual([['level'], ['subtle'], []])
+    const restored = planImport(valid(json), emptyTarget(), 'file', newId).result
+    expect(restored.customWords).toEqual(original.customWords)
   })
 
   it('names backups by local date', () => {

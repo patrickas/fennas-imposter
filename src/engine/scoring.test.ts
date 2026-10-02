@@ -9,7 +9,7 @@ const secret = { wordId: 'w', word: 'Falafel', hint: null, categoryName: 'Food' 
 function votingRound(opts: { scoring?: boolean; source?: Source; imposters?: number } = {}): RoundState {
   const settings: Settings = {
     imposterCount: opts.imposters ?? 1, randomImposterCount: false, hints: true, showCategory: false, rotateStarter: false, wordSource: 'random',
-    timer: { enabled: false, seconds: 180 }, scoring: opts.scoring ?? true,
+    difficulty: 'easy', timer: { enabled: false, seconds: 180 }, scoring: opts.scoring ?? true,
   }
   const source = opts.source ?? { kind: 'random' }
   const ids = ['p1', 'p2', 'p3', 'p4', 'p5']

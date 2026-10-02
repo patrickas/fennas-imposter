@@ -8,6 +8,7 @@ import StickerCard from '../ui/StickerCard.vue'
 import PopButton from '../ui/PopButton.vue'
 import Chip from '../ui/Chip.vue'
 import LeaveRoundButton from './LeaveRoundButton.vue'
+import LevelChip from './LevelChip.vue'
 
 const app = useApp()
 const sound = useSound()
@@ -35,6 +36,7 @@ function hideAndPass(): void {
   <Screen v-if="round && !shown" tone="sun" data-testid="pass-screen">
     <template #top>
       <Chip>{{ app.t('play.round', { n: round.number }) }}</Chip>
+      <LevelChip />
       <LeaveRoundButton />
     </template>
     <p class="center lead">{{ app.t('reveal.passTo') }}</p>
@@ -54,6 +56,7 @@ function hideAndPass(): void {
     <template #top>
       <Chip class="name-chip"><bdi class="card-name">{{ name }}</bdi></Chip>
     </template>
+    <p v-if="round.secret?.level" class="center"><LevelChip /></p>
     <!-- Both cards: a big title line, then one second line (and the category, when shown) — the same shape for every role. -->
     <StickerCard v-if="isImposter" motion="wobble">
       <p class="secret-word" data-testid="imposter-title">{{ app.t('reveal.imposterTitle') }}</p>

@@ -8,6 +8,7 @@ import StickerCard from '../ui/StickerCard.vue'
 import PopButton from '../ui/PopButton.vue'
 import Confetti from '../ui/Confetti.vue'
 import Scoreboard from './Scoreboard.vue'
+import LevelChip from './LevelChip.vue'
 
 const app = useApp()
 const round = computed(() => app.state.round)
@@ -31,12 +32,14 @@ const winner = computed(() => {
       <template v-if="round.settings.hints">
         <p class="hint-label">{{ app.t('result.hint') }}</p>
         <p class="hint" data-testid="result-hint">{{ imposterHint(round.secret) }}</p>
+        <p v-if="round.secret.hintWhy" class="why" data-testid="result-why">{{ round.secret.hintWhy }}</p>
       </template>
     </StickerCard>
     <StickerCard motion="wobble">
       <p>{{ app.t('result.word') }}</p>
       <p class="secret-word" data-testid="result-word">{{ round.secret.word }}</p>
       <p>{{ app.t('result.category', { category: round.secret.categoryName }) }}</p>
+      <p v-if="round.secret.level" class="level"><LevelChip /></p>
     </StickerCard>
     <Scoreboard v-if="round.settings.scoring" />
     <template #actions>
@@ -48,4 +51,6 @@ const winner = computed(() => {
 <style scoped>
 .names, .hint { font-size: 1.6rem; font-weight: 800; overflow-wrap: anywhere; }
 .hint-label { margin-top: 12px; }
+.why { margin-top: 6px; font-size: 1.1rem; font-weight: 700; overflow-wrap: anywhere; }
+.level { margin-top: 10px; }
 </style>

@@ -1,4 +1,5 @@
-export const LIMITS = { player: 20, word: 40, hint: 40, category: 30 } as const
+/** `why` explains a subtle hint, so it gets a sentence's worth of room. */
+export const LIMITS = { player: 20, word: 40, hint: 40, why: 80, category: 30 } as const
 
 /** Discussion timer: 1–10 minutes in 30 s steps (spec §3.1). */
 export const TIMER = { min: 60, max: 600, step: 30, default: 180 } as const

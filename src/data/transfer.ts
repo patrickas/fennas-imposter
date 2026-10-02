@@ -1,5 +1,6 @@
 import {
-  LANGS, SOURCE_KINDS, type Category, type Localized, type Player, type Settings, type SourceKind, type Word,
+  DIFFICULTIES, LANGS, SOURCE_KINDS, type Category, type Difficulty, type Level, type Localized, type Player, type Settings,
+  type SourceKind, type SubtleHint, type Word,
 } from '../engine/types'
 import { SEED_CATEGORY_IDS, SEED_WORD_IDS } from './seed'
 import { cleanLocalized, cleanText, normalizeText } from './normalize'
@@ -14,6 +15,7 @@ const ID_RE = /^[A-Za-z0-9._:-]{1,64}$/
 
 export type PackErrorCode =
   | 'badFormat' | 'wrongType' | 'missing' | 'invalidId' | 'empty' | 'tooLong' | 'unknownCategory' | 'duplicateId'
+  | 'subtleOnHard'
 export interface PackError {
   path: string
   code: PackErrorCode
@@ -27,6 +29,9 @@ export interface PackWord {
   categoryId: string
   text: Localized
   hint: Localized
+  /** Absent means easy. */
+  level?: Level
+  subtle?: SubtleHint
 }
 export interface ValidPack {
   categories: PackCategory[]
@@ -85,6 +90,18 @@ function readLocalized(value: unknown, path: string, max: number, required: bool
   return clean
 }
 
+/** `undefined` when absent; `null` when invalid (already reported). */
+function readSubtle(value: unknown, path: string, fail: Fail): SubtleHint | null | undefined {
+  if (value === undefined) return undefined
+  if (!isRecord(value)) {
+    fail(path, 'wrongType')
+    return null
+  }
+  const hint = readLocalized(value.hint, `${path}.hint`, LIMITS.hint, true, fail)
+  const why = readLocalized(value.why, `${path}.why`, LIMITS.why, false, fail)
+  return hint && why ? { hint, why } : null
+}
+
 function readSettings(v: unknown, fail: Fail): Settings | null {
   const t = isRecord(v) ? v.timer : undefined
   const valid =
@@ -97,6 +114,7 @@ function readSettings(v: unknown, fail: Fail): Settings | null {
     (v.showCategory === undefined || typeof v.showCategory === 'boolean') && // absent in backups from before the option
     (v.rotateStarter === undefined || typeof v.rotateStarter === 'boolean') && // likewise
     (v.wordSource === undefined || SOURCE_KINDS.includes(v.wordSource as SourceKind)) && // likewise
+    (v.difficulty === undefined || DIFFICULTIES.includes(v.difficulty as Difficulty)) && // likewise
     typeof v.scoring === 'boolean' &&
     isRecord(t) &&
     typeof t.enabled === 'boolean' &&
@@ -115,6 +133,7 @@ function readSettings(v: unknown, fail: Fail): Settings | null {
     showCategory: v.showCategory === true,
     rotateStarter: v.rotateStarter !== false,
     wordSource: (v.wordSource as SourceKind | undefined) ?? 'random',
+    difficulty: (v.difficulty as Difficulty | undefined) ?? 'easy',
     scoring: v.scoring as boolean,
     timer: { enabled: t.enabled as boolean, seconds: Math.max(TIMER.min, t.seconds as number) },
   }
@@ -159,7 +178,20 @@ export function parsePack(json: unknown, knownCategoryIds: ReadonlySet<string>):
       else categoryId = w.categoryId
       const text = readLocalized(w.text, `${path}.text`, LIMITS.word, true, fail)
       const hint = readLocalized(w.hint, `${path}.hint`, LIMITS.hint, false, fail)
-      if (id && categoryId && text && hint) words.push({ id, categoryId, text, hint })
+      const levelOk = w.level === undefined || w.level === 'easy' || w.level === 'hard'
+      if (!levelOk) fail(`${path}.level`, 'wrongType')
+      let subtle: SubtleHint | null | undefined
+      if (w.level === 'hard' && w.subtle !== undefined) {
+        fail(`${path}.subtle`, 'subtleOnHard') // a hard round never uses it, so the author should know
+        subtle = null
+      } else {
+        subtle = readSubtle(w.subtle, `${path}.subtle`, fail)
+      }
+      if (id && categoryId && text && hint && levelOk && subtle !== null) {
+        words.push({
+          id, categoryId, text, hint, ...(w.level === 'hard' ? { level: 'hard' as const } : {}), ...(subtle ? { subtle } : {}),
+        })
+      }
     })
   }
 
@@ -228,7 +260,10 @@ export function planImport(pack: ValidPack, current: ImportTarget, mode: ImportM
     if (SEED_WORD_IDS.has(w.id)) { summary.skippedBuiltIn++; continue }
     if (words.has(w.id)) summary.updateWords++
     else summary.addWords++
-    words.set(w.id, { id: w.id, categoryId: w.categoryId, builtIn: false, text: w.text, hint: w.hint })
+    words.set(w.id, {
+      id: w.id, categoryId: w.categoryId, builtIn: false, text: w.text, hint: w.hint,
+      ...(w.level ? { level: w.level } : {}), ...(w.subtle ? { subtle: w.subtle } : {}),
+    })
   }
 
   let players = current.players
@@ -262,7 +297,8 @@ export function exportPack(data: Pick<Stored, 'players' | 'settings' | 'customCa
       format: PACK_FORMAT,
       version: PACK_VERSION,
       categories: data.customCategories.map(({ id, name }) => ({ id, name })),
-      words: data.customWords.map(({ id, categoryId, text, hint }) => ({ id, categoryId, text, hint })),
+      // level and subtle are left out (undefined) on the words that don't have them.
+      words: data.customWords.map(({ id, categoryId, text, hint, level, subtle }) => ({ id, categoryId, text, hint, level, subtle })),
       players: data.players.map(({ id, name }) => ({ id, name })),
       settings: data.settings,
     },

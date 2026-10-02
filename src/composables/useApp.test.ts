@@ -1,7 +1,8 @@
 import { describe, expect, it } from 'bun:test'
 import { seededRng } from '../engine/rng'
 import { STORAGE_KEY, memoryStorage, type StorageLike } from '../data/storage'
-import { TEST_SECRETS } from '../data/testWord'
+import { TEST_SECRETS, testSecret } from '../data/testWord'
+import { SEED_WORDS } from '../data/seed'
 import { createAppStore, type AppStore } from './useApp'
 
 function setup(storage: StorageLike | null = memoryStorage(), seed = 1, devTools = false): AppStore {
@@ -153,6 +154,71 @@ describe('rounds', () => {
       playOut(app)
     }
     expect(seen.size).toBe(25)
+  })
+
+  it('never deals a hard round on Easy (the default)', () => {
+    const app = setup()
+    withPlayers(app)
+    const hardIds = new Set(SEED_WORDS.filter((w) => w.level === 'hard').map((w) => w.id))
+    for (let i = 0; i < 30; i++) {
+      app.beginRound({ kind: 'random' })
+      const secret = app.state.round!.secret!
+      expect(secret.level).toBe('easy')
+      expect(hardIds.has(secret.wordId), secret.wordId).toBe(false)
+      expect(secret.hintWhy).toBeUndefined()
+      playOut(app)
+    }
+  })
+
+  it('deals only hard rounds on Hard: hard words with their hint, or easy words with their subtle hint', () => {
+    const app = setup()
+    withPlayers(app)
+    app.updateSettings({ difficulty: 'hard' })
+    const byId = new Map(SEED_WORDS.map((w) => [w.id, w]))
+    const kinds = new Set<string>()
+    for (let i = 0; i < 30; i++) {
+      app.beginRound({ kind: 'random' })
+      const secret = app.state.round!.secret!
+      const word = byId.get(secret.wordId)!
+      expect(secret.level).toBe('hard')
+      if (word.level === 'hard') {
+        kinds.add('hardWord')
+        expect(secret.hint).toBe(word.hint.en!)
+      } else {
+        kinds.add('subtle')
+        expect(secret.hint).toBe(word.subtle!.hint.en!)
+        expect(secret.hintWhy).toBe(word.subtle!.why.en!)
+      }
+      playOut(app)
+    }
+    expect([...kinds].sort()).toEqual(['hardWord', 'subtle'])
+  })
+
+  it('mixes easy and hard rounds on Random', () => {
+    const app = setup()
+    withPlayers(app)
+    app.updateSettings({ difficulty: 'random' })
+    const levels = new Set<string | undefined>()
+    for (let i = 0; i < 20; i++) {
+      app.beginRound({ kind: 'random' })
+      levels.add(app.state.round!.secret!.level)
+      playOut(app)
+    }
+    expect([...levels].sort()).toEqual(['easy', 'hard'])
+  })
+
+  it('plays an easy round on Hard when the selected categories have nothing hard, and says so on the badge', () => {
+    const app = setup()
+    withPlayers(app)
+    app.beginRound({ kind: 'outsideGm' })
+    app.submitGmWord({ lang: 'en', word: 'Mansaf', hint: 'Jameed', category: { newName: 'Jordan' } })
+    expect(app.state.round!.secret!.level).toBeUndefined() // the Game Master picked the word: no level
+    playOut(app)
+    const jordan = app.state.customCategories[0].id
+    for (const id of [...app.state.selectedCategoryIds]) if (id !== jordan) app.toggleCategory(id)
+    app.updateSettings({ difficulty: 'hard' })
+    app.beginRound({ kind: 'random' })
+    expect(app.state.round!.secret).toMatchObject({ word: 'Mansaf', level: 'easy', hint: 'Jameed' })
   })
 
   it('saves the Game Master word, selects its new category, and deals it without the GM', () => {
@@ -338,7 +404,7 @@ describe('test mode (dev server only)', () => {
     const app = setup(memoryStorage(), 1, true)
     withPlayers(app)
     app.beginRound({ kind: 'random' })
-    expect(app.state.round!.secret).toEqual(TEST_SECRETS.en)
+    expect(app.state.round!.secret).toEqual(testSecret('en', 'easy'))
   })
 
   it('can be switched off on the dev server to play real words', () => {
@@ -357,7 +423,7 @@ describe('test mode (dev server only)', () => {
     expect(app.roundBlocker({ kind: 'random' })).toBeNull()
     for (let i = 0; i < 3; i++) {
       app.beginRound({ kind: 'random' })
-      expect(app.state.round!.secret).toEqual(TEST_SECRETS.en)
+      expect(app.state.round!.secret).toEqual(testSecret('en', 'easy'))
       playOut(app)
     }
     expect(app.state.usedWordIds).toEqual({ en: [], ar: [] })
@@ -369,7 +435,23 @@ describe('test mode (dev server only)', () => {
     app.setTestMode(true)
     app.setLanguage('ar')
     app.beginRound({ kind: 'random' })
-    expect(app.state.round!.secret).toEqual(TEST_SECRETS.ar)
+    expect(app.state.round!.secret).toEqual(testSecret('ar', 'easy'))
+  })
+
+  it('deals both kinds of hard round on Hard, so the badge and the explanation can be tried', () => {
+    const app = setup(memoryStorage(), 1, true)
+    withPlayers(app)
+    app.updateSettings({ difficulty: 'hard' })
+    const seen = new Set<string>()
+    for (let i = 0; i < 12; i++) {
+      app.beginRound({ kind: 'random' })
+      const secret = app.state.round!.secret!
+      expect(secret.level).toBe('hard')
+      seen.add(secret.hintWhy ? 'subtle' : 'hardWord')
+      playOut(app)
+    }
+    expect([...seen].sort()).toEqual(['hardWord', 'subtle'])
+    expect(app.state.usedWordIds).toEqual({ en: [], ar: [] })
   })
 
   it('is ignored outside the dev server, so real players always get real words', () => {

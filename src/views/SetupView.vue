@@ -6,7 +6,7 @@ import { eligibleCategories, eligibleWords } from '../engine/words'
 import { maxImposters } from '../engine/assign'
 import { LIMITS, TIMER } from '../data/limits'
 import { formatClock, type MessageKey } from '../i18n'
-import type { SourceKind } from '../engine/types'
+import type { Difficulty, SourceKind } from '../engine/types'
 import Screen from '../components/ui/Screen.vue'
 import PopButton from '../components/ui/PopButton.vue'
 import UpdatePrompt from '../components/ui/UpdatePrompt.vue'
@@ -93,6 +93,15 @@ const SOURCES: { kind: SourceKind; label: MessageKey }[] = [
 const wordSource = computed({
   get: () => app.state.settings.wordSource,
   set: (value: SourceKind) => app.updateSettings({ wordSource: value }),
+})
+const LEVELS: { value: Difficulty; label: MessageKey }[] = [
+  { value: 'easy', label: 'difficulty.easy' },
+  { value: 'hard', label: 'difficulty.hard' },
+  { value: 'random', label: 'difficulty.random' },
+]
+const difficulty = computed({
+  get: () => app.state.settings.difficulty,
+  set: (value: Difficulty) => app.updateSettings({ difficulty: value }),
 })
 const activePlayers = computed(() => app.state.players.filter((p) => app.state.activePlayerIds.includes(p.id)))
 const gameMaster = computed({
@@ -217,6 +226,16 @@ function done(): void {
             <option v-for="p in activePlayers" :key="p.id" :value="p.id" dir="auto">{{ p.name }}</option>
           </select>
         </label>
+        <!-- Only random words have a level: a Game Master picks their own word. -->
+        <template v-if="wordSource === 'random'">
+          <h3>{{ app.t('setup.difficulty') }}</h3>
+          <div class="sources" role="radiogroup" :aria-label="app.t('setup.difficulty')">
+            <label v-for="d in LEVELS" :key="d.value" class="source" :class="{ chosen: difficulty === d.value }">
+              <input v-model="difficulty" type="radio" name="difficulty" :value="d.value" :data-testid="`difficulty-${d.value}`">
+              <span>{{ app.t(d.label) }}</span>
+            </label>
+          </div>
+        </template>
         <Stepper
           v-model="imposters"
           :min="1"

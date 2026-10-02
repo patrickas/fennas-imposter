@@ -46,8 +46,8 @@ export interface SubtleHint {
 
 export interface Word {
   // …existing fields
-  level: Level
-  subtle: SubtleHint | null   // only on easy words
+  level?: Level         // absent = easy
+  subtle?: SubtleHint   // only on easy words
 }
 ```
 
@@ -83,10 +83,8 @@ export interface Word {
 
 ### 3.4 Storage
 
-- `CURRENT_VERSION` goes from 5 to 6. The migration from v5:
-  - sets `settings.difficulty = 'easy'`;
-  - sets each custom word to `level: 'easy', subtle: null`;
-  - sets `level: null, hintWhy: null` on the secret of a round in progress.
+- `CURRENT_VERSION` goes from 5 to 6. The migration from v5 sets `settings.difficulty = 'easy'`.
+- Saved words and a saved round need no rewriting: a word without `level` is easy, and a round whose secret has no `level` shows no badge.
 - Custom words updated by an import take the imported `level`/`subtle`. An import never touches built-in words (main spec §6.3).
 
 ### 3.5 Built-in packs
@@ -150,8 +148,8 @@ Over many Random rounds this gives about 50% easy, 25% hard word and 25% subtle 
 `Secret` gains:
 
 ```ts
-level: Level | null     // null for GM rounds and for rounds saved before v6
-hintWhy: string | null  // subtle rounds only, when why[L] is present
+level?: Level      // absent for GM rounds and for rounds saved before v6
+hintWhy?: string   // subtle rounds only, when why[L] is present
 ```
 
 In a subtle round, `Secret.hint` holds the subtle hint. `imposterHint()` is unchanged.

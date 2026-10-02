@@ -10,12 +10,24 @@ export interface Category {
   builtIn: boolean
 }
 
+export type Level = 'easy' | 'hard'
+
+/** A subtler hint for an easy word, given to the imposter in hard rounds; `why` explains it at the end. */
+export interface SubtleHint {
+  hint: Localized
+  why: Localized
+}
+
 export interface Word {
   id: string
   categoryId: string
   builtIn: boolean
   text: Localized
   hint: Localized
+  /** Absent means easy. */
+  level?: Level
+  /** Easy words only. */
+  subtle?: SubtleHint
 }
 
 export interface Player {
@@ -38,6 +50,8 @@ export interface Settings {
   rotateStarter: boolean
   /** Where each round's word comes from. The player Game Master is stored apart (Stored.gmPlayerId). */
   wordSource: SourceKind
+  /** How hard random-word rounds are; 'random' settles each round's level by a coin flip. */
+  difficulty: Difficulty
   timer: TimerSettings
   scoring: boolean
 }
@@ -57,12 +71,19 @@ export type Source =
 export type SourceKind = Source['kind']
 export const SOURCE_KINDS: readonly SourceKind[] = ['random', 'playerGm', 'outsideGm']
 
+export type Difficulty = Level | 'random'
+export const DIFFICULTIES: readonly Difficulty[] = ['easy', 'hard', 'random']
+
 /** Snapshot of the round's word, so later edits/deletes never change a running round. */
 export interface Secret {
   wordId: string
   word: string
   hint: string | null
   categoryName: string
+  /** Random-word rounds only; absent in Game Master rounds (and rounds saved before levels existed). */
+  level?: Level
+  /** Explains a subtle hint; shown at the end of the round. */
+  hintWhy?: string
 }
 
 export interface RoundSettings {

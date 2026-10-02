@@ -9,6 +9,7 @@ import StickerCard from '../ui/StickerCard.vue'
 import PopButton from '../ui/PopButton.vue'
 import Chip from '../ui/Chip.vue'
 import ImposterCountChip from './ImposterCountChip.vue'
+import LevelChip from './LevelChip.vue'
 import LeaveRoundButton from './LeaveRoundButton.vue'
 
 const app = useApp()
@@ -39,6 +40,7 @@ function end(): void {
   <Screen v-if="round" tone="sun" data-testid="discussion" @pointerdown="sound.prime()">
     <template #top>
       <Chip>{{ app.t('play.round', { n: round.number }) }}</Chip>
+      <LevelChip />
       <ImposterCountChip />
       <LeaveRoundButton />
     </template>
