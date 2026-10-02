@@ -24,6 +24,14 @@ export const ar: Messages = {
   'home.abandonConfirm': 'بدك تلغي الجولة يلي عم تنلعب؟ النقاط بتضل متل ما هي.',
   'home.abandon': 'الغي',
   'home.about': 'عن اللعبة',
+  'home.freeRounds': {
+    zero: 'ما باقي ولا جولة مجانية اليوم',
+    one: 'باقي جولة مجانية وحدة اليوم',
+    two: 'باقي جولتين مجانيات اليوم',
+    few: 'باقي {count} جولات مجانية اليوم',
+    many: 'باقي {count} جولة مجانية اليوم',
+    other: 'باقي {count} جولة مجانية اليوم',
+  },
 
   'setup.title': 'التحضير',
   'setup.players': 'اللاعبين',
@@ -99,6 +107,8 @@ export const ar: Messages = {
   'play.stay': 'كمّلوا اللعب',
   'play.viewStats': 'شوفوا الإحصائيات',
   'play.hideStats': 'خبّوا الإحصائيات',
+  'play.locked': 'خلصت الجولات المجانية لليوم.',
+  'play.unlock': 'افتح اللعبة',
   'stats.title': 'الجولات اللي لعبناها',
   'stats.word': 'الكلمة',
   'stats.imposter': 'المندسّ',

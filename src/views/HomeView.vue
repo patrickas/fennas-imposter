@@ -37,6 +37,9 @@ function play(): void {
       <h1 class="title-xl">{{ app.t('app.title') }}</h1>
     </StickerCard>
     <p class="guide">{{ app.t('app.tagline') }}</p>
+    <p v-if="!app.isUnlocked.value" class="guide" data-testid="free-rounds">
+      {{ app.t('home.freeRounds', { count: app.freeRoundsLeft() }) }}
+    </p>
     <template #actions>
       <PopButton attention data-testid="play" @click="play">
         {{ app.state.session ? app.t('home.continue') : app.t('home.play') }}

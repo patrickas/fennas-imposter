@@ -25,6 +25,8 @@ const blockerText = computed(() => {
       return app.t('play.noWords')
     case 'noGm':
       return app.t('play.pickGm')
+    case 'locked':
+      return app.t('play.locked')
     default:
       return null
   }
@@ -70,7 +72,10 @@ async function endGame(): Promise<void> {
     <RoundStats v-if="hasStats && statsOpen" />
 
     <template #actions>
-      <PopButton attention :disabled="blocker !== null" data-testid="start-round" @click="start">
+      <PopButton v-if="blocker === 'locked'" attention data-testid="go-unlock" @click="router.push('/about')">
+        {{ app.t('play.unlock') }}
+      </PopButton>
+      <PopButton v-else attention :disabled="blocker !== null" data-testid="start-round" @click="start">
         {{ app.t('play.startRound') }}
       </PopButton>
       <PopButton v-if="hasStats" variant="secondary" data-testid="view-stats" @click="statsOpen = !statsOpen">

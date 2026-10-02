@@ -31,6 +31,7 @@ const messages = {
   'home.abandonConfirm': 'Abandon the round in progress? Scores stay as they are.',
   'home.abandon': 'Abandon',
   'home.about': 'About',
+  'home.freeRounds': { one: '{count} free round left today', other: '{count} free rounds left today' },
 
   'setup.title': 'Setup',
   'setup.players': 'Players',
@@ -92,6 +93,8 @@ const messages = {
   'play.stay': 'Keep playing',
   'play.viewStats': 'View stats',
   'play.hideStats': 'Hide stats',
+  'play.locked': 'No free rounds left today.',
+  'play.unlock': 'Unlock',
   'stats.title': 'Rounds played',
   'stats.word': 'Word',
   'stats.imposter': 'Imposter',
