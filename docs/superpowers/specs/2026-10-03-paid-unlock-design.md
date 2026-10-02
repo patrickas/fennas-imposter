@@ -38,7 +38,7 @@ This is a family game, not real copy protection. These are accepted:
 
 ### 3.1 Key list
 
-`KEY_WORDS` is the **first 256 English words of `SEED_WORDS`**, in shipping order. Words without `text.en` are skipped.
+`KEY_WORDS` is the **first 256 English easy words of `SEED_WORDS`**, in shipping order. Words without `text.en` are skipped. Hard words (from the difficulty feature) are skipped too: they are rarer, harder to spell, and adding more of them must not change the keys.
 
 - The list is derived from the packs, not frozen (§1, "same version").
 - Today it runs from "Falafel" (food) to "Airport" (places). It contains no duplicates; 25 entries have more than one word, such as "Ice cream".

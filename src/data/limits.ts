@@ -14,3 +14,6 @@ export const MAX_IMPOSTER_SETTING = 10
 export function textLength(s: string): number {
   return [...s].length
 }
+
+/** Rounds a free (not unlocked) phone may deal per local calendar day (paid-unlock spec §2). */
+export const FREE_ROUNDS_PER_DAY = 2
