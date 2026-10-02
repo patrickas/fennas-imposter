@@ -23,6 +23,7 @@ export const ar: Messages = {
   'home.abandonRound': 'الغي هالجولة',
   'home.abandonConfirm': 'بدك تلغي الجولة يلي عم تنلعب؟ النقاط بتضل متل ما هي.',
   'home.abandon': 'الغي',
+  'home.about': 'عن اللعبة',
 
   'setup.title': 'التحضير',
   'setup.players': 'اللاعبين',
@@ -225,6 +226,20 @@ export const ar: Messages = {
   'data.confirm': 'استورد',
   'data.imported': 'تم الاستيراد!',
   'data.problems': 'في مشاكل بالملف:',
+
+  'about.title': 'عن اللعبة',
+  'about.free': 'النسخة المجانية: جولتين باليوم. اطلب من أليكس الكلمة السحرية لتفتح اللعبة.',
+  'about.secretWord': 'كلمتك السرّية:',
+  'about.magicWord': 'الكلمة السحرية',
+  'about.unlock': 'افتح',
+  'about.wrong': 'لأ، مش هي',
+  'about.unlocked': 'انفتحت! شكراً لأنك دعمت أليكس.',
+  'about.help': 'في مشكلة بالمفتاح؟',
+  'about.helpLink': 'ابعتلنا إيميل',
+  'about.makeKey': 'اعمل مفتاح',
+  'about.theirWord': 'الكلمة السرّية تبعهم',
+  'about.makeKeyButton': 'اعمل المفتاح',
+  'about.notAWord': 'هيدي مش وحدة من الكلمات السرّية',
 
   'fetch.invalidUrl': 'هاد ما بيشبه رابط',
   'fetch.httpsOnly': 'بس روابط https:// مسموحة',

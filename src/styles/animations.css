@@ -17,6 +17,9 @@
 }
 @keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
 @keyframes confetti-fall { from { transform: translateY(-10vh) rotate(0deg); } to { transform: translateY(110vh) rotate(720deg); } }
+@keyframes spin { to { transform: rotate(360deg); } }
+/* Sideways only, a few pixels: the screen clips anything wider. */
+@keyframes nope { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-6px); } 75% { transform: translateX(6px); } }
 
 /* <Transition name="pop">: enter animation only. Leaving screens vanish at once so a card never lingers. */
 .pop-enter-active { animation: pop-in 320ms cubic-bezier(0.2, 0.9, 0.3, 1.3) both; }
@@ -25,8 +28,10 @@
 .anim-shake { animation: shake 1.8s ease-in-out infinite; }
 .anim-drift { animation: drift 7s ease-in-out infinite alternate; }
 .anim-squish { animation: squish 2.2s ease-in-out infinite; }
+.anim-spin { animation: spin 8s linear infinite; }
+.anim-nope { animation: nope 150ms ease-in-out 2; }
 
 @media (prefers-reduced-motion: reduce) {
-  .anim-loop { animation: none !important; }
+  .anim-loop, .anim-nope { animation: none !important; }
   .pop-enter-active { animation: fade-in 150ms ease both; }
 }

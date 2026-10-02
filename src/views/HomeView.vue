@@ -47,6 +47,7 @@ function play(): void {
       <PopButton variant="secondary" data-testid="nav-setup" @click="router.push('/setup')">{{ app.t('home.setup') }}</PopButton>
       <PopButton variant="secondary" data-testid="nav-words" @click="router.push('/words')">{{ app.t('home.words') }}</PopButton>
       <PopButton variant="secondary" data-testid="nav-data" @click="router.push('/data')">{{ app.t('home.data') }}</PopButton>
+      <PopButton variant="secondary" data-testid="nav-about" @click="router.push('/about')">{{ app.t('home.about') }}</PopButton>
     </template>
   </Screen>
 </template>

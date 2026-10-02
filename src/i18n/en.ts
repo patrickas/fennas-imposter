@@ -30,6 +30,7 @@ const messages = {
   'home.abandonRound': 'Abandon this round',
   'home.abandonConfirm': 'Abandon the round in progress? Scores stay as they are.',
   'home.abandon': 'Abandon',
+  'home.about': 'About',
 
   'setup.title': 'Setup',
   'setup.players': 'Players',
@@ -186,6 +187,20 @@ const messages = {
   'data.confirm': 'Import',
   'data.imported': 'Imported!',
   'data.problems': 'The file has problems:',
+
+  'about.title': 'About',
+  'about.free': 'Free version: 2 rounds a day. Ask Alex for the magic word to unlock the game.',
+  'about.secretWord': 'Your secret word:',
+  'about.magicWord': 'Magic word',
+  'about.unlock': 'Unlock',
+  'about.wrong': "That's not it",
+  'about.unlocked': 'Unlocked! Thanks for supporting Alex.',
+  'about.help': 'Trouble getting a key?',
+  'about.helpLink': 'Email us',
+  'about.makeKey': 'Make a key',
+  'about.theirWord': 'Their secret word',
+  'about.makeKeyButton': 'Make key',
+  'about.notAWord': "That's not one of the secret words",
 
   'fetch.invalidUrl': "That doesn't look like a link",
   'fetch.httpsOnly': 'Only https:// links are allowed',
