@@ -101,11 +101,45 @@ describe('rounds', () => {
     expect(reloaded.state.round?.phase).toBe('result')
     expect(reloaded.state.session!.scores).toEqual(scores)
     expect(reloaded.state.session!.rounds).toBe(1)
+    expect(reloaded.state.session!.history).toHaveLength(1)
     expect(() => reloaded.dispatch({ type: 'imposterGuess', correct: true })).toThrow()
 
     for (const id of r.participantIds) {
       expect(scores[id].points).toBe(r.imposterIds.includes(id) ? 0 : 1)
     }
+  })
+
+  it('keeps a history of finished rounds for the stats screen; a new game starts it over', () => {
+    const app = setup()
+    withPlayers(app)
+    app.updateSettings({ scoring: true })
+    app.beginRound({ kind: 'random' })
+    revealAll(app)
+    app.dispatch({ type: 'startPlaying', now: 0 })
+    app.dispatch({ type: 'endDiscussion' })
+    const first = app.state.round!
+    app.dispatch({ type: 'voteOut', playerId: first.imposterIds[0] })
+    app.dispatch({ type: 'imposterGuess', correct: false })
+    app.finishRound()
+    app.updateSettings({ scoring: false })
+    app.beginRound({ kind: 'random' })
+    const second = app.state.round!
+    app.abandonRound() // a round left early is not a played round
+    app.beginRound({ kind: 'random' })
+    const third = app.state.round!
+    playOut(app)
+
+    expect(second.secret!.word).not.toBe(third.secret!.word)
+    expect(app.state.session!.history).toEqual([
+      { number: 1, word: first.secret!.word, imposterIds: first.imposterIds, starterId: first.startingPlayerId, outcome: 'crew' },
+      // Without scoring nobody votes, so nobody wins.
+      { number: 2, word: third.secret!.word, imposterIds: third.imposterIds, starterId: third.startingPlayerId, outcome: null },
+    ])
+
+    app.endSession()
+    app.beginRound({ kind: 'random' })
+    playOut(app)
+    expect(app.state.session!.history).toHaveLength(1)
   })
 
   it('does not repeat a random word until every word in the selected categories was used', () => {

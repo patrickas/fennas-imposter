@@ -85,6 +85,13 @@ const messages = {
   'play.leaveRound': 'Leave the round',
   'play.leave': 'Leave',
   'play.stay': 'Keep playing',
+  'play.viewStats': 'View stats',
+  'play.hideStats': 'Hide stats',
+  'stats.title': 'Rounds played',
+  'stats.imposters': { one: 'Imposter: {names}', other: 'Imposters: {names}' },
+  'stats.starter': 'Started: {name}',
+  'stats.crewWon': 'Crew won',
+  'stats.impostersWon': { one: 'Imposter won', other: 'Imposters won' },
 
   'gm.passTo': 'Pass the phone to the Game Master',
   'gm.passToPlayer': 'Pass the phone to {name}, the Game Master',

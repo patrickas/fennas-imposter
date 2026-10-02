@@ -1,5 +1,6 @@
 import {
-  LANGS, SOURCE_KINDS, type Category, type Lang, type Player, type RoundState, type Settings, type SourceKind, type Word,
+  LANGS, SOURCE_KINDS, type Category, type Lang, type Outcome, type Player, type RoundState, type Settings, type SourceKind,
+  type Word,
 } from '../engine/types'
 import { SEED_CATEGORIES } from './seed'
 import { TIMER } from './limits'
@@ -17,11 +18,22 @@ export interface SessionScore {
   points: number
 }
 
+/** One finished round, for the stats screen. `outcome` is null when the round was played without scoring. */
+export interface RoundRecord {
+  number: number
+  word: string
+  imposterIds: string[]
+  starterId: string
+  outcome: Outcome | null
+}
+
 export interface Session {
   scores: Record<string, SessionScore>
   rounds: number
   /** Who started the last finished round, so take-turns mode knows who is next. Absent before the first one. */
   lastStarterId?: string
+  /** Finished rounds, oldest first. Absent in games saved before stats existed. */
+  history?: RoundRecord[]
 }
 
 export interface Stored {

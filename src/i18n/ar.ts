@@ -92,6 +92,13 @@ export const ar: Messages = {
   'play.leaveRound': 'اطلع من الجولة',
   'play.leave': 'اطلع',
   'play.stay': 'كمّلوا اللعب',
+  'play.viewStats': 'شوفوا الإحصائيات',
+  'play.hideStats': 'خبّوا الإحصائيات',
+  'stats.title': 'الجولات اللي لعبناها',
+  'stats.imposters': { one: 'المندسّ: {names}', other: 'المندسّين: {names}' },
+  'stats.starter': 'بلّش: {name}',
+  'stats.crewWon': 'ربحت الجماعة',
+  'stats.impostersWon': { one: 'ربح المندسّ', other: 'ربحوا المندسّين' },
 
   'gm.passTo': 'مرّر التلفون للحَكَم',
   'gm.passToPlayer': 'مرّر التلفون لـ{name}، الحَكَم',

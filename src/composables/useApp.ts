@@ -231,8 +231,15 @@ export function createAppStore(deps: AppDeps) {
       for (const id of next.participantIds) {
         scores[id] = { name: playerName(id), points: (scores[id]?.points ?? 0) + (deltas[id] ?? 0) }
       }
+      const record = {
+        number: next.number, word: next.secret!.word, imposterIds: next.imposterIds,
+        starterId: next.startingPlayerId, outcome: next.outcome,
+      }
       // Only a finished round passes the turn to start; one left early is replayed by the same starter.
-      state.session = { scores, rounds: state.session.rounds + 1, lastStarterId: next.startingPlayerId }
+      state.session = {
+        scores, rounds: state.session.rounds + 1, lastStarterId: next.startingPlayerId,
+        history: [...(state.session.history ?? []), record],
+      }
     }
     state.round = next
     persist()
