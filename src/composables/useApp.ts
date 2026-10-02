@@ -1,4 +1,4 @@
-import { computed, reactive } from 'vue'
+import { computed, reactive, ref } from 'vue'
 import type { Lang, Localized, Secret, Settings, Source } from '../engine/types'
 import { cryptoRng, newId, type Rng } from '../engine/rng'
 import { chooseKind, eligibleWords, makeSecret, pickWord, roundPools } from '../engine/words'
@@ -6,6 +6,7 @@ import { MIN_PARTICIPANTS, maxImposters } from '../engine/assign'
 import { participantsFor, reduce, startRound, type RoundAction } from '../engine/round'
 import { scoreDeltas } from '../engine/scoring'
 import { browserStorage, loadStored, saveStored, type LoadStatus, type StorageLike } from '../data/storage'
+import * as lic from '../data/license'
 import * as roster from '../data/roster'
 import * as custom from '../data/content'
 import { parsePack, planImport, type ImportMode, type ImportPlan, type PackError } from '../data/transfer'
@@ -22,7 +23,7 @@ export interface AppDeps {
   devTools?: boolean
 }
 
-export type RoundBlocker = 'needPlayers' | 'noWords' | 'noGm'
+export type RoundBlocker = 'needPlayers' | 'noWords' | 'noGm' | 'locked'
 export type RosterError = roster.NameError | 'inRound'
 export type PreviewResult = { ok: true; plan: ImportPlan } | { ok: false; errors: PackError[] }
 
@@ -48,6 +49,21 @@ export function createAppStore(deps: AppDeps) {
   const devTools = deps.devTools ?? false
   // On the dev server test mode is on unless explicitly switched off; production never honours it.
   const testModeActive = computed(() => devTools && state.testMode !== false)
+
+  // The paid unlock lives apart from the main save, so a reset game never loses it (paid-unlock spec §4).
+  const license = ref(lic.loadLicense(deps.storage, deps.rng))
+  const isUnlocked = computed(() => license.value.unlocked)
+  const isOwner = computed(() => license.value.owner)
+  const secretWord = computed(() => lic.KEY_WORDS[license.value.secret])
+
+  function setLicense(next: lic.License): void {
+    license.value = next
+    lic.saveLicense(deps.storage, next)
+  }
+
+  function freeRoundsLeft(): number {
+    return lic.freeRoundsLeft(license.value, lic.localDay(deps.now()))
+  }
 
   function t(key: MessageKey, params?: Params): string {
     return translate(state.language, key, params)
@@ -168,6 +184,8 @@ export function createAppStore(deps: AppDeps) {
     ) {
       return 'noWords'
     }
+    // Checked last: unlocking would not help a round that cannot start anyway. Never on the dev server.
+    if (!devTools && !license.value.unlocked && freeRoundsLeft() === 0) return 'locked'
     return null
   }
 
@@ -207,6 +225,7 @@ export function createAppStore(deps: AppDeps) {
       },
       deps.rng,
     ).round
+    if (!license.value.unlocked) setLicense(lic.countRound(license.value, lic.localDay(deps.now())))
     persist()
   }
 
@@ -318,6 +337,23 @@ export function createAppStore(deps: AppDeps) {
     meta.noticeDismissed = true
   }
 
+  /** This phone's magic word unlocks it; the owner's password also makes it Alex's key maker. */
+  function unlock(input: string): 'unlocked' | 'owner' | 'wrong' {
+    if (lic.isOwnerPassword(input)) {
+      setLicense({ ...license.value, unlocked: true, owner: true })
+      return 'owner'
+    }
+    if (lic.findKeyIndex(input) !== lic.magicIndex(license.value.secret)) return 'wrong'
+    setLicense({ ...license.value, unlocked: true })
+    return 'unlocked'
+  }
+
+  /** Owner's phone: the magic word for a customer's secret word, or null when it is not one of the secret words. */
+  function makeKey(secretWordInput: string): string | null {
+    const index = lic.findKeyIndex(secretWordInput)
+    return index === null ? null : lic.magicWord(index)
+  }
+
   return {
     state, meta, content, t, playerName,
     setLanguage, addPlayer, renamePlayer, removePlayer, setActive, toggleCategory, updateSettings,
@@ -327,6 +363,7 @@ export function createAppStore(deps: AppDeps) {
     updateCustomWord, updateCustomCategory, deleteCustomWord, deleteCustomCategory,
     previewImport, applyImport, setLastImportUrl, dismissNotice,
     devTools, testModeActive, setTestMode,
+    isUnlocked, isOwner, secretWord, freeRoundsLeft, unlock, makeKey,
   }
 }
 

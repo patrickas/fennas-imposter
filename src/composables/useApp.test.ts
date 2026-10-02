@@ -1,11 +1,16 @@
 import { describe, expect, it } from 'bun:test'
 import { seededRng } from '../engine/rng'
 import { STORAGE_KEY, memoryStorage, type StorageLike } from '../data/storage'
+import { KEY_WORDS, LICENSE_KEY, magicWord } from '../data/license'
 import { TEST_SECRETS, testSecret } from '../data/testWord'
 import { SEED_WORDS } from '../data/seed'
 import { createAppStore, type AppStore } from './useApp'
 
-function setup(storage: StorageLike | null = memoryStorage(), seed = 1, devTools = false): AppStore {
+/** A phone that already paid, so tests about the game itself never meet the free limit. */
+function paidStorage(): StorageLike & { dump(): Record<string, string> } {
+  return memoryStorage({ [LICENSE_KEY]: JSON.stringify({ secret: 0, unlocked: true, owner: false, day: '', used: 0 }) })
+}
+function setup(storage: StorageLike | null = paidStorage(), seed = 1, devTools = false): AppStore {
   let n = 0
   return createAppStore({ storage, rng: seededRng(seed), now: () => 1_000, newId: () => `id${++n}`, devTools })
 }
@@ -27,7 +32,7 @@ function playOut(app: AppStore): void {
 
 describe('persistence', () => {
   it('saves after every action so a killed tab loses nothing', () => {
-    const storage = memoryStorage()
+    const storage = paidStorage()
     setup(storage).addPlayer('Rami')
     expect(JSON.parse(storage.dump()[STORAGE_KEY]).players[0].name).toBe('Rami')
   })
@@ -85,7 +90,7 @@ describe('rounds', () => {
   })
 
   it('applies scores exactly once, even if the app reloads on the result screen', () => {
-    const storage = memoryStorage()
+    const storage = paidStorage()
     const app = setup(storage)
     withPlayers(app)
     app.updateSettings({ scoring: true })
@@ -296,7 +301,7 @@ describe('rounds', () => {
   })
 
   it('keeps the turn when a round is left early, remembers it after a reload, and starts over for a new game', () => {
-    const storage = memoryStorage()
+    const storage = paidStorage()
     const app = setup(storage)
     const ids = withPlayers(app)
     app.beginRound({ kind: 'random' })
@@ -338,7 +343,7 @@ describe('rounds', () => {
 
   // Where the word comes from is a setting now, not a per-round pick that fell back to "random" every round.
   it('remembers where the word comes from and who the Game Master is, even after a reload', () => {
-    const storage = memoryStorage()
+    const storage = paidStorage()
     const app = setup(storage)
     const ids = withPlayers(app)
     expect(app.roundSource()).toEqual({ kind: 'random' })
@@ -401,14 +406,14 @@ describe('import', () => {
 
 describe('test mode (dev server only)', () => {
   it('is on by default on the dev server, so a fresh dev session deals the placeholder word straight away', () => {
-    const app = setup(memoryStorage(), 1, true)
+    const app = setup(paidStorage(), 1, true)
     withPlayers(app)
     app.beginRound({ kind: 'random' })
     expect(app.state.round!.secret).toEqual(testSecret('en', 'easy'))
   })
 
   it('can be switched off on the dev server to play real words', () => {
-    const app = setup(memoryStorage(), 1, true)
+    const app = setup(paidStorage(), 1, true)
     withPlayers(app)
     app.setTestMode(false)
     app.beginRound({ kind: 'random' })
@@ -416,7 +421,7 @@ describe('test mode (dev server only)', () => {
   })
 
   it('always deals the same fixed word, without using up the word history, so the UI can be tried again and again', () => {
-    const app = setup(memoryStorage(), 1, true)
+    const app = setup(paidStorage(), 1, true)
     withPlayers(app)
     app.setTestMode(true)
     for (const id of [...app.state.selectedCategoryIds]) app.toggleCategory(id) // works even with nothing selected
@@ -430,7 +435,7 @@ describe('test mode (dev server only)', () => {
   })
 
   it('uses the Arabic test word in Arabic rounds', () => {
-    const app = setup(memoryStorage(), 1, true)
+    const app = setup(paidStorage(), 1, true)
     withPlayers(app)
     app.setTestMode(true)
     app.setLanguage('ar')
@@ -439,7 +444,7 @@ describe('test mode (dev server only)', () => {
   })
 
   it('deals both kinds of hard round on Hard, so the badge and the explanation can be tried', () => {
-    const app = setup(memoryStorage(), 1, true)
+    const app = setup(paidStorage(), 1, true)
     withPlayers(app)
     app.updateSettings({ difficulty: 'hard' })
     const seen = new Set<string>()
@@ -455,10 +460,130 @@ describe('test mode (dev server only)', () => {
   })
 
   it('is ignored outside the dev server, so real players always get real words', () => {
-    const app = setup(memoryStorage(), 1, false)
+    const app = setup(paidStorage(), 1, false)
     withPlayers(app)
     app.setTestMode(true)
     app.beginRound({ kind: 'random' })
     expect(app.state.round!.secret!.wordId).not.toBe(TEST_SECRETS.en.wordId)
+  })
+})
+
+describe('free version (paid-unlock spec)', () => {
+  const EVENING = new Date(2026, 9, 3, 20, 0).getTime()
+  const NEXT_MORNING = new Date(2026, 9, 4, 9, 0).getTime()
+
+  function freeApp(storage: StorageLike | null = memoryStorage(), clock = { now: EVENING }, devTools = false): AppStore {
+    let n = 0
+    return createAppStore({ storage, rng: seededRng(1), now: () => clock.now, newId: () => `id${++n}`, devTools })
+  }
+  function storedLicense(storage: { dump(): Record<string, string> }) {
+    return JSON.parse(storage.dump()[LICENSE_KEY])
+  }
+  function wrongMagicWord(app: AppStore): string {
+    const mine = magicWord(KEY_WORDS.indexOf(app.secretWord.value))
+    return KEY_WORDS.find((w) => w !== mine)!
+  }
+
+  it('plays 2 rounds a day, counting a round when it is dealt, then blocks until the next day', () => {
+    const clock = { now: EVENING }
+    const app = freeApp(memoryStorage(), clock)
+    withPlayers(app)
+    expect(app.freeRoundsLeft()).toBe(2)
+    app.beginRound({ kind: 'random' })
+    playOut(app)
+    app.beginRound({ kind: 'random' })
+    app.abandonRound() // the cards were dealt, so it counts
+    expect(app.freeRoundsLeft()).toBe(0)
+    expect(app.roundBlocker({ kind: 'random' })).toBe('locked')
+    expect(app.roundBlocker({ kind: 'outsideGm' })).toBe('locked')
+    expect(() => app.beginRound({ kind: 'random' })).toThrow(/locked/)
+    clock.now = NEXT_MORNING
+    expect(app.freeRoundsLeft()).toBe(2)
+    expect(app.roundBlocker({ kind: 'random' })).toBeNull()
+  })
+
+  it('remembers the count after a reload, and a reload mid-round neither counts it again nor gives it back', () => {
+    const storage = memoryStorage()
+    const app = freeApp(storage)
+    withPlayers(app)
+    app.beginRound({ kind: 'random' })
+    const reloaded = freeApp(storage)
+    expect(reloaded.state.round).not.toBeNull()
+    expect(reloaded.freeRoundsLeft()).toBe(1)
+    playOut(reloaded)
+    reloaded.beginRound({ kind: 'random' })
+    playOut(reloaded)
+    expect(freeApp(storage).roundBlocker({ kind: 'random' })).toBe('locked')
+  })
+
+  it('shows the other reasons first, since unlocking would not help a round that cannot start anyway', () => {
+    const spent = JSON.stringify({ secret: 0, unlocked: false, owner: false, day: '2026-10-03', used: 2 })
+    const app = freeApp(memoryStorage({ [LICENSE_KEY]: spent }))
+    withPlayers(app, ['Rami', 'Lina'])
+    expect(app.roundBlocker({ kind: 'random' })).toBe('needPlayers')
+  })
+
+  it('never blocks or counts on an unlocked phone', () => {
+    const storage = paidStorage()
+    const app = freeApp(storage)
+    withPlayers(app)
+    for (let i = 0; i < 4; i++) {
+      expect(app.roundBlocker({ kind: 'random' })).toBeNull()
+      app.beginRound({ kind: 'random' })
+      playOut(app)
+    }
+    expect(storedLicense(storage)).toMatchObject({ day: '', used: 0 })
+  })
+
+  it('never blocks on the dev server, so the UI can be tried again and again', () => {
+    const app = freeApp(memoryStorage(), { now: EVENING }, true)
+    withPlayers(app)
+    for (let i = 0; i < 3; i++) {
+      expect(app.roundBlocker({ kind: 'random' })).toBeNull()
+      app.beginRound({ kind: 'random' })
+      playOut(app)
+    }
+  })
+
+  it('keeps the unlock when the main save is damaged and reset', () => {
+    const paid = JSON.stringify({ secret: 7, unlocked: true, owner: false, day: '', used: 0 })
+    const app = freeApp(memoryStorage({ [STORAGE_KEY]: '{damaged', [LICENSE_KEY]: paid }))
+    expect(app.meta.status).toBe('corrupt')
+    expect(app.isUnlocked.value).toBe(true)
+    expect(app.secretWord.value).toBe(KEY_WORDS[7])
+  })
+
+  it("unlocks only with this phone's magic word, typed any way, and stays unlocked after a reload", () => {
+    const storage = memoryStorage()
+    const app = freeApp(storage)
+    expect(app.unlock(app.secretWord.value)).toBe('wrong') // the word on the customer's own screen is not the key
+    expect(app.unlock(wrongMagicWord(app))).toBe('wrong') // a key bought for a different phone
+    expect(app.unlock('')).toBe('wrong')
+    expect(app.isUnlocked.value).toBe(false)
+    const magic = magicWord(KEY_WORDS.indexOf(app.secretWord.value))
+    expect(app.unlock(`  ${magic.toUpperCase()} `)).toBe('unlocked')
+    expect(app.isUnlocked.value).toBe(true)
+    expect(app.isOwner.value).toBe(false)
+    const reloaded = freeApp(storage)
+    expect(reloaded.isUnlocked.value).toBe(true)
+    expect(reloaded.secretWord.value).toBe(app.secretWord.value)
+  })
+
+  it("the owner password makes the phone Alex's key maker", () => {
+    const storage = memoryStorage()
+    const app = freeApp(storage)
+    expect(app.unlock('Wrong Horse Battery Staple')).toBe('owner')
+    expect(app.isUnlocked.value).toBe(true)
+    expect(app.isOwner.value).toBe(true)
+    expect(freeApp(storage).isOwner.value).toBe(true)
+    expect(app.makeKey(KEY_WORDS[42].toLowerCase())).toBe(magicWord(42))
+    expect(app.makeKey('not one of them')).toBeNull()
+  })
+
+  it('still shows a secret word and unlocks for the session when storage is blocked (private tab)', () => {
+    const app = freeApp(null)
+    expect(KEY_WORDS).toContain(app.secretWord.value)
+    expect(app.unlock(magicWord(KEY_WORDS.indexOf(app.secretWord.value)))).toBe('unlocked')
+    expect(app.isUnlocked.value).toBe(true)
   })
 })
