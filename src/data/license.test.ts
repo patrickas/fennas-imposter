@@ -15,11 +15,38 @@ describe('key words', () => {
     expect(new Set(KEY_WORDS.map(keyText)).size).toBe(256)
   })
 
-  // Keys sold on one version only match phones on the same version. Changing the first 256 English
-  // built-in easy words changes every key, so update these two lines only on purpose.
+  // Keys sold on one version only match phones on the same version. Renaming, adding, removing or
+  // reordering any of the first 256 English built-in easy words changes keys already sold, so the
+  // whole list is spelled out here and changes only on purpose.
   it('are the first 256 English built-in easy words, in shipping order', () => {
-    expect(KEY_WORDS[0]).toBe('Falafel')
-    expect(KEY_WORDS[255]).toBe('Airport')
+    expect(KEY_WORDS).toEqual([
+      'Falafel', 'Hummus', 'Pizza', 'Burger', 'Shawarma', 'Ice cream', 'Chocolate', 'Coffee', 'Tea', 'Lemonade',
+      'Watermelon', 'Banana', 'Tomato', 'Cucumber', 'Bread', 'Rice', 'Eggs', 'Cheese', 'Soup', 'Popcorn', 'Cake',
+      'Honey', 'Orange juice', 'French fries', 'Grapes', 'Spaghetti', 'Lasagne', 'Sushi', 'Noodles', 'Sandwich',
+      'Pancakes', 'Waffles', 'Baguette', 'Croissant', 'Doughnut', 'Biscuits', 'Crisps', 'Lollipop', 'Chewing gum',
+      'Candy floss', 'Jelly', 'Marshmallow', 'Yoghurt', 'Milk', 'Milkshake', 'Butter', 'Jam', 'Salt', 'Sugar',
+      'Vinegar', 'Cinnamon', 'Black pepper', 'Ketchup', 'Mayonnaise', 'Steak', 'Fried chicken', 'Tacos', 'Curry',
+      'Grilled fish', 'Cereal', 'Cappuccino', 'Fizzy drink', 'Meat', 'Cat', 'Dog', 'Lion', 'Elephant', 'Monkey',
+      'Horse', 'Donkey', 'Camel', 'Chicken', 'Cow', 'Sheep', 'Fish', 'Shark', 'Snake', 'Frog', 'Butterfly', 'Bee',
+      'Owl', 'Penguin', 'Giraffe', 'Rabbit', 'Mouse', 'Turtle', 'Bear', 'Parrot', 'Tiger', 'Zebra', 'Wolf', 'Fox',
+      'Crocodile', 'Hippo', 'Rhino', 'Kangaroo', 'Panda', 'Gazelle', 'Goat', 'Duck', 'Dove', 'Eagle', 'Crow',
+      'Sparrow', 'Peacock', 'Flamingo', 'Ostrich', 'Rooster', 'Bat', 'Spider', 'Ant', 'Mosquito', 'Fly', 'Snail',
+      'Worm', 'Scorpion', 'Dolphin', 'Whale', 'Octopus', 'Crab', 'Jellyfish', 'Squirrel', 'Hedgehog', 'Lizard',
+      'Chameleon', 'Cockroach', 'Sofa', 'Bed', 'Fridge', 'Oven', 'Washing machine', 'TV', 'Mirror', 'Pillow',
+      'Blanket', 'Lamp', 'Door', 'Window', 'Stairs', 'Carpet', 'Clock', 'Toothbrush', 'Towel', 'Broom', 'Chair',
+      'Fan', 'Kettle', 'Plate', 'Spoon', 'Charger', 'Balcony', 'Kitchen', 'Bathroom', 'Bedroom', 'Living room',
+      'Table', 'Wardrobe', 'Curtains', 'Fork', 'Knife', 'Cup', 'Pot', 'Frying pan', 'Stove', 'Microwave',
+      'Dishwasher', 'Sink', 'Tap', 'Bucket', 'Mop', 'Vacuum cleaner', 'Iron', 'Soap', 'Shampoo', 'Bathtub', 'Shower',
+      'Key', 'Hairdryer', 'Shelf', 'Rubbish bin', 'Air conditioner', 'Heater', 'Tray', 'Teapot', 'Drawer', 'Roof',
+      'Alarm clock', 'Vase', 'Doormat', 'Doctor', 'Teacher', 'Chef', 'Police officer', 'Firefighter', 'Pilot',
+      'Farmer', 'Barber', 'Dentist', 'Mechanic', 'Baker', 'Taxi driver', 'Photographer', 'Singer', 'Actor', 'Nurse',
+      'Lawyer', 'Engineer', 'Plumber', 'Electrician', 'Carpenter', 'Tailor', 'Astronaut', 'Waiter', 'Postman',
+      'Butcher', 'Fisherman', 'Hairdresser', 'Pharmacist', 'House painter', 'Artist', 'Judge', 'Security guard',
+      'Vet', 'Scientist', 'Builder', 'Journalist', 'TV presenter', 'Cashier', 'Greengrocer', 'Florist', 'Jeweller',
+      'Coach', 'Referee', 'Footballer', 'Clown', 'Writer', 'Gardener', 'Shepherd', 'Beekeeper', 'Lifeguard',
+      'Flight attendant', 'Captain', 'Delivery driver', 'Programmer', 'Librarian', 'Detective', 'Tour guide',
+      'Barista', 'Film director', 'Comedian', 'Blacksmith', 'Inventor', 'Beach', 'Hospital', 'School', 'Airport',
+    ])
   })
 })
 
