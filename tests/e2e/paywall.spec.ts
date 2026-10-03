@@ -1,5 +1,5 @@
 import { expect, test, type Page } from '@playwright/test'
-import { KEY_WORDS, magicWord } from '../../src/data/license'
+import { KEY_WORDS, localDay, magicWord } from '../../src/data/license'
 import { addPlayers, dealCards, startGame, startPlaying } from './helpers'
 
 // A free phone plays 2 rounds a day; after that, between rounds, the only way on is to unlock.
@@ -50,4 +50,20 @@ test('Home counts down the free rounds as they are dealt', async ({ page }) => {
   await page.getByTestId('leave-round').click()
   await page.getByTestId('dialog-confirm').click()
   await expect(page.getByTestId('free-rounds')).toHaveText('1 free round left today')
+})
+
+test("a phone left on the locked screen overnight offers the new day's rounds when it is picked up again", async ({ page }) => {
+  const evening = new Date(2026, 9, 3, 20, 0)
+  await page.clock.setFixedTime(evening)
+  await page.goto('/')
+  const spent = { secret: 0, unlocked: false, owner: false, day: localDay(evening.getTime()), used: 2 }
+  await page.evaluate((v) => localStorage.setItem('fennas-imposter:license', v), JSON.stringify(spent))
+  await page.reload()
+  await addPlayers(page, PLAYERS)
+  await startGame(page)
+  await expect(page.getByTestId('go-unlock')).toBeVisible()
+
+  await page.clock.setFixedTime(new Date(2026, 9, 4, 9, 0))
+  await page.evaluate(() => document.dispatchEvent(new Event('visibilitychange'))) // the phone is picked up again
+  await expect(page.getByTestId('start-round')).toBeEnabled()
 })

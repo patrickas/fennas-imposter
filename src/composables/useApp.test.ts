@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'bun:test'
+import { computed } from 'vue'
 import { seededRng } from '../engine/rng'
 import { STORAGE_KEY, memoryStorage, type StorageLike } from '../data/storage'
 import { KEY_WORDS, LICENSE_KEY, magicWord } from '../data/license'
@@ -500,6 +501,18 @@ describe('free version (paid-unlock spec)', () => {
     clock.now = NEXT_MORNING
     expect(app.freeRoundsLeft()).toBe(2)
     expect(app.roundBlocker({ kind: 'random' })).toBeNull()
+  })
+
+  it("a screen left open overnight offers the new day's rounds once the app is back in front", () => {
+    const clock = { now: EVENING }
+    const spent = JSON.stringify({ secret: 0, unlocked: false, owner: false, day: '2026-10-03', used: 2 })
+    const app = freeApp(memoryStorage({ [LICENSE_KEY]: spent }), clock)
+    withPlayers(app)
+    const shown = computed(() => app.roundBlocker({ kind: 'random' })) // what Between rounds keeps on screen
+    expect(shown.value).toBe('locked')
+    clock.now = NEXT_MORNING
+    app.recheckDay() // what the app does when it comes back to the front
+    expect(shown.value).toBeNull()
   })
 
   it('remembers the count after a reload, and a reload mid-round neither counts it again nor gives it back', () => {

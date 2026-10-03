@@ -61,7 +61,16 @@ export function createAppStore(deps: AppDeps) {
     lic.saveLicense(deps.storage, next)
   }
 
+  // Bumped when the app comes back to the front (see useApp), so screens left open re-check the date:
+  // a phone left overnight on "No free rounds left today" must offer the new day's rounds.
+  const dayChecks = ref(0)
+
+  function recheckDay(): void {
+    dayChecks.value++
+  }
+
   function freeRoundsLeft(): number {
+    void dayChecks.value // a reactive read, so cached screens re-run after recheckDay()
     return lic.freeRoundsLeft(license.value, lic.localDay(deps.now()))
   }
 
@@ -363,7 +372,7 @@ export function createAppStore(deps: AppDeps) {
     updateCustomWord, updateCustomCategory, deleteCustomWord, deleteCustomCategory,
     previewImport, applyImport, setLastImportUrl, dismissNotice,
     devTools, testModeActive, setTestMode,
-    isUnlocked, isOwner, secretWord, freeRoundsLeft, unlock, makeKey,
+    isUnlocked, isOwner, secretWord, freeRoundsLeft, recheckDay, unlock, makeKey,
   }
 }
 
@@ -372,12 +381,19 @@ export type AppStore = ReturnType<typeof createAppStore>
 let instance: AppStore | null = null
 
 export function useApp(): AppStore {
-  instance ??= createAppStore({
-    storage: browserStorage(),
-    rng: cryptoRng,
-    now: () => Date.now(),
-    newId,
-    devTools: import.meta.env.DEV,
-  })
+  if (!instance) {
+    const store = createAppStore({
+      storage: browserStorage(),
+      rng: cryptoRng,
+      now: () => Date.now(),
+      newId,
+      devTools: import.meta.env.DEV,
+    })
+    // Phones keep the app open in the background for days: re-check the date whenever it comes back.
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible') store.recheckDay()
+    })
+    instance = store
+  }
   return instance
 }
