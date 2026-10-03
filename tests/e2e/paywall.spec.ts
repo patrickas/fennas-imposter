@@ -1,9 +1,10 @@
 import { expect, test, type Page } from '@playwright/test'
 import { KEY_WORDS, localDay, magicWord } from '../../src/data/license'
 import { addPlayers, dealCards, startGame, startPlaying } from './helpers'
+import { phoneState } from './phone-state'
 
 // A free phone plays 2 rounds a day; after that, between rounds, the only way on is to unlock.
-test.use({ storageState: { cookies: [], origins: [] } }) // a phone that has not paid
+test.use({ storageState: phoneState({ paid: false }) }) // a phone that has not paid
 
 const PLAYERS = ['Rami', 'Lina', 'Omar']
 

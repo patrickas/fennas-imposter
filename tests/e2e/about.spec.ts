@@ -1,9 +1,10 @@
 import { expect, test } from '@playwright/test'
 import { KEY_WORDS, magicWord } from '../../src/data/license'
+import { phoneState } from './phone-state'
 
 // Alex sells the game face to face: About shows the phone's secret word, takes the magic word he
 // gives for it, and on his own phone (after the owner password) works out magic words for others.
-test.use({ storageState: { cookies: [], origins: [] } }) // a phone that has not paid
+test.use({ storageState: phoneState({ paid: false }) }) // a phone that has not paid
 
 test('About shows the secret word, refuses a wrong word, and the right magic word unlocks the phone', async ({ page }) => {
   await page.goto('/')

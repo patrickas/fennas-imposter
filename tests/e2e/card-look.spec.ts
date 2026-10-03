@@ -1,6 +1,9 @@
 import { expect, test, type Page } from '@playwright/test'
 import { addPlayers, openSetupPanel, startGame } from './helpers'
 
+// The cards' motion is compared, so it has to be running.
+test.use({ reducedMotion: 'no-preference' })
+
 // Bystanders see the screen's colour, motion and the card's shape from across the room, even when
 // they can't read the text. If crew and imposter cards look different, the role leaks without anyone
 // peeking. So both cards share the same screen, card, motion and line layout (two lines, or three with the category); only the text differs.

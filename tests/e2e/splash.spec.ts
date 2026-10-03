@@ -1,5 +1,8 @@
 import { expect, test, type Page } from '@playwright/test'
 
+// The splash animation itself is under test (the reduced-motion case emulates it explicitly).
+test.use({ reducedMotion: 'no-preference' })
+
 // Every load — launching the installed app or refreshing the page — opens on the game icon: still
 // for 500 ms, then one full clockwise turn in 1 s, and only then the game.
 

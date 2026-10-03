@@ -14,10 +14,22 @@ withDefaults(defineProps<{ tone?: 'sun' | 'bubblegum' | 'mint'; align?: 'center'
  * animation-based, so it also holds with reduced motion.
  */
 const ARM_DELAY_MS = 500
+
+/** End-to-end tests tap once per screen, so they switch the wait off (tests/e2e/phone-state.ts). */
+function armDelayMs(): number {
+  try {
+    const override = window.localStorage.getItem('fennas-imposter:armDelayMs')
+    if (override !== null) return Number(override)
+  } catch {
+    // Storage blocked: keep the guard.
+  }
+  return ARM_DELAY_MS
+}
+
 const armed = ref(false)
 let armTimer: ReturnType<typeof setTimeout> | undefined
 onMounted(() => {
-  armTimer = setTimeout(() => (armed.value = true), ARM_DELAY_MS)
+  armTimer = setTimeout(() => (armed.value = true), armDelayMs())
 })
 onUnmounted(() => clearTimeout(armTimer))
 </script>

@@ -1,4 +1,5 @@
 import { defineConfig, devices } from '@playwright/test'
+import { phoneState } from './tests/e2e/phone-state'
 
 export default defineConfig({
   testDir: 'tests/e2e',
@@ -9,18 +10,10 @@ export default defineConfig({
   use: {
     baseURL: 'http://localhost:4173',
     trace: 'retain-on-failure',
-    // Every test starts on a phone that already paid, so the free limit (2 rounds a day) never gets in
-    // the way. paywall.spec.ts opts out to test the limit itself.
-    storageState: {
-      cookies: [],
-      origins: [{
-        origin: 'http://localhost:4173',
-        localStorage: [{
-          name: 'fennas-imposter:license',
-          value: JSON.stringify({ secret: 0, unlocked: true, owner: false, day: '', used: 0 }),
-        }],
-      }],
-    },
+    // A paid phone with the tap guard off (see phone-state.ts); specs that test those opt out.
+    storageState: phoneState({ paid: true }),
+    // Skips the splash turn and screen animations. Specs that check motion itself opt out.
+    reducedMotion: 'reduce',
   },
   projects: [{ name: 'phone', use: { ...devices['Pixel 7'] } }],
   webServer: {

@@ -50,6 +50,7 @@ test('maximum-length words and names wrap instead of overflowing a small phone',
   // Screens clip their own overflow, so a page-level scrollWidth check could never fail. Instead,
   // check that no element inside the screen pokes outside the viewport or overflows its own box.
   await page.setViewportSize({ width: 360, height: 740 })
+  await page.emulateMedia({ reducedMotion: 'no-preference' }) // wobbling cards must stay on screen too
   const longName = 'W'.repeat(20) // widest glyph, at the 20-character limit
   await page.goto('/')
   await addPlayers(page, [longName, 'Lina', 'Omar', 'Sara'], { scoring: true })

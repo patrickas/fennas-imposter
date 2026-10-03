@@ -1,9 +1,12 @@
 import { expect, test, type Locator, type Page } from '@playwright/test'
 import { addPlayers, dealCards, startGame, startPlaying } from './helpers'
+import { phoneState } from './phone-state'
 
 // A tap that lands twice — a double tap, or an impatient re-tap — must never fall through to the
 // button that appears in the same spot on the next screen. Falling through shows a card to the
 // wrong player, destroys a card before it is read, or skips (and scores) part of the round.
+
+test.use({ storageState: phoneState({ paid: true, realTapGuard: true }) }) // the guard is what these tests test
 
 const PLAYERS = ['Rami', 'Lina', 'Omar']
 
