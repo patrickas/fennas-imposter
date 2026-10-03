@@ -8,6 +8,8 @@ test.use({ storageState: { cookies: [], origins: [] } }) // a phone that has not
 test('About shows the secret word, refuses a wrong word, and the right magic word unlocks the phone', async ({ page }) => {
   await page.goto('/')
   await page.getByTestId('nav-about').click()
+  // Phone keyboards must not "correct" the typed word (iOS would turn British spellings like Yoghurt into Yogurt).
+  await expect(page.getByTestId('magic-input')).toHaveAttribute('autocorrect', 'off')
   const secret = (await page.getByTestId('my-secret-word').innerText()).trim()
   const index = KEY_WORDS.indexOf(secret)
   expect(index).toBeGreaterThanOrEqual(0)
@@ -36,6 +38,7 @@ test("the owner password turns a phone into Alex's key maker", async ({ page }) 
   await page.getByTestId('magic-input').fill('Wrong Horse Battery Staple')
   await page.getByTestId('unlock').click()
   await expect(page.getByTestId('unlocked')).toBeVisible()
+  await expect(page.getByTestId('key-input')).toHaveAttribute('autocorrect', 'off')
   await page.getByTestId('key-input').fill(KEY_WORDS[42].toLowerCase())
   await page.getByTestId('make-key').click()
   await expect(page.getByTestId('key-result')).toHaveText(magicWord(42))
