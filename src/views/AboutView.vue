@@ -25,10 +25,10 @@ function makeKey(): void {
   keyResult.value = { word: app.makeKey(theirWord.value) }
 }
 
-// English on purpose: it lands in Alex's inbox, and the secret word is English anyway.
+// English on purpose: it lands in Alex's inbox, and the username is English anyway.
 const helpLink = computed(() => {
-  const subject = encodeURIComponent('Fennass key')
-  const body = encodeURIComponent(`My secret word: ${app.secretWord.value}`)
+  const subject = encodeURIComponent('Fennass password')
+  const body = encodeURIComponent(`My username: ${app.secretWord.value}`)
   return `mailto:${HELP_EMAIL}?subject=${subject}&body=${body}`
 })
 </script>

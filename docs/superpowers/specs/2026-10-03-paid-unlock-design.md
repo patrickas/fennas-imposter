@@ -113,20 +113,21 @@ Every round starts at the *Start round* button here, so this is where the limit 
 
 - A **Back** button to Home, like the other screens.
 - **Alex's face:** the app icon, turning slowly (a new `spin` keyframe). It stops under `prefers-reduced-motion`, like the other animations.
+- **On screen, the secret word is the "username" and the magic word is the "password"** (2026-10-31). People know those words from every login, and "secret word" already means the word of a round. The code and test IDs keep the old names.
 - **Free phone:**
-  - "Free version: 2 rounds a day. Ask Alex for the magic word to unlock the game."
-  - "Your secret word:" followed by the word, big (`secret-word`).
-  - A text box (`magic-input`) and an **Unlock** button (`unlock`). Enter submits too.
+  - "Free version: 2 rounds a day. Read Alex your username to get the password that unlocks the game."
+  - "Your username:" followed by the word, big (`secret-word`).
+  - A text box "Password" (`magic-input`) and an **Unlock** button (`unlock`). Enter submits too.
   - **Wrong word:** the box shakes, and "That's not it" appears (`unlock-wrong`).
   - **Right word, or the owner password:** "Unlocked! Thanks for supporting Alex." appears (`unlocked`), and the box goes away.
-  - **Help link** (`help-email`): "Trouble getting a key? **Email us**", where "Email us" is the link. The address itself is not shown, to keep the line short on a phone.
-    - It is a `mailto:` link with the subject "Fennass key" and a body that already says "My secret word: …", since Alex needs that word to make a key.
+  - **Help link** (`help-email`): "Trouble getting a password? **Email us**", where "Email us" is the link. The address itself is not shown, to keep the line short on a phone.
+    - It is a `mailto:` link with the subject "Fennass password" and a body that already says "My username: …", since Alex needs that word to make a key.
     - It shows on free phones only.
 - **Unlocked phone:** only the thanks message. The secret word is hidden.
-- **Owner's phone:** the thanks message, plus a **Make a key** section:
-  - a text box "Their secret word" (`key-input`)
-  - a **Make key** button (`make-key`)
-  - the result (`key-result`): the magic word, big, or the "not one of the secret words" message.
+- **Owner's phone:** the thanks message, plus a **Make a password** section:
+  - a text box "Their username" (`key-input`)
+  - a **Make password** button (`make-key`)
+  - the result (`key-result`): the magic word, big, or the "not one of the usernames" message.
 - **Text boxes** have `autocapitalize="off"`, `autocomplete="off"` and `spellcheck="false"`.
 - All new text has English and Arabic strings. Secret and magic words are always English.
 

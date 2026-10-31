@@ -4,11 +4,15 @@ import { phoneState } from './phone-state'
 
 // Alex sells the game face to face: About shows the phone's secret word, takes the magic word he
 // gives for it, and on his own phone (after the owner password) works out magic words for others.
+// On screen they are the "username" and the "password": people know those words from every login, and
+// "secret word" already means the word of a round.
 test.use({ storageState: phoneState({ paid: false }) }) // a phone that has not paid
 
 test('About shows the secret word, refuses a wrong word, and the right magic word unlocks the phone', async ({ page }) => {
   await page.goto('/')
   await page.getByTestId('nav-about').click()
+  await expect(page.getByText('Your username:')).toBeVisible()
+  await expect(page.getByLabel('Password')).toHaveAttribute('data-testid', 'magic-input')
   // Phone keyboards must not "correct" the typed word (iOS would turn British spellings like Yoghurt into Yogurt).
   await expect(page.getByTestId('magic-input')).toHaveAttribute('autocorrect', 'off')
   const secret = (await page.getByTestId('my-secret-word').innerText()).trim()
@@ -17,7 +21,7 @@ test('About shows the secret word, refuses a wrong word, and the right magic wor
 
   const help = await page.getByTestId('help-email').getAttribute('href')
   expect(help).toMatch(/^mailto:fennas\.game@abisalloum\.com\?/)
-  expect(decodeURIComponent(help!)).toContain(`My secret word: ${secret}`)
+  expect(decodeURIComponent(help!)).toContain(`My username: ${secret}`)
   await expect(page.getByTestId('help-email')).toHaveText('Email us')
 
   await page.getByTestId('magic-input').fill(secret) // the word on the customer's own screen is not the key
@@ -45,7 +49,7 @@ test("the owner password turns a phone into Alex's key maker", async ({ page }) 
   await expect(page.getByTestId('key-result')).toHaveText(magicWord(42))
   await page.getByTestId('key-input').fill('not a secret word')
   await page.getByTestId('make-key').click()
-  await expect(page.getByTestId('key-result')).toHaveText("That's not one of the secret words")
+  await expect(page.getByTestId('key-result')).toHaveText("That's not one of the usernames")
   await page.reload()
   await expect(page.getByTestId('owner-tools')).toBeVisible()
 })
